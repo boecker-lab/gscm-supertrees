@@ -1,5 +1,6 @@
 package greedySCM;
 
+
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
