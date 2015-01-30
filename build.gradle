@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.unijena.bioinf:phylo_Tree:0.9.9-SNAPSHOT'
+//    compile 'de.unijena.bioinf:phyloTree-lib:0.9.9-SNAPSHOT'
     compile 'de.unijena.bioinf:consensus-lib:0.9.3-SNAPSHOT'
     testCompile 'junit:junit:4.11'
 
