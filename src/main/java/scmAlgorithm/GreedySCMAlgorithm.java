@@ -2,13 +2,11 @@ package scmAlgorithm;
 
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
-import java.util.*;
+import java.util.Arrays;
 
 /**
  * Created by fleisch on 10.02.15.
@@ -27,6 +25,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
             superCandidate = mergeTrees(pair);
             selector.addTree(superCandidate);
         }
+        TreeUtilsBasic.cleanTree(superCandidate); //remove inner labels and branch lengths //todo create useful branch length?!
         superTrees = Arrays.asList(superCandidate);
 
     }

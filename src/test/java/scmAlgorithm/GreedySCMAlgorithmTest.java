@@ -24,7 +24,7 @@ public class GreedySCMAlgorithmTest {
     public final static String newickInput1000 = "sm.5.sourceTrees_OptSCM-Rooting.tre";
     public final static String newickSCM1000 = "sm.5.sourceTrees.scmTree.tre_OptRoot.tre";
 
-    @Test
+    /*@Test
     public void test(){
         System.out.printf("just for vm starting");
 //        Tree[] inputTrees = {Newick.getTreeFromString("((A,B),((C,D),(F,E)))"),Newick.getTreeFromString("((A,B),((C,D),(F,E)))")};
@@ -37,7 +37,7 @@ public class GreedySCMAlgorithmTest {
         System.out.println();
         System.out.println();
 
-    }
+    }*/
 
     @Test
     public void smidgenSample100(){
