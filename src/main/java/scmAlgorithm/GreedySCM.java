@@ -1,4 +1,4 @@
-package greedySCM;
+package scmAlgorithm;
 
 
 import epos.algo.consensus.nconsensus.NConsensus;
@@ -83,9 +83,9 @@ public class GreedySCM {
                     else {
                         scm = SCM(iter, cur);
                         //TODO look up the definition of resolution
-                        //a = scm.vertexCount();
-                        //b = scm.getLeaves().length-3;
-                        //c = scm.getLeaves().length;
+                        //a = scmAlgorithm.vertexCount();
+                        //b = scmAlgorithm.getLeaves().length-3;
+                        //c = scmAlgorithm.getLeaves().length;
                         resolution = scm.vertexCount() / (scm.getLeaves().length-3);
                         //resolution = a / b;
                         //TODO is this possible or do I have to take |L(Ti)UL(Tj)|?
