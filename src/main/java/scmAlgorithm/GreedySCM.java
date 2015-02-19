@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +26,51 @@ public class GreedySCM {
 
     protected LinkedHashMap<String, List<String>> TreeCut1 = new LinkedHashMap<String, List<String>>();
     protected LinkedHashMap<String, List<String>> TreeCut2 = new LinkedHashMap<String, List<String>>();
+
+    public boolean equalLists(List<String> one, List<String> two){
+        if (one == null && two == null){
+            return true;
+        }
+        if((one == null && two != null)
+                || one != null && two == null
+                || one.size() != two.size()){
+            return false;
+        }
+        List copyone = new ArrayList<String>(one);
+        List copytwo = new ArrayList<String>(two);
+        Collections.sort(copyone);
+        Collections.sort(copytwo);
+        return copyone.equals(copytwo);
+    }
+
+    public List<String> getLabelsFromTreeNodes(List<TreeNode> input){
+        List<String> output = new ArrayList<String>();
+        String def = "";
+        for (TreeNode nod : input){
+            output.add(def.concat(nod.getLabel()));
+        }
+        return output;
+    }
+
+    public boolean TreeEquals (Tree one, Tree two){
+        if (one==two) return true;
+        else {
+            if (one.vertexCount()!=two.vertexCount()) return false;
+            if (!equalLists(getLabelsFromTreeNodes(Arrays.asList(one.getLeaves())), getLabelsFromTreeNodes(Arrays.asList(two.getLeaves())))) return false;
+            //if (one.getRoot().getLabel() != two.getRoot().getLabel()) return false;
+            //TODO is this a valid equals method? What is missing to make it complete? How to change the comparison of vertices for correctness?
+            boolean vertexequals = false;
+            for (TreeNode m : one.vertices()){
+                for (TreeNode n : two.vertices()){
+                    if (m.equalsNode(n)) vertexequals = true;
+                }
+                if (!vertexequals) return false;
+                vertexequals = false;
+            }
+            if (!one.getRoot().equalsNode(two.getRoot())) return false;
+        }
+        return true;
+    }
 
     public Tree getPaperConsensus (List<Tree> input) {
         List<Tree> output = input.subList(0, input.size()-1);
@@ -477,6 +523,66 @@ public class GreedySCM {
 
     }
 
+    public Tree randomInsert(Tree tre, int nodenumber){
+        //don't hang nodes at leaves
+        Tree out = tre.cloneTree();
+        String label = "";
+        int vertexsize = 0;
+        int randnumber = 0;
+        boolean correct = false;
+        Random rand = new Random();
+        for (int iter=0; iter<nodenumber; iter++){
+            label = "hangsatnode";
+            vertexsize = tre.vertexCount();
+            while (!correct){
+                randnumber = rand.nextInt(vertexsize);
+                if (!out.getVertex(randnumber).isLeaf()) correct = true;
+            }
+            label = label.concat(Integer.toString(randnumber));
+            label = label.concat(Integer.toString(iter));
+            TreeNode nod = new TreeNode(label);
+            out.addVertex(nod);
+            out.addEdge(out.getVertex(randnumber),nod);
+        }
+        return out;
+    }
+
+    public void testCuttingAndInserting(){
+        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+        List<Tree> alltrees = new ArrayList();
+        try{
+            FileReader re = new FileReader(fi);
+            alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
+            //Tree result = getPaperConsensus(alltrees);
+            //System.out.println("Supertree ist "+Newick.getStringFromTree(result));
+        }
+        catch (FileNotFoundException e){
+            System.err.println("kein File");
+        };
+        Tree tree = alltrees.get(1);
+        Tree compare = tree.cloneTree();
+        Tree consensus = new Tree();
+        NConsensus con = new NConsensus();
+        compare = randomInsert(compare, 15);
+        System.out.println("Randomisierter Baum erstellt");
+        ArrayList<String> nodesofboth = getOverLappingNodes(tree, compare);
+        tree = CutTree(tree, nodesofboth);
+        compare = CutTree(compare, nodesofboth);
+        consensus = con.consesusTree(new Tree[]{tree, compare}, 1.0);
+        //if (consensus.equals(tree)){
+        if (TreeEquals (tree, consensus)){
+            System.out.println ("Konsensusbaum ist gleich Ursprungsbaum");
+        }
+        else System.out.println("Fehler, Konsensusbaum ungleich Ursprungsbaum");
+        consensus = hangInNodes(consensus);
+        if (TreeEquals(tree, consensus)){
+            System.out.println("Baum mit eingefügten Vertices ist gleich Vergleichsbaum");
+        }
+        else System.out.println("Fehler, Baum mit eingefügten Verticees ungleich Vergleichsbaum");
+
+    }
+
+
     public void testStrictConsensus(){
 
         Tree a = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(d:1.0,c:1.0):1.0);");
@@ -507,6 +613,7 @@ public class GreedySCM {
         System.out.println("Baum f: "+x);
         System.out.println("Baum g: "+y);
         System.out.println("Baum h: "+z);
+
 
         NConsensus eins = new NConsensus();
         NConsensus zwei = new NConsensus();
@@ -573,6 +680,7 @@ public class GreedySCM {
 
     public Tree CutTree (Tree input, List<String> keep){
         List<String> originalleaves = new ArrayList<String>();
+        //makes a list that contains all leaves in the input tree
         for (TreeNode iter : input.getLeaves()){
             originalleaves.add(iter.getLabel());
         }
@@ -593,6 +701,7 @@ public class GreedySCM {
         if (TreeCut1.isEmpty()) savewhere = 1;
         else savewhere = 2;
         //List<TreeNode> savenodes = new ArrayList<TreeNode>();
+        if (cut.size()==0) return output;
         while (cut.size()!=0){
             for (TreeNode iter : cut){
 
@@ -649,6 +758,7 @@ public class GreedySCM {
         /*if (!output.getRoot().equalsNode(output.findLeastCommonAncestor(tokeep))){
             output.setRoot(output.findLeastCommonAncestor(tokeep));
         }*/
+        //TODO !!
         for (TreeNode x : output.vertices()){
             if (x.degree() == 2 && x!=output.getRoot()){
                 for (TreeNode y : x.children()){
@@ -696,7 +806,8 @@ public class GreedySCM {
 
 
         GreedySCM hey = new GreedySCM();
-        hey.testSCM();
+        //hey.testSCM();
+        hey.testCuttingAndInserting();
 
 
 
