@@ -255,7 +255,7 @@ public class TreePair implements Comparable<TreePair> {
                 TreeNode p = node.getParent();
 
                 if (!lcaToLabels.containsKey(p))
-                    lcaToLabels.put(p, new HashSet<>());
+                    lcaToLabels.put(p, new HashSet<String>());
 
                 if (node.isLeaf()) {
                     String l = node.getLabel();
