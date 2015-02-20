@@ -20,9 +20,13 @@ import static org.junit.Assert.assertNotNull;
 public class GreedySCMAlgorithmTest {
     public final static String newickInput100 = "sm.13.sourceTrees_OptSCM-Rooting.tre";
     public final static String newickSCM100 = "sm.13.sourceTrees.scmTree.tre_OptRoot.tre";
+    public final static String newickInput100_NORoot = "sm.13.sourceTrees.tre";
+    public final static String newickSCM100_NORoot = "sm.13.sourceTrees.scmTree.tre";
 
     public final static String newickInput1000 = "sm.5.sourceTrees_OptSCM-Rooting.tre";
     public final static String newickSCM1000 = "sm.5.sourceTrees.scmTree.tre_OptRoot.tre";
+    public final static String newickInput1000_NORoot = "sm.5.sourceTrees.tre";
+    public final static String newickSCM1000_NORoot = "sm.5.sourceTrees.scmTree.tre";
 
     /*@Test
     public void test(){
@@ -40,28 +44,56 @@ public class GreedySCMAlgorithmTest {
     }*/
 
     @Test
-    public void smidgenSample100(){
+    public void smidgenSample100() {
         File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(),inputTrees);
-        AbstractSCMAlgorithm algo =  new GreedySCMAlgorithm(selector);
-        Tree supertree =  algo.getSupertree();
-        System.out.println((double)(System.currentTimeMillis() - t)/1000d + "s");
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
+        Tree supertree = algo.getSupertree();
+        System.out.println((double) (System.currentTimeMillis() - t) / 1000d + "s");
         assertNotNull(supertree);
         System.out.println(Newick.getStringFromTree(supertree));
 
     }
 
     @Test
-    public void smidgenSample1000(){
+    public void smidgenSample100_NORoot() {
+        File inputFile = new File(getClass().getResource("/" + newickInput100_NORoot).getFile());
+        long t = System.currentTimeMillis();
+        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector, true);//rooting stuff
+        Tree supertree = algo.getSupertree();
+        System.out.println((double) (System.currentTimeMillis() - t) / 1000d + "s");
+        assertNotNull(supertree);
+        System.out.println(Newick.getStringFromTree(supertree));
+
+    }
+
+    @Test
+    public void smidgenSample1000() {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(),inputTrees);
-        AbstractSCMAlgorithm algo =  new GreedySCMAlgorithm(selector);
-        Tree supertree =  algo.getSupertree();
-        System.out.println((double)(System.currentTimeMillis() - t)/1000d + "s");
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
+        Tree supertree = algo.getSupertree();
+        System.out.println((double) (System.currentTimeMillis() - t) / 1000d + "s");
+        assertNotNull(supertree);
+        System.out.println(Newick.getStringFromTree(supertree));
+
+    }
+
+    @Test
+    public void smidgenSample1000_NORoot() {
+        File inputFile = new File(getClass().getResource("/" + newickInput1000_NORoot).getFile());
+        long t = System.currentTimeMillis();
+        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector, true);
+        Tree supertree = algo.getSupertree();
+        System.out.println((double) (System.currentTimeMillis() - t) / 1000d + "s");
         assertNotNull(supertree);
         System.out.println(Newick.getStringFromTree(supertree));
 

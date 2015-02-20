@@ -12,9 +12,15 @@ import java.util.Arrays;
  * Created by fleisch on 10.02.15.
  */
 public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
+    private final boolean rootOptimization;
 
     public GreedySCMAlgorithm(TreeSelector selector) {
+        this(selector, false);
+    }
+
+    public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization) {
         super(selector);
+        this.rootOptimization = rootOptimization;
     }
 
     @Override
@@ -34,6 +40,9 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         final NConsensus consMaker =  new NConsensus();
         consMaker.setMethod(NConsensus.METHOD_STRICT); //todo we want semi-strict maybe?
 
+        if (rootOptimization)
+            if (!pair.buildCompatibleRoots())
+                System.out.println("WARNING:  no compatible root found --> inefficient scm calculation");
         pair.pruneToCommonLeafes();
         Tree consensus;
         if (pair.t1.vertexCount() <= pair.getCommonLeafes().size()+1){
@@ -45,6 +54,9 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         }
 
         pair.reinsertSingleTaxa(consensus);
+        if (rootOptimization)
+            TreeUtilsBasic.deleteRootNode(consensus,false);
+
         return consensus;
     }
 

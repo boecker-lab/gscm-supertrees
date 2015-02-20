@@ -1,5 +1,7 @@
 package scmAlgorithm.treeSelector;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import epos.model.tree.treetools.SingleTaxonReduction;
@@ -116,7 +118,7 @@ public class TreePair implements Comparable<TreePair> {
 
 //                toRemove.add(node);
                 singleTaxa.add(st);
-                TreeUtilsBasic.pruneDegreeOneNodes(t,false,false);
+                TreeUtilsBasic.pruneDegreeOneNodes(t, false, false);
 
             } else {
                 for (TreeNode child : node.children()) {
@@ -146,10 +148,10 @@ public class TreePair implements Comparable<TreePair> {
             //check ist we have to add a new inner node (removed from binary) or not (removed from polytomy)
             if (singleTaxon.numOfSiblings == 1) {
                 //check if parent was inserted from another treee --> build polytomi
-                if (lcaParent != null){
-                    if (alreadyInsertedLCAParent.contains(lcaParent)){//should work because new nodes from same tree cant be a parent because of sorting step, if not use 2 single taxa lists
+                if (lcaParent != null) {
+                    if (alreadyInsertedLCAParent.contains(lcaParent)) {//should work because new nodes from same tree cant be a parent because of sorting step, if not use 2 single taxa lists
                         lca = lcaParent;
-                    }else{
+                    } else {
                         TreeNode nuLcaParent = new TreeNode();
                         t.addVertex(nuLcaParent);
                         alreadyInsertedLCAParent.add(nuLcaParent);
@@ -158,7 +160,7 @@ public class TreePair implements Comparable<TreePair> {
                         t.removeEdge(lcaParent, lca);
                         lca = nuLcaParent;
                     }
-                }else{
+                } else {
                     TreeNode nuLcaParent = new TreeNode();
                     t.addVertex(nuLcaParent);
                     alreadyInsertedLCAParent.add(nuLcaParent);
@@ -166,7 +168,7 @@ public class TreePair implements Comparable<TreePair> {
                     t.setRoot(nuLcaParent);
                     lca = nuLcaParent;
                 }
-            }else if (lca.isLeaf()) {
+            } else if (lca.isLeaf()) {
                 lca = lcaParent;
             }
 
@@ -187,8 +189,160 @@ public class TreePair implements Comparable<TreePair> {
         }
     }
 
+    //todo just for debuging an testig
+    public boolean buildCompatibleRootsNaive() {
+        Map<TreeNode, Set<String>> innerNodeToSplit = new HashMap<>();
+        for (TreeNode n1 : t1.vertices()) {
+            if (n1.isInnerNode() && !n1.equals(t1.getRoot())) {
+                Set<String> split1a = TreeUtilsBasic.getLeafLabels(n1);
+                split1a.retainAll(commonLeafes);
+                Set<String> split1b = new HashSet<>(commonLeafes);
+                split1b.removeAll(split1a);
+                for (TreeNode n2 : t2.vertices()) {
+                    if (n2.isInnerNode() && !n2.equals(t2.getRoot())) {
+                        Set<String> split2;
+                        if (!innerNodeToSplit.containsKey(n2)) {
+                            split2 = TreeUtilsBasic.getLeafLabels(n2);
+                            split2.retainAll(commonLeafes);
+                            innerNodeToSplit.put(n2, split2);
+                        } else {
+                            split2 = innerNodeToSplit.get(n2);
+                        }
+                        if (split2.equals(split1a) || split2.equals(split1a)) {
+                            //possible root position found
+                            rerootToNode(t1, n1);
+                            rerootToNode(t2, n2);
+
+                            /*//todo remove debug stuff
+                            Set<Set<String>> s1 = new HashSet<>();
+                            for (TreeNode node : t1.getRoot().children()) {
+                                Set<String> s = TreeUtilsBasic.getLeafLabels(node);
+                                s.retainAll(commonLeafes);
+                                s1.add(s);
+                            }
+                            if (!s1.contains(split1a) || !s1.contains(split1b)) {
+                                System.out.println("Error during rooting");
+                            }
+                            assert s1.contains(split1a);
+                            assert s1.contains(split1b);
+
+                            Set<Set<String>> s2 = new HashSet<>();
+                            for (TreeNode node : t2.getRoot().children()) {
+                                Set<String> s = TreeUtilsBasic.getLeafLabels(node);
+                                s.retainAll(commonLeafes);
+                                s2.add(s);
+                            }
+                            if (!s2.contains(split2)) {
+                                System.out.println("Error during rooting");
+                            }
+                            assert s2.contains(split2);
+*/
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean buildCompatibleRoots() {
+        Map<TreeNode, Set<String>> lcaToLabels = new HashMap<>(t2.vertexCount());
+        Map<Set<String>,TreeNode> labelsToLCA = new HashMap<>(t2.vertexCount());
+
+        for (TreeNode node : t2.getRoot().depthFirstIterator()) {
+            if (!node.equals(t2.getRoot()) && !node.getParent().equals(t2.getRoot())) {
+                TreeNode p = node.getParent();
+
+                if (!lcaToLabels.containsKey(p))
+                    lcaToLabels.put(p, new HashSet<>());
+
+                if (node.isLeaf()) {
+                    String l = node.getLabel();
+                    if (commonLeafes.contains(l))
+                        lcaToLabels.get(p).add(l);
+                } else {
+                    lcaToLabels.get(p).addAll(lcaToLabels.get(node));
+                    labelsToLCA.put(lcaToLabels.get(node),node);
+                }
+            }
+        }
+
+        lcaToLabels = new HashMap<>(t1.vertexCount());
+        TreeNode rootEdge1 = null;
+        TreeNode rootEdge2 = null;
+
+        for (TreeNode node : t1.getRoot().depthFirstIterator()) {
+            if (!node.equals(t1.getRoot())) {
+                TreeNode p = node.getParent();
+
+                if (!lcaToLabels.containsKey(p))
+                    lcaToLabels.put(p, new HashSet<>());
+
+                if (node.isLeaf()) {
+                    String l = node.getLabel();
+                    if (commonLeafes.contains(l))
+                        lcaToLabels.get(p).add(l);
+                } else {
+                    if (!p.equals(t1.getRoot()))
+                        lcaToLabels.get(p).addAll(lcaToLabels.get(node));
+
+                    //check if current node is a possible root
+                    Set<String> split1a = new HashSet<>(lcaToLabels.get(node));
+                    split1a.retainAll(commonLeafes);
+                    Set<String> split1b = new HashSet<>(commonLeafes);
+                    split1b.removeAll(split1a);
+
+                    rootEdge2 = labelsToLCA.get(split1a);
+                    if (rootEdge2 == null)
+                        rootEdge2 = labelsToLCA.get(split1b);
+
+                    if (rootEdge2 != null) {
+                        rootEdge1 = node;
+                        break;
+
+                    }
+                }
+            }
+        }
+
+        if (rootEdge2 != null && rootEdge1 != null){
+            //possible root position found
+            rerootToNode(t1, rootEdge1);
+            rerootToNode(t2, rootEdge2);
+            return true;
+        }
+        return false;
+    }
+
+    private void rerootToNode(Tree t, TreeNode rootEdge) {
+        TreeNode firstParent = rootEdge.getParent();
+        Deque<TreeNode> nodes = new ArrayDeque<>();
+        nodes.add(firstParent);
+        while (!nodes.isEmpty()) {
+            TreeNode p = nodes.peek().getParent();
+            if (p != null) {
+                nodes.push(p);
+            } else {
+                TreeNode n1 = nodes.poll();
+                TreeNode n2 = nodes.peek();
+                if (n2 != null) {
+                    t.removeEdge(n1, n2);
+                    t.addEdge(n2, n1);
+                }
+            }
+        }
+
+        TreeNode nuRoot = new TreeNode();
+        t.addVertex(nuRoot);
+        t.setRoot(nuRoot);
+        t.removeEdge(firstParent, rootEdge);
+        t.addEdge(nuRoot, rootEdge);
+        t.addEdge(nuRoot, firstParent);
+    }
 
 
+    //todo just for debuging an testig
     private void pruneLeafes2(Tree t) {
         Collection<TreeNode> parents = new THashSet<>();
         for (TreeNode node : t.vertices()) {
@@ -235,7 +389,7 @@ public class TreePair implements Comparable<TreePair> {
 
     private class SingleTaxon {
         final TreeNode insertionPoint;
-//        final Tree subtree;
+        //        final Tree subtree;
         final Set<String> siblingLeaves;
         final int numOfSiblings;
 
