@@ -27,7 +27,7 @@ public class GreedySCM {
     protected LinkedHashMap<String, List<String>> TreeCut1 = new LinkedHashMap<String, List<String>>();
     protected LinkedHashMap<String, List<String>> TreeCut2 = new LinkedHashMap<String, List<String>>();
 
-    public boolean equalLists(List<String> one, List<String> two){
+    public boolean StringListsEquals(List<String> one, List<String> two){
         if (one == null && two == null){
             return true;
         }
@@ -43,7 +43,7 @@ public class GreedySCM {
         return copyone.equals(copytwo);
     }
 
-    public List<String> getLabelsFromTreeNodes(List<TreeNode> input){
+    public List<String> helpgetLabelsFromNodes(List<TreeNode> input){
         List<String> output = new ArrayList<String>();
         String def = "";
         for (TreeNode nod : input){
@@ -51,23 +51,128 @@ public class GreedySCM {
         }
         return output;
     }
+    
+
+    /*public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
+        boolean foundcorrectiteration = false;
+        if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
+        else {
+            List<TreeNode> childrenone = new ArrayList<TreeNode>(nodone.getChildren());
+            List<TreeNode> childrentwo = new ArrayList<TreeNode>(nodtwo.getChildren());
+            subiteration:for (TreeNode iter1 : childrenone){
+                for (TreeNode iter2 : childrentwo){
+                    if (!iter1.isLeaf() && !iter2.isLeaf()){
+                        if (helpCompareTreeStructure(one, iter1, two, iter2)){
+                            foundcorrectiteration = true;
+                            break subiteration;
+                        }
+                    }
+                    else return true; //foundcorrectiteration = true;
+                }
+            }
+
+            if (!foundcorrectiteration) return false;
+            return true;
+        }
+    }*/
+
+    public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
+        boolean foundcorrectiteration = false;
+        //if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
+        List<String> list1 = helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves()));
+        List<String> list2 = helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves()));
+        if (!StringListsEquals(list1, list2)) return false;
+        else {
+            List<TreeNode> childrenone = new ArrayList<TreeNode>(nodone.getChildren());
+            List<TreeNode> childrentwo = new ArrayList<TreeNode>(nodtwo.getChildren());
+            for (TreeNode iter1 : childrenone){
+                foundcorrectiteration = false;
+                for (TreeNode iter2 : childrentwo){
+                    if (!iter1.isLeaf() && !iter2.isLeaf()){
+                        if (helpCompareTreeStructure(one, iter1, two, iter2)){
+                            foundcorrectiteration = true;
+                            break;
+                        }
+                    }
+                    else if (iter1.getLabel().equalsIgnoreCase(iter2.getLabel())){
+                        //return true;
+                        foundcorrectiteration = true;
+                        break;
+                    }
+                }
+                if (!foundcorrectiteration) return false;
+            }
+            //if (!foundcorrectiteration) return false;
+            return true;
+        }
+    }
+
+    public boolean CompareTreeStructure (Tree one, Tree two){
+        TreeNode start1 = one.getRoot();
+        TreeNode start2 = two.getRoot();
+        if (helpCompareTreeStructure(one, start1, two, start2)) return true;
+        else return false;
+    }
+
+    public void testCompareTreeStructure(){
+        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+        List<Tree> alltrees = new ArrayList();
+        try{
+            FileReader re = new FileReader(fi);
+            alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
+        }
+        catch (FileNotFoundException e){
+            System.err.println("kein File");
+        };
+        Tree tree = alltrees.get(1);
+        Tree copy = tree.cloneTree();
+        if (TreeEquals(tree, copy)) System.out.println("Baum 1 und seine Kopie sind gleich.");
+    }
 
     public boolean TreeEquals (Tree one, Tree two){
         if (one==two) return true;
         else {
+            //compare number of vertices
             if (one.vertexCount()!=two.vertexCount()) return false;
-            if (!equalLists(getLabelsFromTreeNodes(Arrays.asList(one.getLeaves())), getLabelsFromTreeNodes(Arrays.asList(two.getLeaves())))) return false;
-            //if (one.getRoot().getLabel() != two.getRoot().getLabel()) return false;
+            //List<String> leaveslabellistone = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(one.getLeaves())));
+            //List<String> leaveslabellisttwo = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(two.getLeaves())));
+            //if (!StringListsEquals(leaveslabellistone, leaveslabellisttwo)) return false;
+            List<TreeNode> leaveslistone = new ArrayList<TreeNode>(Arrays.asList(one.getLeaves()));
+            List<TreeNode> leaveslisttwo = new ArrayList<TreeNode>(Arrays.asList(two.getLeaves()));
+            //compare number and labeling of leaves
+            if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(one.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(two.getLeaves())))) return false;
+            //compare TreeStructure
+            if (!CompareTreeStructure(one, two)) return false;
             //TODO is this a valid equals method? What is missing to make it complete? How to change the comparison of vertices for correctness?
-            boolean vertexequals = false;
-            for (TreeNode m : one.vertices()){
-                for (TreeNode n : two.vertices()){
-                    if (m.equalsNode(n)) vertexequals = true;
+            /*TreeNode leastca = new TreeNode();
+            TreeNode mintwo = new TreeNode();
+            TreeNode nintwo = new TreeNode();
+            for (TreeNode m : leaveslistone){
+                for (TreeNode n : leaveslistone){
+                    if (!m.getLabel().equalsIgnoreCase(n.getLabel())){
+                        leastca = one.findLeastCommonAncestor(m, n);
+                        mintwo = two.getVertex(m.getLabel());
+                        nintwo = two.getVertex(n.getLabel());
+                        //TreeNode lcatwo = two.findLeastCommonAncestor(two.getVertex(m.getLabel()), two.getVertex(n.getLabel()));
+                        TreeNode lcatwo = two.findLeastCommonAncestor(mintwo, nintwo);
+                        //if (!leastca.getLabel().equalsIgnoreCase(two.findLeastCommonAncestor(two.getVertex(m.getLabel()), two.getVertex(n.getLabel())).getLabel())){
+                        if (!leastca.getLabel().equalsIgnoreCase(lcatwo.getLabel())){
+                            return false;
+                        }
+                    }
                 }
-                if (!vertexequals) return false;
-                vertexequals = false;
+                //if (!vertexequals) return false;
+                //vertexequals = false;
+            }*/
+            //TODO why does consensus method mess up the node-labels so equalsNode doesn't work correctly anymore?
+            /*if (!one.findLeastCommonAncestor(one.getLeaves()).equalsNode(two.findLeastCommonAncestor(two.getLeaves()))){
+                System.out.println("Die Wurzel ist wohl ungleich.");
+                return false;
             }
-            if (!one.getRoot().equalsNode(two.getRoot())) return false;
+            if (!one.getRoot().equalsNode(two.getRoot())){
+                System.out.println("Die Wurzel ist wohl ungleich.");
+                return false;
+            }*/
         }
         return true;
     }
@@ -570,7 +675,7 @@ public class GreedySCM {
         compare = CutTree(compare, nodesofboth);
         consensus = con.consesusTree(new Tree[]{tree, compare}, 1.0);
         //if (consensus.equals(tree)){
-        if (TreeEquals (tree, consensus)){
+        if (TreeEquals(tree, consensus)){
             System.out.println ("Konsensusbaum ist gleich Ursprungsbaum");
         }
         else System.out.println("Fehler, Konsensusbaum ungleich Ursprungsbaum");
@@ -808,7 +913,7 @@ public class GreedySCM {
         GreedySCM hey = new GreedySCM();
         //hey.testSCM();
         hey.testCuttingAndInserting();
-
+        //hey.testCompareTreeStructure();
 
 
 
