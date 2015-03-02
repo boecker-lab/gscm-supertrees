@@ -895,6 +895,7 @@ public class GreedySCM {
                         TreeCut1.put(label.concat(iter.getLabel()), finallist);
 
                     }
+
                     else {
                         TreeCut2.put(label.concat(iter.getLabel()), finallist);
                     }
