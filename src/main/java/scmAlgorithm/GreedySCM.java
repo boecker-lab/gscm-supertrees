@@ -332,7 +332,7 @@ public class GreedySCM {
         String currlabel;
         List<String> currlist;
         List<TreeNode> finallist = new ArrayList<TreeNode>();
-        TreeNode lca;
+        TreeNode lca = new TreeNode();
         TreeNode newvertex;
         TreeNode betw1;
         TreeNode betw2;
@@ -351,7 +351,14 @@ public class GreedySCM {
             }
 
 
-            if (finallist.size()==1 && !finallist.get(0).equalsNode(output.getRoot())){
+            if (finallist.size()==1){
+                lca = finallist.get(0);
+            }
+            else {
+                lca = output.findLeastCommonAncestor(finallist);
+            }
+
+            /*if (finallist.size()==1 && !finallist.get(0).equalsNode(output.getRoot())){
                 lca = finallist.get(0).getParent();
             }
             else if (finallist.get(0).equalsNode(output.getRoot())){
@@ -360,9 +367,9 @@ public class GreedySCM {
             }
             else {
                 lca = output.findLeastCommonAncestor(finallist);
-            }
+            }*/
 
-            if (lca.isLeaf()){
+            /*if (lca.isLeaf()){
                 betw1 = lca.getParent();
                 betw2 = new TreeNode();
                 output.removeEdge(betw1, lca);
@@ -385,6 +392,27 @@ public class GreedySCM {
             output.addVertex(newvertex);
             output.addEdge(lca, newvertex);
             //TreeCut1.remove(currlabel);
+            finallist.clear();*/
+
+            if (lca.getParent()!=null){
+                betw1 = lca.getParent();
+                betw2 = new TreeNode();
+                output.removeEdge(betw1, lca);
+                output.addVertex(betw2);
+                output.addEdge(betw1, betw2);
+                output.addEdge(betw2, lca);
+                lca = betw2;
+            }
+            else {
+                betw1 = new TreeNode();
+                output.addVertex(betw1);
+                output.addEdge(betw1, lca);
+                output.setRoot(betw1);
+                lca = betw1;
+            }
+            newvertex = new TreeNode(currlabel);
+            output.addVertex(newvertex);
+            output.addEdge(lca, newvertex);
             finallist.clear();
 
         }
@@ -426,6 +454,8 @@ public class GreedySCM {
         }
         TreeCut1.clear();*/
 
+
+
         mapValues = TreeCut2.entrySet();
         maplength = mapValues.size();
         Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength];
@@ -438,9 +468,14 @@ public class GreedySCM {
                 finallist.add(output.getVertex(x));
             }
 
-            lca = output.findLeastCommonAncestor(finallist);
+            if (finallist.size()==1){
+                lca = finallist.get(0);
+            }
+            else {
+                lca = output.findLeastCommonAncestor(finallist);
+            }
 
-            if (lca.isLeaf()){
+            if (lca.getParent()!=null){
                 betw1 = lca.getParent();
                 betw2 = new TreeNode();
                 output.removeEdge(betw1, lca);
@@ -449,22 +484,17 @@ public class GreedySCM {
                 output.addEdge(betw2, lca);
                 lca = betw2;
             }
-            else if (!lca.equals(output.getRoot())){
-                //lca = lca.getParent();
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
+            else {
+                betw1 = new TreeNode();
+                output.addVertex(betw1);
+                output.addEdge(betw1, lca);
+                output.setRoot(betw1);
+                lca = betw1;
             }
             newvertex = new TreeNode(currlabel);
             output.addVertex(newvertex);
             output.addEdge(lca, newvertex);
-            //TreeCut1.remove(currlabel);
             finallist.clear();
-
         }
         TreeCut2.clear();
 
@@ -644,7 +674,8 @@ public class GreedySCM {
                 if (!out.getVertex(randnumber).isLeaf()) correct = true;
             }
             label = label.concat(Integer.toString(randnumber));
-            label = label.concat(Integer.toString(iter));
+            label = label.concat(",labeled_"+out.getVertex(randnumber).getLabel());
+            label = label.concat(",try_"+Integer.toString(iter));
             TreeNode nod = new TreeNode(label);
             out.addVertex(nod);
             out.addEdge(out.getVertex(randnumber),nod);
@@ -666,10 +697,12 @@ public class GreedySCM {
         };
         Tree tree = alltrees.get(1);
         Tree compare = tree.cloneTree();
+        System.out.println(Newick.getStringFromTree(compare));
         Tree consensus = new Tree();
         NConsensus con = new NConsensus();
-        compare = randomInsert(compare, 15);
+        compare = randomInsert(compare, 1);
         System.out.println("Randomisierter Baum erstellt");
+        System.out.println(Newick.getStringFromTree(compare));
         ArrayList<String> nodesofboth = getOverLappingNodes(tree, compare);
         tree = CutTree(tree, nodesofboth);
         compare = CutTree(compare, nodesofboth);
@@ -684,6 +717,23 @@ public class GreedySCM {
             System.out.println("Baum mit eingefügten Vertices ist gleich Vergleichsbaum");
         }
         else System.out.println("Fehler, Baum mit eingefügten Verticees ungleich Vergleichsbaum");
+
+
+
+        Tree one = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,e:1.0):1.0,((f:1.0,g:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0);");
+        Tree two = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0):1.0,((g:1.0,f:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0):1.0,(k:1.0,l:1.0):1.0);");
+        //Tree two = Newick.getTreeFromString("((k:1.0,l:1.0):1.0,(((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0):1.0,((g:1.0,f:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0):1.0);");
+        //Tree one = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,(e:1.0,f:1.0):1.0);");
+        //Tree two = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0);");
+        nodesofboth = getOverLappingNodes(one, two);
+        Tree cutone = CutTree(one, nodesofboth);
+        Tree cuttwo = CutTree(two, nodesofboth);
+        NConsensus nee = new NConsensus();
+        Tree res = nee.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
+        //consensus = con.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
+        Tree hungin = hangInNodes(res);
+        System.out.println(Newick.getStringFromTree(hungin));
+
 
     }
 
