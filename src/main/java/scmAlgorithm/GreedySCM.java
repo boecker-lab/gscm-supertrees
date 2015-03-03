@@ -255,10 +255,10 @@ public class GreedySCM {
         if (maxscore == 0 && input.size()>=2){
             output.add(input.get(0));
             output.add(input.get(1));
-            System.err.println("In der Liste gibt es keine BÃ¤ume mit Scoring Ã¼ber 0");
+            System.err.println("In der Liste gibt es keine Bäume mit Scoring Ã¼ber 0");
         }
         else if (input.size()<2){
-            System.err.println("Im Input existieren weniger als 2 BÃ¤ume");
+            System.err.println("Im Input existieren weniger als 2 Bäume");
         }
         else {
             output.add(input.get(mem1));
@@ -288,10 +288,10 @@ public class GreedySCM {
         if (maxsize == 0 && input.size()>=2){
             output.add(input.get(0));
             output.add(input.get(1));
-            System.err.println("In der Liste gibt es keine BÃ¤ume mit Overlap");
+            System.err.println("In der Liste gibt es keine Bäume mit Overlap");
         }
         else if (input.size()<2){
-            System.err.println("Im Input existieren weniger als 2 BÃ¤ume");
+            System.err.println("Im Input existieren weniger als 2 Bäume");
         }
         else {
             output.add(input.get(mem1));
@@ -309,11 +309,11 @@ public class GreedySCM {
         NConsensus con = new NConsensus();
         con.getLog().setLevel(Level.OFF);
         if (nodesofboth.size()==0){
-            System.err.println("Kein SCM mÃ¶glich, da kein Overlap");
+            System.err.println("Kein SCM möglich, da kein Overlap");
         }
         if (nodesofboth.size() == one.getLeaves().length && nodesofboth.size() == two.getLeaves().length){
             result = con.consesusTree(new Tree[]{one, two}, 1.0);
-            System.err.println("SCM der BÃ¤ume ergab Consensus, da gleiches Taxaset.");
+            System.err.println("SCM der Bäume ergab Consensus, da gleiches Taxaset.");
         }
         else {
             one = CutTree(one, nodesofboth);
@@ -346,114 +346,51 @@ public class GreedySCM {
             //System.out.println(test[iter].getKey()+" "+test[iter].getValue());
             currlabel = TreeCut1entries[iter].getKey();
             currlist = TreeCut1entries[iter].getValue();
-            for (String x : currlist){
-                finallist.add(output.getVertex(x));
-            }
-
-
-            if (finallist.size()==1){
-                lca = finallist.get(0);
-            }
-            else {
+            if (currlist.contains("Polytomy")){
+                currlist.remove("Polytomy");
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
+                }
                 lca = output.findLeastCommonAncestor(finallist);
-            }
-
-            /*if (finallist.size()==1 && !finallist.get(0).equalsNode(output.getRoot())){
-                lca = finallist.get(0).getParent();
-            }
-            else if (finallist.get(0).equalsNode(output.getRoot())){
-                lca = output.getRoot();
-                System.err.println("Fehler bei hangInNode: Baum hat nur einen Knoten");
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
             }
             else {
-                lca = output.findLeastCommonAncestor(finallist);
-            }*/
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
+                }
 
-            /*if (lca.isLeaf()){
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
+                if (finallist.size()==1){
+                    lca = finallist.get(0);
+                }
+                else {
+                    lca = output.findLeastCommonAncestor(finallist);
+                }
+                if (lca.getParent()!=null){
+                    betw1 = lca.getParent();
+                    betw2 = new TreeNode();
+                    output.removeEdge(betw1, lca);
+                    output.addVertex(betw2);
+                    output.addEdge(betw1, betw2);
+                    output.addEdge(betw2, lca);
+                    lca = betw2;
+                }
+                else {
+                    betw1 = new TreeNode();
+                    output.addVertex(betw1);
+                    output.addEdge(betw1, lca);
+                    output.setRoot(betw1);
+                    lca = betw1;
+                }
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
             }
-            else if (!lca.equals(output.getRoot())){
-                //lca = lca.getParent();
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            newvertex = new TreeNode(currlabel);
-            output.addVertex(newvertex);
-            output.addEdge(lca, newvertex);
-            //TreeCut1.remove(currlabel);
-            finallist.clear();*/
-
-            if (lca.getParent()!=null){
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            else {
-                betw1 = new TreeNode();
-                output.addVertex(betw1);
-                output.addEdge(betw1, lca);
-                output.setRoot(betw1);
-                lca = betw1;
-            }
-            newvertex = new TreeNode(currlabel);
-            output.addVertex(newvertex);
-            output.addEdge(lca, newvertex);
-            finallist.clear();
-
         }
         TreeCut1.clear();
-
-        /*while (!TreeCut1.keySet().isEmpty()){
-            currlabel = TreeCut1.firstEntry().getKey();
-            currlist = TreeCut1.firstEntry().getValue();
-            for (String x : currlist){
-                finallist.add(output.getVertex(x));
-            }
-
-            lca = output.findLeastCommonAncestor(finallist);
-
-            if (lca.isLeaf()){
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            else if (!lca.equals(output.getRoot())){
-                //lca = lca.getParent();
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            newvertex = new TreeNode(currlabel);
-            output.addVertex(newvertex);
-            output.addEdge(lca, newvertex);
-            TreeCut1.remove(currlabel);
-            finallist.clear();
-        }
-        TreeCut1.clear();*/
-
 
 
         mapValues = TreeCut2.entrySet();
@@ -464,74 +401,51 @@ public class GreedySCM {
             //System.out.println(test[iter].getKey()+" "+test[iter].getValue());
             currlabel = TreeCut2entries[iter].getKey();
             currlist = TreeCut2entries[iter].getValue();
-            for (String x : currlist){
-                finallist.add(output.getVertex(x));
-            }
-
-            if (finallist.size()==1){
-                lca = finallist.get(0);
-            }
-            else {
+            if (currlist.contains("Polytomy")){
+                currlist.remove("Polytomy");
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
+                }
                 lca = output.findLeastCommonAncestor(finallist);
-            }
-
-            if (lca.getParent()!=null){
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
             }
             else {
-                betw1 = new TreeNode();
-                output.addVertex(betw1);
-                output.addEdge(betw1, lca);
-                output.setRoot(betw1);
-                lca = betw1;
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
+                }
+
+                if (finallist.size()==1){
+                    lca = finallist.get(0);
+                }
+                else {
+                    lca = output.findLeastCommonAncestor(finallist);
+                }
+                if (lca.getParent()!=null){
+                    betw1 = lca.getParent();
+                    betw2 = new TreeNode();
+                    output.removeEdge(betw1, lca);
+                    output.addVertex(betw2);
+                    output.addEdge(betw1, betw2);
+                    output.addEdge(betw2, lca);
+                    lca = betw2;
+                }
+                else {
+                    betw1 = new TreeNode();
+                    output.addVertex(betw1);
+                    output.addEdge(betw1, lca);
+                    output.setRoot(betw1);
+                    lca = betw1;
+                }
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
             }
-            newvertex = new TreeNode(currlabel);
-            output.addVertex(newvertex);
-            output.addEdge(lca, newvertex);
-            finallist.clear();
         }
         TreeCut2.clear();
-
-
-        /*while (!TreeCut2.keySet().isEmpty()){
-            currlabel = TreeCut2.firstEntry().getKey();
-            currlist = TreeCut2.firstEntry().getValue();
-            for (String x : currlist){
-                finallist.add(output.getVertex(x));
-            }
-            lca = output.findLeastCommonAncestor(finallist);
-            if (lca.isLeaf()){
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            else if (!lca.equals(output.getRoot())){
-                //lca = lca.getParent();
-                betw1 = lca.getParent();
-                betw2 = new TreeNode();
-                output.removeEdge(betw1, lca);
-                output.addVertex(betw2);
-                output.addEdge(betw1, betw2);
-                output.addEdge(betw2, lca);
-                lca = betw2;
-            }
-            newvertex = new TreeNode(currlabel);
-            output.addVertex(newvertex);
-            output.addEdge(lca, newvertex);
-            TreeCut2.remove(currlabel);
-            finallist.clear();
-        }
-        TreeCut2.clear();*/
 
         return output;
     }
@@ -574,7 +488,7 @@ public class GreedySCM {
         String print = "";
 
            /*
-        //BEISPIEL A eingeschrÃ¤nkt auf a, b, c
+        //BEISPIEL A eingeschränkt auf a, b, c
         //tokeep.add(ah);
         //tokeep.add(be);
         //tokeep.add(ce);
@@ -583,10 +497,10 @@ public class GreedySCM {
         tokeep.add("c");
         result = CutTree(a, tokeep);
         print = Newick.getStringFromTree(result);
-        System.out.println("A eingeschrÃ¤nkt auf a, b, c: "+print);
+        System.out.println("A eingeschränkt auf a, b, c: "+print);
         */
 
-        //BEISPIEL A eingeschrÃ¤nkt auf a, b
+        //BEISPIEL A eingeschränkt auf a, b
         tokeep.clear();
         a = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(d:1.0,c:1.0):1.0);");
         //tokeep.add(a.getVertex("a"));
@@ -595,9 +509,9 @@ public class GreedySCM {
         tokeep.add("b");
         result = CutTree(a, tokeep);
         print = Newick.getStringFromTree(result);
-        System.out.println("A eingeschrÃ¤nkt auf a, b: "+print);
+        System.out.println("A eingeschränkt auf a, b: "+print);
 
-        //BEISPIEL C eingeschrÃ¤nkt auf a, b
+        //BEISPIEL C eingeschränkt auf a, b
         tokeep.clear();
 
         boolean te = a.getVertex("a").equalsNode(c.getVertex("a"));
@@ -617,14 +531,14 @@ public class GreedySCM {
         Tree result2;
         result2 = CutTree(c, tokeep);
         print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschrÃ¤nkt auf a, b: "+print);
+        System.out.println("C eingeschränkt auf a, b: "+print);
 
         //NConsensus con = new NConsensus();
         //result = con.consesusTree(new Tree[]{result, result2}, 1.0);
 
 
         /*
-        //BEISPIEL C eingeschrÃ¤nkt auf c, d
+        //BEISPIEL C eingeschränkt auf c, d
         tokeep.clear();
         //c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
         //tokeep.add(c.getVertex("c"));
@@ -635,10 +549,10 @@ public class GreedySCM {
         tokeep.add("d");
         result = CutTree(c, tokeep);
         print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschrÃ¤nkt auf c, d: "+print);
+        System.out.println("C eingeschränkt auf c, d: "+print);
         */
         /*
-        //BEISPIEL C eingeschrÃ¤nkt auf d
+        //BEISPIEL C eingeschränkt auf d
         //tokeep.remove(ce);
         tokeep.clear();
         c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
@@ -646,7 +560,7 @@ public class GreedySCM {
         tokeep.add("d");
         result = CutTree(c, tokeep);
         print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschrÃ¤nkt auf d : "+print);
+        System.out.println("C eingeschränkt auf d : "+print);
         */
 
         Object zwischen = TreeCut2.get("d");
@@ -697,23 +611,26 @@ public class GreedySCM {
         };
         Tree tree = alltrees.get(1);
         Tree compare = tree.cloneTree();
-        System.out.println(Newick.getStringFromTree(compare));
+        Tree cutcompare;
+        Tree cuttree;
+        Tree hanginconsensus;
         Tree consensus = new Tree();
+        //System.out.println(Newick.getStringFromTree(compare));
         NConsensus con = new NConsensus();
-        compare = randomInsert(compare, 1);
+        compare = randomInsert(compare, 100);
         System.out.println("Randomisierter Baum erstellt");
-        System.out.println(Newick.getStringFromTree(compare));
+        //System.out.println(Newick.getStringFromTree(compare));
         ArrayList<String> nodesofboth = getOverLappingNodes(tree, compare);
-        tree = CutTree(tree, nodesofboth);
-        compare = CutTree(compare, nodesofboth);
-        consensus = con.consesusTree(new Tree[]{tree, compare}, 1.0);
+        cuttree = CutTree(tree, nodesofboth);
+        cutcompare = CutTree(compare, nodesofboth);
+        consensus = con.consesusTree(new Tree[]{cuttree, cutcompare}, 1.0);
         //if (consensus.equals(tree)){
         if (TreeEquals(tree, consensus)){
             System.out.println ("Konsensusbaum ist gleich Ursprungsbaum");
         }
         else System.out.println("Fehler, Konsensusbaum ungleich Ursprungsbaum");
-        consensus = hangInNodes(consensus);
-        if (TreeEquals(tree, consensus)){
+        hanginconsensus = hangInNodes(consensus);
+        if (TreeEquals(compare, hanginconsensus)){
             System.out.println("Baum mit eingefügten Vertices ist gleich Vergleichsbaum");
         }
         else System.out.println("Fehler, Baum mit eingefügten Verticees ungleich Vergleichsbaum");
@@ -871,7 +788,8 @@ public class GreedySCM {
                     for (TreeNode el : between2){
                         if (!originalleaves.contains(el.getLabel())) between.remove(el);
                     }
-                    while (between.size() <= 1 && !between.get(0).equalsNode(output.getRoot())){
+                    //while (between.size() <= 1 && !between.get(0).equalsNode(output.getRoot())){
+                    while (between.size() <= 1 && between.get(0).getParent()!=null){
                         par = par.getParent();
                         between = new ArrayList<TreeNode>(Arrays.asList(par.getLeaves()));
                         between2 = new ArrayList<TreeNode>(between);
@@ -888,12 +806,14 @@ public class GreedySCM {
                     if (between.size()==0){
                         System.err.println("Fehler bei CutTree");
                     }
+                    if (between.size()>1 && par.getChildren().size()>2){
+                        finallist.add("Polytomy");
+                    }
                     for (TreeNode x : between){
                         finallist.add(x.getLabel());
                     }
                     if (savewhere == 1){
                         TreeCut1.put(label.concat(iter.getLabel()), finallist);
-
                     }
 
                     else {
@@ -962,8 +882,8 @@ public class GreedySCM {
 
 
         GreedySCM hey = new GreedySCM();
-        //hey.testSCM();
-        hey.testCuttingAndInserting();
+        hey.testSCM();
+        //hey.testCuttingAndInserting();
         //hey.testCompareTreeStructure();
 
 
