@@ -1,9 +1,12 @@
 package scmAlgorithm;
 
+
 import epos.algo.consensus.ConsensusAlgorithm;
 import epos.algo.consensus.adams.AdamsConsensus;
+import epos.algo.consensus.loose.PairwiseLooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
+import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
@@ -15,7 +18,7 @@ import java.util.Arrays;
  */
 public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     private final boolean rootOptimization;
-    public static enum Methods {STRICT,MAJORITY,ADAMS}
+    public static enum Methods {SEMI_STRICT, STRICT,MAJORITY,ADAMS}
 
     private final Methods METHOD;
 
@@ -52,6 +55,11 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
             if (!pair.buildCompatibleRoots())
                 System.out.println("WARNING:  no compatible root found --> inefficient scm calculation");
         pair.pruneToCommonLeafes();
+        /*System.out.println("Treepair: ");
+        System.out.println(Newick.getStringFromTree(pair.t1));
+        System.out.println(Newick.getStringFromTree(pair.t2));
+        System.out.println();
+        System.out.println();*/
         Tree consensus;
         if (pair.t1.vertexCount() <= pair.getCommonLeafes().size()+1){
             consensus = pair.t2;
@@ -71,10 +79,12 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
 
     private ConsensusAlgorithm getConsensusAlgorithm(Tree t1, Tree t2){
         switch (METHOD){
+            case SEMI_STRICT:
+                return new PairwiseLooseConsensus(t1, t2, false);
             case STRICT:
                 return  new NConsensus(new Tree[]{t1, t2},NConsensus.METHOD_STRICT);
             case MAJORITY:
-                return new NConsensus(new Tree[]{t1, t2},NConsensus.METHOD_STRICT);
+                return new NConsensus(new Tree[]{t1, t2},NConsensus.METHOD_MAJORITY); // is same as strict for 2 trees...
             case ADAMS:
                 return  new AdamsConsensus(new Tree[]{t1, t2}); // todo is adams semi strict?
             default: return null;

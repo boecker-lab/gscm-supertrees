@@ -108,6 +108,36 @@ public class GreedySCMAlgorithmTest {
     }
 
     @Test
+    public void smidgenSample100Loose() {
+        File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
+        long t = System.currentTimeMillis();
+        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector,false, GreedySCMAlgorithm.Methods.SEMI_STRICT);
+        Tree supertree = algo.getSupertree();
+        System.out.println("Semi-Strict-100: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        assertNotNull(supertree);
+        System.out.println(Newick.getStringFromTree(supertree));
+        int inner =  supertree.vertexCount() - supertree.getNumTaxa();
+        System.out.println("Clades: " + inner);
+
+    }
+
+    @Test
+    public void smidgenSample100Loose_NORoot() {
+        File inputFile = new File(getClass().getResource("/" + newickInput100_NORoot).getFile());
+        long t = System.currentTimeMillis();
+        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
+        TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector, true, GreedySCMAlgorithm.Methods.SEMI_STRICT);//rooting stuff
+        Tree supertree = algo.getSupertree();
+        System.out.println("Semi-Strict-100_Root: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        assertNotNull(supertree);
+        System.out.println(Newick.getStringFromTree(supertree));
+        int inner =  supertree.vertexCount() - supertree.getNumTaxa();
+        System.out.println("Clades: " + inner);
+    }
+    /*@Test
     public void smidgenSample1000() {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
@@ -171,7 +201,7 @@ public class GreedySCMAlgorithmTest {
         System.out.println(Newick.getStringFromTree(supertree));
         int inner =  supertree.vertexCount() - supertree.getNumTaxa();
         System.out.println("Clades: " + inner);
-    }
+    }*/
 
 
 }
