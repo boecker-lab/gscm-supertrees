@@ -6,7 +6,6 @@ import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.PairwiseLooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
