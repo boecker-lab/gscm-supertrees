@@ -19,7 +19,9 @@ public class TreePair implements Comparable<TreePair> {
     public final Tree t2;
     public final double score;
     private Set<String> commonLeafes = null;
+
     private List<SingleTaxon> singleTaxa = null;
+    private SingleTaxonReduction singleTaxonReducer = null;
 
     public TreePair(final Tree t1, final Tree t2, final double score) {
         this.t1 = t1;
@@ -56,6 +58,20 @@ public class TreePair implements Comparable<TreePair> {
         pruneLeafes(t1);
         pruneLeafes(t2);
     }
+
+    public void pruneToCommonLeafes(boolean singeTaxonReduction) {
+        if (singeTaxonReduction) {
+            singleTaxonReducer =  new SingleTaxonReduction();
+            singleTaxonReducer.modify(Arrays.asList(t1,t2));
+        }else{
+            singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound vor list --> no resizing
+            pruneLeafes(t1);
+            pruneLeafes(t2);
+        }
+    }
+
+
+
 
     public void pruneToCommonLeafes(SingleTaxonReduction reducer) {
         reducer.modify(new ArrayList<>(Arrays.asList(t1, t2)));
@@ -129,7 +145,17 @@ public class TreePair implements Comparable<TreePair> {
 //        TreeUtilsBasic.removeSubtreeFromTree(toRemove, t, false, false);
     }
 
+    //todo use only on version for perfomance reasons?
     public void reinsertSingleTaxa(Tree t) {
+        if (singleTaxa != null){
+            reinsertSingleTaxaFast(t);
+        }else if (singleTaxonReducer != null){
+            singleTaxonReducer.unmodify(Arrays.asList(t));
+        }
+    }
+
+
+    private void reinsertSingleTaxaFast(Tree t) {
         Map<String, TreeNode> labelToNode = new THashMap<>();
         Set<TreeNode> alreadyInsertedLCAParent = new THashSet<>();
         for (TreeNode leaf : t.getLeaves()) {

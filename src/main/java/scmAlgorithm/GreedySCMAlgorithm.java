@@ -20,6 +20,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     public static enum Methods {SEMI_STRICT, STRICT,MAJORITY,ADAMS}
 
     private final Methods METHOD;
+    private final boolean externalSingleTaxonReduction;
 
     public GreedySCMAlgorithm(TreeSelector selector) {
         this(selector, false);
@@ -30,8 +31,13 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     }
 
     public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization, Methods method) {
+        this(selector,rootOptimization,false,method);
+    }
+
+    public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization, boolean externalSingleTaxonReduction, Methods method) {
         super(selector);
         this.rootOptimization = rootOptimization;
+        this.externalSingleTaxonReduction = externalSingleTaxonReduction;
         METHOD = method;
     }
 
@@ -53,7 +59,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         if (rootOptimization)
             if (!pair.buildCompatibleRoots())
                 System.out.println("WARNING:  no compatible root found --> inefficient scm calculation");
-        pair.pruneToCommonLeafes();
+        pair.pruneToCommonLeafes(externalSingleTaxonReduction);
         /*System.out.println("Treepair: ");
         System.out.println(Newick.getStringFromTree(pair.t1));
         System.out.println(Newick.getStringFromTree(pair.t2));
