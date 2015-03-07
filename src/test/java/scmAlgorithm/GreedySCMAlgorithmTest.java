@@ -10,6 +10,7 @@ import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -51,13 +52,15 @@ public class GreedySCMAlgorithmTest {
         TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         Tree supertree = algo.getSupertree();
+        Tree scm =  Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM100_NORoot).getFile()))[0];
+        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
         System.out.println("Strict-100: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
         assertNotNull(supertree);
+        assertEquals(scm.getNumTaxa(),supertree.getNumTaxa());
         System.out.println(Newick.getStringFromTree(supertree));
         int inner =  supertree.vertexCount() - supertree.getNumTaxa();
         System.out.println("Clades: " + inner);
-        Tree scm =  Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM100_NORoot).getFile()))[0];
-        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
+
     }
 
     @Test
@@ -147,13 +150,15 @@ public class GreedySCMAlgorithmTest {
         TreeSelector selector = new GreedyTreeSelector.GTSMapPQ(new AbstractOverlapScorer.OverlapScorerTroveObject(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         Tree supertree = algo.getSupertree();
+        Tree scm =  Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM1000_NORoot).getFile()))[0];
+        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
         System.out.println("Strict-1000: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
         assertNotNull(supertree);
+        assertEquals(scm.getNumTaxa(),supertree.getNumTaxa());
         System.out.println(Newick.getStringFromTree(supertree));
         int inner =  supertree.vertexCount() - supertree.getNumTaxa();
         System.out.println("Clades: " + inner);
-        Tree scm =  Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM1000_NORoot).getFile()))[0];
-        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
+
 
 
     }
