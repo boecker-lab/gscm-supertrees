@@ -5,6 +5,8 @@ import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import epos.model.tree.io.Newick;
+import epos.model.tree.treetools.FN_FP_RateComputer;
+import epos.model.tree.treetools.TreeUtilsBasic;
 import org.apache.log4j.Level;
 
 import java.io.File;
@@ -731,7 +733,10 @@ public class GreedySCM {
         System.out.println("SCM-Ergebnis von c und d: "+Newick.getStringFromTree(result));*/
 
         //File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\100\\20\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+//        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+        File fi = new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Source_Trees/RaxML/sm.0.sourceTrees_OptSCM-Rooting.tre");
+        Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
+
 
         try{
             FileReader re = new FileReader(fi);
@@ -740,6 +745,14 @@ public class GreedySCM {
             //Tree result = getSuperfineConsensus(alltrees);
             Tree result = getPaperConsensus(alltrees);
             System.out.println("Supertree ist "+Newick.getStringFromTree(result));
+            System.out.println(result.vertexCount() - result.getNumTaxa());
+            System.out.println("swenson scm ist "+Newick.getStringFromTree(realSCM));
+            System.out.println(realSCM.vertexCount() - realSCM.getNumTaxa());
+            //todo mach was damit :)
+
+            FN_FP_RateComputer.calculateSumOfRates(result,alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+            FN_FP_RateComputer.calculateRates(result, realSCM,false);
+
         }
         catch (FileNotFoundException e){
             System.err.println("kein File");
@@ -855,7 +868,6 @@ public class GreedySCM {
     }
 
     public static void main (String args[]){
-
         /*LinkedHashMap<String, String> list = new LinkedHashMap<String,String>(4, 0.75F, true);
         list.put("1", "a");
         list.put("2", "b");
