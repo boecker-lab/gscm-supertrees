@@ -16,7 +16,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'net.sf.trove4j:trove4j:3.0.3'
 
-    testCompile 'de.unijena.bioinf:project-evaluation:0.8-SNAPSHOT'
+//    testCompile 'de.unijena.bioinf:project-evaluation:0.8-SNAPSHOT'
     testCompile 'junit:junit:4.11'
 
 
