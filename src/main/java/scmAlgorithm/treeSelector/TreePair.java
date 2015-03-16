@@ -223,19 +223,13 @@ public class TreePair implements Comparable<TreePair> {
             if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
 //                System.out.println("start inserting leafes");
                 if (singleTaxon.numOfSiblings == 1) {
-                    //todo is there a faster way
+                    //todo is there a faster way to proof that
                     Set<String> s =  TreeUtilsBasic.getLeafLabels(lca);
                     s.retainAll(commonLeafes);
                     Set<String> s2 =  new HashSet<>(singleTaxon.siblingLeaves);
                     s2.retainAll(commonLeafes);
 
-                    if (!s.equals(s2)){
-//                        System.out.println("maybe removed clade!!!");
-                        if (lca.isLeaf()) {//todo do we need that? because if there is more siblings than it should be, there are at least 2?
-                            System.out.println("nu leaf insert point");
-                            lca = lcaParent;
-                        }
-                    }else {
+                    if (s.equals(s2)){
                         //check if we have to insert a new root
                         if (lcaParent != null) {
 //                            System.out.println("standard");
@@ -255,11 +249,7 @@ public class TreePair implements Comparable<TreePair> {
                             lca = nuLcaParent;
                         }
                     }
-                } else if (lca.isLeaf()) {
-                    System.out.println("nu leaf insert point");
-                    lca = lcaParent;//todo do we need that? because polytomi leafes have mor than one sibling?!
                 }
-
 
                 for (SingleTaxon st : singles) {
                     TreeNode nuNode = st.insertionPoint;

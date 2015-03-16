@@ -287,6 +287,9 @@ public class GreedySCMAlgorithmTest {
         int fptrees = 0;
         int swfptrees = 0;
         int equalrees = 0;
+
+        int swensonClades = 0;
+        int scmClades = 0;
         for (int taxa : taxas) {
             TEMPLATES.put(Global.TAG_TAXA, Integer.toString(taxa));
 
@@ -317,7 +320,9 @@ public class GreedySCMAlgorithmTest {
 
                         System.out.println();
                         System.out.println("### Calc SCM Trees ###");
-                        System.out.println("SCM-SMID: " + (swensonSCM.vertexCount() - swensonSCM.getNumTaxa()));
+                        int c = swensonSCM.vertexCount() - swensonSCM.getNumTaxa();
+                        swensonClades =+ c;
+                        System.out.println("SCM-SMID: " + (c));
                         System.out.println(Newick.getStringFromTree(swensonSCM));
 
                         long scmTime =  System.currentTimeMillis();
@@ -325,7 +330,9 @@ public class GreedySCMAlgorithmTest {
                         Tree scmTree = scmAlgorithm.getSupertree();
                         scmTime =  System.currentTimeMillis() - scmTime;
                         scmTimes[scaffoldFactorIndex].addValue(scmTime);
-                        System.out.println("SCM: " + (scmTree.vertexCount() - scmTree.getNumTaxa()));
+                        c = scmTree.vertexCount() - scmTree.getNumTaxa();
+                        scmClades =+ c;
+                        System.out.println("SCM: " + (c));
                         System.out.println(Newick.getStringFromTree(scmTree));
                         System.out.println("SCM Time " + taxa + "/" + scaffoldFactors[scaffoldFactorIndex] + "/" + instance + ": " + (float)scmTime/1000f + "s");
 
@@ -367,6 +374,8 @@ public class GreedySCMAlgorithmTest {
         System.out.println("trees with false positives: " + fptrees + " relative: " + (double)fptrees/(double)trees);
         System.out.println("swenson trees with false positives: " + swfptrees + " relative: " + (double)swfptrees/(double)trees);
         System.out.println("trees equal to swenson: " + equalrees);
+        System.out.println("swenson clades: " + swensonClades);
+        System.out.println("scm clades: " + scmClades);
 
     }
 }
