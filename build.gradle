@@ -7,6 +7,7 @@ version = '0.8-SNAPSHOT'
 repositories {
     mavenCentral()
     maven {url "http://bio.informatik.uni-jena.de/artifactory/repo"}
+    mavenLocal()
 }
 
 dependencies {
@@ -14,6 +15,8 @@ dependencies {
     compile 'de.unijena.bioinf:consensus-lib:0.9.3-SNAPSHOT'
     compile 'com.google.guava:guava:18.0'
     compile 'net.sf.trove4j:trove4j:3.0.3'
+
+    testCompile 'de.unijena.bioinf:project-evaluation:0.8-SNAPSHOT'
     testCompile 'junit:junit:4.11'
 
 

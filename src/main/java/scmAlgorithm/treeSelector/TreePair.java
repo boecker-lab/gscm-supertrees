@@ -2,6 +2,7 @@ package scmAlgorithm.treeSelector;
 
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
+import epos.model.tree.treetools.FN_FP_RateComputer;
 import epos.model.tree.treetools.SingleTaxonReduction;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.THashMap;
@@ -15,6 +16,7 @@ import java.util.*;
 public class TreePair implements Comparable<TreePair> {
     public final Tree t1;
     public final Tree t2;
+//    public Tree[] clones = new Tree[2]; //todo remove --> debug
     public final double score;
     private Set<String> commonLeafes = null;
 
@@ -56,6 +58,9 @@ public class TreePair implements Comparable<TreePair> {
 
 
     public void pruneToCommonLeafes() {
+//        clones[0] = t1.cloneTree();//todo remove --> debug
+//        clones[1] = t2.cloneTree();//todo remove --> debug
+
         singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound for the list --> no resizing
         commenInsertionPointTaxa = new THashMap<>(t1.vertexCount() + t2.vertexCount());
 
@@ -64,6 +69,8 @@ public class TreePair implements Comparable<TreePair> {
     }
 
     public void pruneToCommonLeafes(boolean singeTaxonReduction) {
+//        clones[0] = t1.cloneTree();//todo remove --> debug
+//        clones[1] = t2.cloneTree();//todo remove --> debug
         if (singeTaxonReduction) {
             System.out.println("Warning wrong taxa reinsertion method used");
             singleTaxonReducer = new SingleTaxonReduction();
@@ -130,34 +137,37 @@ public class TreePair implements Comparable<TreePair> {
                     t.removeVertex(node);
                 }
 
-                Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves); //todo what todo with empty suff --> is part of subtree an not important for the collision case
-                commonSiblingLeafes.retainAll(commonLeafes);
-                st = new SingleTaxon(node, siblingLeaves, commonSiblingLeafes, numOfSiblings);
 
-                singleTaxa.add(st);
+                if (numOfSiblings == 1) {
+                    Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves); //todo what todo with empty suff --> is part of subtree an not important for the collision case
+                    commonSiblingLeafes.retainAll(commonLeafes);
+                    st = new SingleTaxon(node, siblingLeaves, commonSiblingLeafes, numOfSiblings);
 
-
-                if (!commonSiblingLeafes.isEmpty()) {
-                    Set<SingleTaxon> singles = commenInsertionPointTaxa.get(commonSiblingLeafes);
-                    if (singles == null) {
-                        if (first) {
-                            singles = new THashSet<>();
-                            commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
-                            singles.add(st);
-                        } else {
-                            singles = this.commenInsertionPointTaxa.get(commonSiblingLeafes);
-                            if (singles != null) {
+                    if (!commonSiblingLeafes.isEmpty()) {
+                        Set<SingleTaxon> singles = commenInsertionPointTaxa.get(commonSiblingLeafes);
+                        if (singles == null) {
+                            if (first) {
+                                singles = new THashSet<>();
                                 commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
                                 singles.add(st);
+                            } else {
+                                singles = this.commenInsertionPointTaxa.get(commonSiblingLeafes);
+                                if (singles != null) {
+                                    commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
+                                    singles.add(st);
+                                }
                             }
+                        } else {
+                            singles.add(st);
                         }
-                    } else {
-                        singles.add(st);
-                    }
 
-                } else {
-                    System.out.println("this schouldn't be possible");//todo this case schould not exist maybe remove if
+                    } else {
+                        System.out.println("this schouldn't be possible");//todo this case schould not exist maybe remove if
+                    }
+                }else{
+                    st = new SingleTaxon(node, siblingLeaves, new THashSet<String>(), numOfSiblings);
                 }
+                singleTaxa.add(st);
 
                 TreeUtilsBasic.pruneDegreeOneNodes(t, false, false);
             } else {
@@ -185,7 +195,6 @@ public class TreePair implements Comparable<TreePair> {
 
     private void reinsertSingleTaxaFast(Tree t) {
         Map<String, TreeNode> labelToNode = new THashMap<>();
-//        Set<TreeNode> alreadyInsertedLCAParent = new THashSet<>();
         for (TreeNode leaf : t.getLeaves()) {
             labelToNode.put(leaf.getLabel(), leaf);
         }
@@ -202,38 +211,53 @@ public class TreePair implements Comparable<TreePair> {
 
 
             //check ist we have to add a new inner node (removed from binary) or not (removed from polytomy)
+            //todo not very nice --> maybe put all single taxa in such a map from begining on --> maybe less confusing code
             Set<SingleTaxon> singles = commenInsertionPointTaxa.get(singleTaxon.commonSiblingLeaves);
             if (singles == null) {
                 singles = new THashSet<>(1);
                 singles.add(singleTaxon);
             }
 
-            //todo not very nice --> maybe put all single taxa in such a map from begining on --> maybe less confusing code
-            //biuld insertion point for first occurence on this path...
 
-            //if empty the taxon is already iserted before.
-            if (!singles.isEmpty()) {
+            //build insertion point for first occurence on this path...
+            if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
+//                System.out.println("start inserting leafes");
                 if (singleTaxon.numOfSiblings == 1) {
-                    //check if we have to insert a new root
-                    if (lcaParent != null) {
-                        TreeNode nuLcaParent = new TreeNode();
-                        t.addVertex(nuLcaParent);
-//                        alreadyInsertedLCAParent.add(nuLcaParent); //todo remove this shit not needed anymore
-                        t.addEdge(nuLcaParent, lca);
-                        t.addEdge(lcaParent, nuLcaParent);
-                        t.removeEdge(lcaParent, lca);
-                        lca = nuLcaParent;
+                    //todo is there a faster way
+                    Set<String> s =  TreeUtilsBasic.getLeafLabels(lca);
+                    s.retainAll(commonLeafes);
+                    Set<String> s2 =  new HashSet<>(singleTaxon.siblingLeaves);
+                    s2.retainAll(commonLeafes);
 
-                    } else { //insert new root
-                        TreeNode nuLcaParent = new TreeNode();
-                        t.addVertex(nuLcaParent);
-//                        alreadyInsertedLCAParent.add(nuLcaParent);//todo remove this shit not needed anymore
-                        t.addEdge(nuLcaParent, lca);
-                        t.setRoot(nuLcaParent);
-                        lca = nuLcaParent;
+                    if (!s.equals(s2)){
+//                        System.out.println("maybe removed clade!!!");
+                        if (lca.isLeaf()) {//todo do we need that? because if there is more siblings than it should be, there are at least 2?
+                            System.out.println("nu leaf insert point");
+                            lca = lcaParent;
+                        }
+                    }else {
+                        //check if we have to insert a new root
+                        if (lcaParent != null) {
+//                            System.out.println("standard");
+                            TreeNode nuLcaParent = new TreeNode();
+                            t.addVertex(nuLcaParent);
+                            t.addEdge(nuLcaParent, lca);
+                            t.addEdge(lcaParent, nuLcaParent);
+                            t.removeEdge(lcaParent, lca);
+                            lca = nuLcaParent;
+
+                        } else { //insert new root
+//                            System.out.println("nu ROOT");
+                            TreeNode nuLcaParent = new TreeNode();
+                            t.addVertex(nuLcaParent);
+                            t.addEdge(nuLcaParent, lca);
+                            t.setRoot(nuLcaParent);
+                            lca = nuLcaParent;
+                        }
                     }
                 } else if (lca.isLeaf()) {
-                    lca = lcaParent;
+                    System.out.println("nu leaf insert point");
+                    lca = lcaParent;//todo do we need that? because polytomi leafes have mor than one sibling?!
                 }
 
 
@@ -253,7 +277,12 @@ public class TreePair implements Comparable<TreePair> {
                         labelToNode.put(nuNode.getLabel(), nuNode);
                     }
                 }
+                /*double[] r = FN_FP_RateComputer.calculateSumOfRates(t, clones);//todo remove --> debug
+                if (Double.compare(0d,r[1]) != 0){//todo remove --> debug
+                    System.out.println("False positives  DURING taxa insertion!");
+                }*/
                 singles.clear();
+//                System.out.println();
             }
         }
     }

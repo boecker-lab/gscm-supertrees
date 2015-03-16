@@ -4,9 +4,7 @@ import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
 import scmAlgorithm.treeScorer.TreeScorer;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * Created by fleisch on 05.02.15.
@@ -106,6 +104,17 @@ public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Colle
     protected abstract TreePair getMax(S treePairs);
 
     protected abstract TreePair findGlobalMax();
+
+    public Tree[] getInputCopy(){
+        List<Tree> c = new ArrayList();
+        int i = 0;
+        for (Tree tree : treeToPairs.keySet()) {
+            if (tree != null)
+                c.add(tree.cloneTree());
+
+        }
+        return c.toArray(new Tree[c.size()]);
+    }
 
 
 //#############################################################################
