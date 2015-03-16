@@ -262,7 +262,7 @@ public class GreedySCMAlgorithmTest {
         System.out.println("Clades: " + inner);
     }
 
-    @Test
+    /*@Test
     public void debugTest() {
         int[] taxas = {
                 100,
@@ -321,7 +321,7 @@ public class GreedySCMAlgorithmTest {
                         System.out.println();
                         System.out.println("### Calc SCM Trees ###");
                         int c = swensonSCM.vertexCount() - swensonSCM.getNumTaxa();
-                        swensonClades =+ c;
+                        swensonClades += c;
                         System.out.println("SCM-SMID: " + (c));
                         System.out.println(Newick.getStringFromTree(swensonSCM));
 
@@ -331,7 +331,7 @@ public class GreedySCMAlgorithmTest {
                         scmTime =  System.currentTimeMillis() - scmTime;
                         scmTimes[scaffoldFactorIndex].addValue(scmTime);
                         c = scmTree.vertexCount() - scmTree.getNumTaxa();
-                        scmClades =+ c;
+                        scmClades += c;
                         System.out.println("SCM: " + (c));
                         System.out.println(Newick.getStringFromTree(scmTree));
                         System.out.println("SCM Time " + taxa + "/" + scaffoldFactors[scaffoldFactorIndex] + "/" + instance + ": " + (float)scmTime/1000f + "s");
@@ -377,5 +377,5 @@ public class GreedySCMAlgorithmTest {
         System.out.println("swenson clades: " + swensonClades);
         System.out.println("scm clades: " + scmClades);
 
-    }
+    }*/
 }
