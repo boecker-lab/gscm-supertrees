@@ -9,9 +9,10 @@ import java.util.List;
  * Created by fleisch on 05.02.15.
  */
 public abstract class AbstractSCMAlgorithm{
+
     protected List<Tree> superTrees;
 
-    protected TreeSelector selector;
+    public final TreeSelector selector;
 
     public AbstractSCMAlgorithm(TreeSelector selector) {
         this.selector = selector;
@@ -30,10 +31,5 @@ public abstract class AbstractSCMAlgorithm{
         return getSupertrees().get(0);
     }
 
-
-    public static void main(String[] args){
-
-
-    }
 
 }

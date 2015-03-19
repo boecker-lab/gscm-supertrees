@@ -1,15 +1,8 @@
 package scmAlgorithm;
 
 
-import epos.algo.consensus.ConsensusAlgorithm;
-import epos.algo.consensus.adams.AdamsConsensus;
-import epos.algo.consensus.loose.PairwiseLooseConsensus;
-import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
 import epos.model.tree.treetools.TreeUtilsBasic;
-import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
@@ -19,11 +12,10 @@ import java.util.Arrays;
  * Created by fleisch on 10.02.15.
  */
 public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
-    private final boolean rootOptimization;
-    public static enum Methods {SEMI_STRICT, STRICT,MAJORITY,ADAMS}
+    private final boolean rootOptimization; //todo remove
 
-    private final Methods METHOD;
-    private final boolean externalSingleTaxonReduction;
+
+    private final boolean externalSingleTaxonReduction; //todo remove
 
 //    private Tree[] input; //todo remove
 
@@ -31,19 +23,16 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         this(selector, false);
     }
 
+
+
     public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization) {
-        this(selector,rootOptimization,Methods.STRICT);
+        this(selector,rootOptimization,false);
     }
 
-    public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization, Methods method) {
-        this(selector,rootOptimization,false,method);
-    }
-
-    public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization, boolean externalSingleTaxonReduction, Methods method) {
+    public GreedySCMAlgorithm(TreeSelector selector, boolean rootOptimization, boolean externalSingleTaxonReduction) {
         super(selector);
         this.rootOptimization = rootOptimization;
         this.externalSingleTaxonReduction = externalSingleTaxonReduction;
-        METHOD = method;
     }
 
 
@@ -53,7 +42,8 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         Tree superCandidate = null;
         TreePair pair;
         while((pair = selector.pollTreePair()) != null){
-            superCandidate = mergeTrees(pair);
+//            superCandidate = mergeTrees(pair);
+            superCandidate =  pair.getConsensus(selector.scorer.getConsensusAlgorithm());
             selector.addTree(superCandidate);
         }
         TreeUtilsBasic.cleanTree(superCandidate); //remove inner labels and branch lengths //todo create useful branch length?!
@@ -63,54 +53,31 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     }
 
     private Tree mergeTrees(TreePair pair) {
-        if (rootOptimization)
-            if (!pair.buildCompatibleRoots())
-                System.out.println("WARNING:  no compatible root found --> inefficient scm calculation");
-
-        pair.pruneToCommonLeafes(externalSingleTaxonReduction);
+        //todo what is that good for?
+        int pc = 0;
         Tree consensus;
-        if (pair.t1.vertexCount() <= pair.getCommonLeafes().size()+1){
+        if (pair.t1.vertexCount() <= pair.getNumCommonLeafes() + 1){
             consensus = pair.t2;
-        }else if (pair.t2.vertexCount() <= pair.getCommonLeafes().size()+1){
+        }else if (pair.t2.vertexCount() <= pair.getNumCommonLeafes() + 1){
             consensus = pair.t1;
         }else{
-            final ConsensusAlgorithm consMaker =  getConsensusAlgorithm(pair.t1,pair.t2);
-            consensus = consMaker.getConsensusTree();
+            consensus = pair.getConsensus(selector.scorer.getConsensusAlgorithm());
+//            pc += pair.pc; //todo remove --> Debug stuff
         }
-//        double[] r = FN_FP_RateComputer.calculateSumOfRates(consensus,pair.clones);
-//        if (Double.compare(0d,r[1]) != 0){//todo remove --> debug
-//            System.out.println("False positives  BEFORE taxa insertion!");
-//        }
 
-        pair.reinsertSingleTaxa(consensus);
+        /*double[] r = FN_FP_RateComputer.calculateSumOfRates(consensus, new Tree[]{pair.t1, pair.t2});
+        if (Double.compare(0d,r[1]) != 0){//todo remove --> debug
+            System.out.println("False positives during taxa insertion: " + r[3]);
+            System.out.println("False positives prevention during taxa insertion: " + pair.pc);
 
-//        r = FN_FP_RateComputer.calculateSumOfRates(consensus,pair.clones);
-//        if (Double.compare(0d,r[1]) != 0){//todo remove --> debug
-//            System.out.println("False positives AFTER taxa insertion!");
-//            System.out.println(Newick.getStringFromTree(consensus));
-//            System.out.println(Newick.getStringFromTree(pair.clones[0]));
-//            System.out.println(Newick.getStringFromTree(pair.clones[1]));
-//        }
-
-        if (rootOptimization)
-            TreeUtilsBasic.deleteRootNode(consensus,false);
-
+            System.out.println(Newick.getStringFromTree(consensus));
+            System.out.println(Newick.getStringFromTree(pair.t1));
+            System.out.println(Newick.getStringFromTree(pair.t2));
+}*/
         return consensus;
     }
 
-    private ConsensusAlgorithm getConsensusAlgorithm(Tree t1, Tree t2){
-        switch (METHOD){
-            case SEMI_STRICT:
-                return new PairwiseLooseConsensus(t1, t2, false);
-            case STRICT:
-                return  new NConsensus(new Tree[]{t1, t2},NConsensus.METHOD_STRICT);
-            case MAJORITY:
-                return new NConsensus(new Tree[]{t1, t2},NConsensus.METHOD_MAJORITY); // is same as strict for 2 trees...
-            case ADAMS:
-                return  new AdamsConsensus(new Tree[]{t1, t2});
-            default: return null;
-        }
-    }
+
 
 
 

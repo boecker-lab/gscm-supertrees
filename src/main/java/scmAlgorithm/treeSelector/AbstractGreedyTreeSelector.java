@@ -9,17 +9,18 @@ import java.util.*;
 /**
  * Created by fleisch on 05.02.15.
  */
-public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> implements TreeSelector {
+public abstract class AbstractGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
     protected final M treeToPairs;
-    protected final TreeScorer scorer;
 
-    public GreedyTreeSelector(TreeScorer scorer, Tree... trees) {
-        this.scorer = scorer;
+
+
+    public AbstractGreedyTreeSelector(TreeScorer scorer, Tree... trees) {
+        super(scorer);
         treeToPairs = getTreeToPairsInstance(trees.length - 1);
         init(trees);
     }
 
-    public GreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
+    public AbstractGreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
         this(scorer, treeCollection.toArray(new Tree[treeCollection.size()]));
     }
 
@@ -34,7 +35,7 @@ public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Colle
             Tree first = trees[i];
             for (int j = i + 1; j < trees.length; j++) {
                 Tree second = trees[j];
-                TreePair pair = scorer.getScoredTreePair(first, second);
+                TreePair pair = new TreePair(first, second,scorer);
                 if (pair != null) {
                     treeToPairs.get(first).add(pair);
                     treeToPairs.get(second).add(pair);
@@ -64,7 +65,7 @@ public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Colle
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Map.Entry<Tree, S> entry : treeToPairs.entrySet()) {
             Tree old = entry.getKey();
-            TreePair pair = scorer.getScoredTreePair(tree, old);
+            TreePair pair = new TreePair(tree, old, scorer);
 
             if (pair != null) { //null pair have no overlap
                 pairsToAdd.add(pair);//add to own list O(log(n))
@@ -122,9 +123,9 @@ public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Colle
 //#############################################################################
 
 
-    public static class GTSMapPQ extends GreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+    public static class GreedyTreeSelector extends AbstractGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
 
-        public GTSMapPQ(TreeScorer scorer, Tree... trees) {
+        public GreedyTreeSelector(TreeScorer scorer, Tree... trees) {
             super(scorer, trees);
         }
 
@@ -147,7 +148,7 @@ public abstract class GreedyTreeSelector<M extends Map<Tree, S>, S extends Colle
         //find best pair (O(nlog(n)))
         @Override
         protected TreePair findGlobalMax() {
-            TreePair best = new TreePair(null, null, Double.NEGATIVE_INFINITY);
+            TreePair best = TreePair.MIN_VALUE;
             //iteration in O(n)
             for (PriorityQueue<TreePair> treePairs : treeToPairs.values()) {
                 TreePair max = getMax(treePairs); //get local best in O(log(n))

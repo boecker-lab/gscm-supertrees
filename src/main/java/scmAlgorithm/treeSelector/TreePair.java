@@ -1,12 +1,12 @@
 package scmAlgorithm.treeSelector;
 
+import epos.algo.consensus.ConsensusAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
-import epos.model.tree.treetools.FN_FP_RateComputer;
-import epos.model.tree.treetools.SingleTaxonReduction;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import scmAlgorithm.treeScorer.TreeScorer;
 
 import java.util.*;
 
@@ -14,29 +14,41 @@ import java.util.*;
  * Created by fleisch on 10.02.15.
  */
 public class TreePair implements Comparable<TreePair> {
+    public final static TreePair MIN_VALUE =  new TreePair(); //todo node are in several tree druring the resolution scorer?????????
+
     public final Tree t1;
     public final Tree t2;
-//    public Tree[] clones = new Tree[2]; //todo remove --> debug
+
+    private Tree t1pruned;
+    private Tree t2pruned;
+
+
+    private Tree consensus = null;
+    private int consensusNumOfTaxa = -1;
+
     public final double score;
-    private Set<String> commonLeafes = null;
+    private Set<String> commonLeafes;
 
     private boolean first = true;
     private List<SingleTaxon> singleTaxa = null;
     private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null;
 
 
-    private SingleTaxonReduction singleTaxonReducer = null;
+    public int pc;
 
-    public TreePair(final Tree t1, final Tree t2, final double score) {
+    //just to create min value
+    private TreePair(){
+        t1 = null;
+        t2 = null;
+        score = Double.NEGATIVE_INFINITY;
+    }
+
+    public TreePair(final Tree t1, final Tree t2, TreeScorer scorer) {
         this.t1 = t1;
         this.t2 = t2;
-        this.score = score;
+        score = scorer.scoreTreePair(this);
     }
 
-    public TreePair(Tree t1, Tree t2, double score, Set<String> commonLeafes) {
-        this(t1, t2, score);
-        this.commonLeafes = commonLeafes;
-    }
 
     //unchecked
     public Tree getPartner(Tree t) {
@@ -46,41 +58,24 @@ public class TreePair implements Comparable<TreePair> {
             return t1;
     }
 
-    public Collection<String> getCommonLeafes() {
-        return commonLeafes;
+    //unchecked
+    public int getNumCommonLeafes() {
+        return commonLeafes.size();
     }
-
     public void setCommonLeafes(Set<String> commonLeafes) {
         this.commonLeafes = commonLeafes;
     }
 
     //uncheked and uncached
-
-
-    public void pruneToCommonLeafes() {
-//        clones[0] = t1.cloneTree();//todo remove --> debug
-//        clones[1] = t2.cloneTree();//todo remove --> debug
+    private void pruneToCommonLeafes() {
+        t1pruned = t1.cloneTree();
+        t2pruned = t2.cloneTree();
 
         singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound for the list --> no resizing
         commenInsertionPointTaxa = new THashMap<>(t1.vertexCount() + t2.vertexCount());
 
-        pruneLeafes(t1);
-        pruneLeafes(t2);
-    }
-
-    public void pruneToCommonLeafes(boolean singeTaxonReduction) {
-//        clones[0] = t1.cloneTree();//todo remove --> debug
-//        clones[1] = t2.cloneTree();//todo remove --> debug
-        if (singeTaxonReduction) {
-            System.out.println("Warning wrong taxa reinsertion method used");
-            singleTaxonReducer = new SingleTaxonReduction();
-            singleTaxonReducer.modify(Arrays.asList(t1, t2));
-        } else {
-            singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound vor list --> no resizing
-            commenInsertionPointTaxa = new THashMap<>(t1.vertexCount() + t2.vertexCount());
-            pruneLeafes(t1);
-            pruneLeafes(t2);
-        }
+        pruneLeafes(t1pruned);
+        pruneLeafes(t2pruned);//todo directly and with if? so that we only clone if is is nessesary
     }
 
     // NOTE: single taxon reduction optimized for 2 trees with known common taxa
@@ -115,7 +110,6 @@ public class TreePair implements Comparable<TreePair> {
 
         // sorting nodes to delete via tree (O(2n) instead of O(nlog(n)))
         Deque<TreeNode> stack = new ArrayDeque<>(t.vertexCount());
-//        List<TreeNode> toRemove = new ArrayList<>(maxSingleSubtreeRoots.size());
 
         stack.push(t.getRoot());
         while (!stack.isEmpty()) {
@@ -183,23 +177,16 @@ public class TreePair implements Comparable<TreePair> {
 
     }
 
-    //todo use only one version for perfomance reasons?
-    public void reinsertSingleTaxa(Tree t) {
-        if (singleTaxa != null) {
-            reinsertSingleTaxaFast(t);
-        } else if (singleTaxonReducer != null) {
-            singleTaxonReducer.unmodify(Arrays.asList(t));
-        }
-    }
-
-
-    private void reinsertSingleTaxaFast(Tree t) {
+    private int reinsertSingleTaxa(Tree t) {
         Map<String, TreeNode> labelToNode = new THashMap<>();
+
         for (TreeNode leaf : t.getLeaves()) {
             labelToNode.put(leaf.getLabel(), leaf);
         }
 
         ListIterator<SingleTaxon> it = singleTaxa.listIterator(singleTaxa.size());
+        pc = 0;
+
         while (it.hasPrevious()) {
             SingleTaxon singleTaxon = it.previous();
             List<TreeNode> siblingLeaves = new ArrayList<>(singleTaxon.siblingLeaves.size());
@@ -221,18 +208,17 @@ public class TreePair implements Comparable<TreePair> {
 
             //build insertion point for first occurence on this path...
             if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
-//                System.out.println("start inserting leafes");
                 if (singleTaxon.numOfSiblings == 1) {
-                    //todo is there a faster way to proof that
-                    Set<String> s =  TreeUtilsBasic.getLeafLabels(lca);
+                    //todo is there a faster/more elegant way to proof that
+                    Set<String> s =  new THashSet<>(TreeUtilsBasic.getLeafLabels(lca));
                     s.retainAll(commonLeafes);
                     Set<String> s2 =  new HashSet<>(singleTaxon.siblingLeaves);
                     s2.retainAll(commonLeafes);
-
+                    //todo remove --> DEBUG
+                    if (!s.equals(s2))
+                        pc++;
                     if (s.equals(s2)){
-                        //check if we have to insert a new root
-                        if (lcaParent != null) {
-//                            System.out.println("standard");
+                        if (lcaParent != null) { //check if we have to insert a new root
                             TreeNode nuLcaParent = new TreeNode();
                             t.addVertex(nuLcaParent);
                             t.addEdge(nuLcaParent, lca);
@@ -241,7 +227,6 @@ public class TreePair implements Comparable<TreePair> {
                             lca = nuLcaParent;
 
                         } else { //insert new root
-//                            System.out.println("nu ROOT");
                             TreeNode nuLcaParent = new TreeNode();
                             t.addVertex(nuLcaParent);
                             t.addEdge(nuLcaParent, lca);
@@ -267,198 +252,39 @@ public class TreePair implements Comparable<TreePair> {
                         labelToNode.put(nuNode.getLabel(), nuNode);
                     }
                 }
-                /*double[] r = FN_FP_RateComputer.calculateSumOfRates(t, clones);//todo remove --> debug
-                if (Double.compare(0d,r[1]) != 0){//todo remove --> debug
-                    System.out.println("False positives  DURING taxa insertion!");
-                }*/
                 singles.clear();
-//                System.out.println();
             }
+        }
+        //calculate consensus resolution because we have the information now and do not want to iterate over the tree again.
+        return  labelToNode.size();
+    }
+
+    public Tree getConsensus(final ConsensusAlgorithm consensorator){
+        if (consensus == null)
+            calculateConsensus(consensorator);
+
+        return consensus;
+    }
+    //unchecked
+    public int getConsensusNumOfTaxa() {
+        return consensusNumOfTaxa;
+    }
+
+    private void calculateConsensus(final ConsensusAlgorithm consensorator) {
+        if (commonLeafes.size() > 2) {
+            pruneToCommonLeafes();
+            consensus = consensorator.getConsensusTree(t1pruned,t2pruned);
+            consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }
     }
 
-    //todo just for debuging an testig
-    public boolean buildCompatibleRootsNaive() {
-        Map<TreeNode, Set<String>> innerNodeToSplit = new HashMap<>();
-        for (TreeNode n1 : t1.vertices()) {
-            if (n1.isInnerNode() && !n1.equals(t1.getRoot())) {
-                Set<String> split1a = TreeUtilsBasic.getLeafLabels(n1);
-                split1a.retainAll(commonLeafes);
-                Set<String> split1b = new HashSet<>(commonLeafes);
-                split1b.removeAll(split1a);
-                for (TreeNode n2 : t2.vertices()) {
-                    if (n2.isInnerNode() && !n2.equals(t2.getRoot())) {
-                        Set<String> split2;
-                        if (!innerNodeToSplit.containsKey(n2)) {
-                            split2 = TreeUtilsBasic.getLeafLabels(n2);
-                            split2.retainAll(commonLeafes);
-                            innerNodeToSplit.put(n2, split2);
-                        } else {
-                            split2 = innerNodeToSplit.get(n2);
-                        }
-                        if (split2.equals(split1a) || split2.equals(split1a)) {
-                            //possible root position found
-                            rerootToNode(t1, n1);
-                            rerootToNode(t2, n2);
 
-                            /*//todo remove debug stuff
-                            Set<Set<String>> s1 = new HashSet<>();
-                            for (TreeNode node : t1.getRoot().children()) {
-                                Set<String> s = TreeUtilsBasic.getLeafLabels(node);
-                                s.retainAll(commonLeafes);
-                                s1.add(s);
-                            }
-                            if (!s1.contains(split1a) || !s1.contains(split1b)) {
-                                System.out.println("Error during rooting");
-                            }
-                            assert s1.contains(split1a);
-                            assert s1.contains(split1b);
-
-                            Set<Set<String>> s2 = new HashSet<>();
-                            for (TreeNode node : t2.getRoot().children()) {
-                                Set<String> s = TreeUtilsBasic.getLeafLabels(node);
-                                s.retainAll(commonLeafes);
-                                s2.add(s);
-                            }
-                            if (!s2.contains(split2)) {
-                                System.out.println("Error during rooting");
-                            }
-                            assert s2.contains(split2);
-*/
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    public Tree getT1pruned() {
+        return t1pruned;
     }
 
-    public boolean buildCompatibleRoots() {
-        Map<TreeNode, Set<String>> lcaToLabels = new HashMap<>(t2.vertexCount());
-        Map<Set<String>, TreeNode> labelsToLCA = new HashMap<>(t2.vertexCount());
-
-        for (TreeNode node : t2.getRoot().depthFirstIterator()) {
-            if (!node.equals(t2.getRoot()) && !node.getParent().equals(t2.getRoot())) {
-                TreeNode p = node.getParent();
-
-                if (!lcaToLabels.containsKey(p))
-                    lcaToLabels.put(p, new HashSet<String>());
-
-                if (node.isLeaf()) {
-                    String l = node.getLabel();
-                    if (commonLeafes.contains(l))
-                        lcaToLabels.get(p).add(l);
-                } else {
-                    lcaToLabels.get(p).addAll(lcaToLabels.get(node));
-                    labelsToLCA.put(lcaToLabels.get(node), node);
-                }
-            }
-        }
-
-        lcaToLabels = new HashMap<>(t1.vertexCount());
-        TreeNode rootEdge1 = null;
-        TreeNode rootEdge2 = null;
-
-        for (TreeNode node : t1.getRoot().depthFirstIterator()) {
-            if (!node.equals(t1.getRoot())) {
-                TreeNode p = node.getParent();
-
-                if (!lcaToLabels.containsKey(p))
-                    lcaToLabels.put(p, new HashSet<String>());
-
-                if (node.isLeaf()) {
-                    String l = node.getLabel();
-                    if (commonLeafes.contains(l))
-                        lcaToLabels.get(p).add(l);
-                } else {
-                    if (!p.equals(t1.getRoot()))
-                        lcaToLabels.get(p).addAll(lcaToLabels.get(node));
-
-                    //check if current node is a possible root
-                    Set<String> split1a = new HashSet<>(lcaToLabels.get(node));
-                    split1a.retainAll(commonLeafes);
-                    Set<String> split1b = new HashSet<>(commonLeafes);
-                    split1b.removeAll(split1a);
-
-                    rootEdge2 = labelsToLCA.get(split1a);
-                    if (rootEdge2 == null)
-                        rootEdge2 = labelsToLCA.get(split1b);
-
-                    if (rootEdge2 != null) {
-                        rootEdge1 = node;
-                        break;
-
-                    }
-                }
-            }
-        }
-
-        if (rootEdge2 != null && rootEdge1 != null) {
-            //possible root position found
-            rerootToNode(t1, rootEdge1);
-            rerootToNode(t2, rootEdge2);
-            return true;
-        }
-        return false;
-    }
-
-    private void rerootToNode(Tree t, TreeNode rootEdge) {
-        TreeNode firstParent = rootEdge.getParent();
-        Deque<TreeNode> nodes = new ArrayDeque<>();
-        nodes.add(firstParent);
-        while (!nodes.isEmpty()) {
-            TreeNode p = nodes.peek().getParent();
-            if (p != null) {
-                nodes.push(p);
-            } else {
-                TreeNode n1 = nodes.poll();
-                TreeNode n2 = nodes.peek();
-                if (n2 != null) {
-                    t.removeEdge(n1, n2);
-                    t.addEdge(n2, n1);
-                }
-            }
-        }
-
-        TreeNode nuRoot = new TreeNode();
-        t.addVertex(nuRoot);
-        t.setRoot(nuRoot);
-        t.removeEdge(firstParent, rootEdge);
-        t.addEdge(nuRoot, rootEdge);
-        t.addEdge(nuRoot, firstParent);
-    }
-
-
-    //todo just for debuging an testig
-    private void pruneLeafes2(Tree t) {
-        Collection<TreeNode> parents = new THashSet<>();
-        for (TreeNode node : t.vertices()) {
-            if (node.isLeaf()) {
-                if (!commonLeafes.contains(node.getLabel())) {
-                    parents.add(node.getParent());
-                    t.removeVertex(node);
-                }
-            }
-        }
-
-        while (!parents.isEmpty()) {
-            List<TreeNode> nuParents = new ArrayList<>(parents.size());
-            for (TreeNode node : parents) {
-                int count = node.childCount();
-                if (count < 2) {
-                    TreeNode parent = node.getParent();
-                    nuParents.add(parent);
-                    if (count == 1) {
-                        TreeNode child = node.edges().iterator().next().getTarget();
-                        t.removeEdge(node, child);
-                        t.addEdge(parent, child);
-                    }
-                    t.removeVertex(node);
-                }
-            }
-            parents = nuParents;
-        }
+    public Tree getT2pruned() {
+        return t2pruned;
     }
 
     @Override
