@@ -262,15 +262,19 @@ public class TreePair implements Comparable<TreePair> {
     public Tree getConsensus(final ConsensusAlgorithm consensorator){
         if (consensus == null)
             calculateConsensus(consensorator);
-
         return consensus;
     }
+
+    public Tree getConsensus(){
+        return consensus;
+    }
+
     //unchecked
     public int getConsensusNumOfTaxa() {
         return consensusNumOfTaxa;
     }
 
-    private void calculateConsensus(final ConsensusAlgorithm consensorator) {
+    public void calculateConsensus(final ConsensusAlgorithm consensorator) {
         if (commonLeafes.size() > 2) {
             pruneToCommonLeafes();
             consensus = consensorator.getConsensusTree(t1pruned,t2pruned);

@@ -23,7 +23,10 @@ public class ResolutionScorer extends TreeScorer {
             return Double.NEGATIVE_INFINITY;
 
         Tree c =  pair.getConsensus(getConsensusAlgorithm());
-        int numTaxa =  pair.getConsensusNumOfTaxa();
-        return ((double)(c.vertexCount() - numTaxa)) / ((double)(numTaxa - 1));
+        return calculateTreeResolution(pair.getConsensusNumOfTaxa(),c.vertexCount());
+    }
+
+    public static double calculateTreeResolution(int numTaxa, int vertexCount){
+        return ((double)(vertexCount - numTaxa)) / ((double)(numTaxa - 1));
     }
 }

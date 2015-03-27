@@ -10,18 +10,22 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import scmAlgorithm.treeSelector.TreePair;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Created by fleisch on 06.02.15.
  */
 public abstract class TreeScorer {
     public static enum ConsensusMethods {SEMI_STRICT, STRICT,MAJORITY,ADAMS}
     public final ConsensusMethods METHOD;
+    protected final THashMap<Tree, THashSet<String>> treeToTaxa = new THashMap<>();
+
 
     public TreeScorer(ConsensusMethods method){
         this.METHOD = method;
     }
-
-    protected final THashMap<Tree, THashSet<String>> treeToTaxa = new THashMap<>();
 
     protected THashSet<String> calculateCommonLeafes(Tree tree1, Tree tree2) {
         THashSet<String> ts1 = treeToTaxa.get(tree1);
@@ -88,7 +92,17 @@ public abstract class TreeScorer {
 
     public void clear(){
         treeToTaxa.clear();
-    };
+    }
+
+    public void clear(Collection<Tree> keep){
+        Iterator<Tree> it = treeToTaxa.keySet().iterator();
+        while (it.hasNext()) {
+            Tree next = it.next();
+            if (!keep.contains(next)){
+                it.remove();
+            }
+        }
+    }
 
 
 }
