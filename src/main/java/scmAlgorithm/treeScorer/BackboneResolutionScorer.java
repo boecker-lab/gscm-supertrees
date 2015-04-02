@@ -1,14 +1,16 @@
 package scmAlgorithm.treeScorer;
 
+import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 
 import java.util.Set;
 
 /**
- * Created by fleisch on 06.02.15.
+ * Created by fleisch on 31.03.15.
  */
-public class OverlapScorer extends TreeScorer {
-    public OverlapScorer(ConsensusMethods method) {
+public class BackboneResolutionScorer extends TreeScorer {
+
+    public BackboneResolutionScorer(TreeScorer.ConsensusMethods method) {
         super(method);
     }
 
@@ -18,6 +20,8 @@ public class OverlapScorer extends TreeScorer {
         pair.setCommonLeafes(common);
         if (common.size() < 3)
             return Double.NEGATIVE_INFINITY;
-        return pair.getNumOfBackboneTaxa();
+
+        pair.calculateConsensus(getConsensusAlgorithm());
+        return TreeUtilsBasic.calculateTreeResolution(pair.getNumOfBackboneTaxa(), pair.getNumOfBackboneVertices());
     }
 }

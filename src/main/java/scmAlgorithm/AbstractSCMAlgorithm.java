@@ -3,7 +3,7 @@ package scmAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import scmAlgorithm.treeScorer.ResolutionScorer;
+import scmAlgorithm.treeScorer.ConsensusResolutionScorer;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
@@ -36,7 +36,7 @@ public abstract class AbstractSCMAlgorithm{
             for (TreePair pair : finalPairs) {
                 Tree st =  pair.getConsensus();
                 TreeUtilsBasic.cleanTree(st);
-                comp.put(st,ResolutionScorer.calculateTreeResolution(pair.getConsensusNumOfTaxa(),st.vertexCount()));
+                comp.put(st, TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), st.vertexCount()));
                 superTrees.add(st);
             }
             Collections.sort(superTrees, comp);
@@ -73,7 +73,7 @@ public abstract class AbstractSCMAlgorithm{
         }
 
         private double caclulateTreeResolution(Tree tree) {
-            return ResolutionScorer.calculateTreeResolution(tree.getNumTaxa(),tree.vertexCount());
+            return TreeUtilsBasic.calculateTreeResolution(tree.getNumTaxa(), tree.vertexCount());
         }
 
         public double put(Tree tree, double resolution){

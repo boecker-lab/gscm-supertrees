@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'de.unijena.bioinf'
 version = '0.8-SNAPSHOT'
-//languageLevel = '1.8'
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()

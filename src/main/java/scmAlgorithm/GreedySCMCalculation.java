@@ -13,7 +13,7 @@ public interface GreedySCMCalculation {
         TreePair superCandidatePair = null;
         TreePair pair;
         while((pair = selector.pollTreePair()) != null){
-            Tree superCandidate = pair.getConsensus(selector.scorer.getConsensusAlgorithm());
+            Tree superCandidate = pair.getConsensus(selector.getScorer().getConsensusAlgorithm());
             selector.addTree(superCandidate);
             superCandidatePair =  pair;
         }

@@ -12,7 +12,6 @@ import scmAlgorithm.treeSelector.TreePair;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by fleisch on 06.02.15.

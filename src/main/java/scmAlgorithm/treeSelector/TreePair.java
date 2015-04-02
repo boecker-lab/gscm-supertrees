@@ -26,15 +26,14 @@ public class TreePair implements Comparable<TreePair> {
     private Tree consensus = null;
     private int consensusNumOfTaxa = -1;
 
+    private int backboneNumOfVertices = -1;
+
     public final double score;
     private Set<String> commonLeafes;
 
     private boolean first = true;
     private List<SingleTaxon> singleTaxa = null;
     private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null;
-
-
-    public int pc;
 
     //just to create min value
     private TreePair(){
@@ -58,10 +57,6 @@ public class TreePair implements Comparable<TreePair> {
             return t1;
     }
 
-    //unchecked
-    public int getNumCommonLeafes() {
-        return commonLeafes.size();
-    }
     public void setCommonLeafes(Set<String> commonLeafes) {
         this.commonLeafes = commonLeafes;
     }
@@ -159,7 +154,7 @@ public class TreePair implements Comparable<TreePair> {
                         System.out.println("this schouldn't be possible");//todo this case schould not exist maybe remove if
                     }
                 }else{
-                    st = new SingleTaxon(node, siblingLeaves, new THashSet<String>(), numOfSiblings);
+                    st = new SingleTaxon(node, siblingLeaves, new THashSet<>(), numOfSiblings);
                 }
                 singleTaxa.add(st);
 
@@ -185,7 +180,6 @@ public class TreePair implements Comparable<TreePair> {
         }
 
         ListIterator<SingleTaxon> it = singleTaxa.listIterator(singleTaxa.size());
-        pc = 0;
 
         while (it.hasPrevious()) {
             SingleTaxon singleTaxon = it.previous();
@@ -215,8 +209,7 @@ public class TreePair implements Comparable<TreePair> {
                     Set<String> s2 =  new HashSet<>(singleTaxon.siblingLeaves);
                     s2.retainAll(commonLeafes);
                     //todo remove --> DEBUG
-                    if (!s.equals(s2))
-                        pc++;
+
                     if (s.equals(s2)){
                         if (lcaParent != null) { //check if we have to insert a new root
                             TreeNode nuLcaParent = new TreeNode();
@@ -269,19 +262,30 @@ public class TreePair implements Comparable<TreePair> {
         return consensus;
     }
 
-    //unchecked
-    public int getConsensusNumOfTaxa() {
-        return consensusNumOfTaxa;
-    }
-
     public void calculateConsensus(final ConsensusAlgorithm consensorator) {
         if (commonLeafes.size() > 2) {
             pruneToCommonLeafes();
             consensus = consensorator.getConsensusTree(t1pruned,t2pruned);
+            backboneNumOfVertices =  consensus.vertexCount();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }
     }
 
+    //unchecked
+    public int getNumOfConsensusTaxa() {
+        return consensusNumOfTaxa;
+    }
+    public int getNumOfConsensusVertices() {
+        return consensus.vertexCount();
+    }
+    //unchecked
+    public int getNumOfBackboneTaxa() {
+        return commonLeafes.size();
+    }
+    //unchecked
+    public int getNumOfBackboneVertices() {
+        return backboneNumOfVertices;
+    }
 
     public Tree getT1pruned() {
         return t1pruned;

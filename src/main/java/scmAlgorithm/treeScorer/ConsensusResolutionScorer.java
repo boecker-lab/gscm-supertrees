@@ -1,6 +1,7 @@
 package scmAlgorithm.treeScorer;
 
 import epos.model.tree.Tree;
+import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 
 import java.util.Set;
@@ -8,10 +9,10 @@ import java.util.Set;
 /**
  * Created by fleisch on 16.03.15.
  */
-public class ResolutionScorer extends TreeScorer {
+public class ConsensusResolutionScorer extends TreeScorer {
 
 
-    public ResolutionScorer(ConsensusMethods method) {
+    public ConsensusResolutionScorer(ConsensusMethods method) {
         super(method);
     }
 
@@ -22,11 +23,7 @@ public class ResolutionScorer extends TreeScorer {
         if (common.size() < 3)
             return Double.NEGATIVE_INFINITY;
 
-        Tree c =  pair.getConsensus(getConsensusAlgorithm());
-        return calculateTreeResolution(pair.getConsensusNumOfTaxa(),c.vertexCount());
-    }
-
-    public static double calculateTreeResolution(int numTaxa, int vertexCount){
-        return ((double)(vertexCount - numTaxa)) / ((double)(numTaxa - 1));
+        pair.calculateConsensus(getConsensusAlgorithm());
+        return TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices());
     }
 }

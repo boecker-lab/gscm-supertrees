@@ -9,7 +9,7 @@ import java.util.*;
  * Created by fleisch on 06.02.15.
  */
 public abstract class TreeSelector {
-    public final TreeScorer scorer;
+    protected TreeScorer scorer;
 
     protected TreeSelector(TreeScorer scorer) {
         this.scorer = scorer;
@@ -20,6 +20,13 @@ public abstract class TreeSelector {
     public abstract int getNumberOfTrees();
     public abstract void init(Tree[] trees);
 
+    public TreeScorer getScorer() {
+        return scorer;
+    }
+
+    public void setScorer(TreeScorer scorer) {
+        this.scorer = scorer;
+    }
 
     public static abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
         protected final M treeToPairs;
