@@ -314,6 +314,7 @@ public class GreedySCM {
     public void takeCareOfCollisions () {
 
 
+
     }
 
 
