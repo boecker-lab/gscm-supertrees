@@ -54,6 +54,7 @@ public class GreedySCM {
         }
         return output;
     }
+    
 
     public List<TreeNode> helpgetTreeNodesFromLabels(List<String> li, Tree input){
         List<TreeNode> output = new ArrayList<TreeNode>();
