@@ -5,6 +5,8 @@ import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import epos.model.tree.io.Newick;
+import epos.model.tree.treetools.FN_FP_RateComputer;
+import epos.model.tree.treetools.TreeUtilsBasic;
 import org.apache.log4j.Level;
 
 import java.io.File;
@@ -55,7 +57,7 @@ public class GreedySCM {
 
     public List<TreeNode> helpgetTreeNodesFromLabels(List<String> li, Tree input){
         List<TreeNode> output = new ArrayList<TreeNode>();
-        for (String x : li){
+        for (String x: li){
             output.add(input.getVertex(x));
         }
         return output;
@@ -86,7 +88,6 @@ public class GreedySCM {
     }*/
 
     public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
-
         boolean foundcorrectiteration = false;
         //if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
         List<String> list1 = helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves()));
@@ -311,11 +312,6 @@ public class GreedySCM {
     }
 
 
-    public void takeCareOfCollisions () {
-
-
-    }
-
 
     public Tree SCM (Tree one, Tree two){
         ArrayList<String> nodesofboth = getOverLappingNodes(one, two);
@@ -333,8 +329,6 @@ public class GreedySCM {
         else {
             one = CutTree(one, nodesofboth);
             two = CutTree(two, nodesofboth);
-
-            takeCareOfCollisions();
 
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
             result = hangInNodes(between);
@@ -748,7 +742,10 @@ public class GreedySCM {
         System.out.println("SCM-Ergebnis von c und d: "+Newick.getStringFromTree(result));*/
 
         //File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\100\\20\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+//        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+        File fi = new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Source_Trees/RaxML/sm.0.sourceTrees_OptSCM-Rooting.tre");
+        Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
+
 
         try{
             FileReader re = new FileReader(fi);
@@ -757,6 +754,14 @@ public class GreedySCM {
             //Tree result = getSuperfineConsensus(alltrees);
             Tree result = getPaperConsensus(alltrees);
             System.out.println("Supertree ist "+Newick.getStringFromTree(result));
+            System.out.println(result.vertexCount() - result.getNumTaxa());
+            System.out.println("swenson scm ist "+Newick.getStringFromTree(realSCM));
+            System.out.println(realSCM.vertexCount() - realSCM.getNumTaxa());
+            //todo mach was damit :)
+
+            FN_FP_RateComputer.calculateSumOfRates(result,alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+            FN_FP_RateComputer.calculateRates(result, realSCM,false);
+
         }
         catch (FileNotFoundException e){
             System.err.println("kein File");
@@ -875,28 +880,22 @@ public class GreedySCM {
     }
 
     public List<String> generateDepthFirstListChildren (Tree input){
-        List<String> nlist = new ArrayList<String>();
+        List<String> dnodes = new ArrayList<String>();
         TreeNode root = input.getRoot();
-        helpGenerateDepthFirstListChildren(input, root, nlist);
+        helpgenerateDepthFirstListChildren(input, root, dnodes);
 
-        return nlist;
+        return dnodes;
     }
 
-    public void helpGenerateDepthFirstListChildren (Tree input, TreeNode cur, List<String> nodes){
-        List<TreeNode> children = cur.getChildren();
+    public void helpgenerateDepthFirstListChildren(Tree input, TreeNode cur, List<String> dnodes){
+        List<TreeNode> children = new ArrayList<TreeNode>(cur.getChildren());
         for (TreeNode iter : children){
             if (!iter.isLeaf()){
-                helpGenerateDepthFirstListChildren(input, iter, nodes);
+                helpgenerateDepthFirstListChildren(input, iter, dnodes);
             }
-            else nodes.add(iter.getLabel());
+            else dnodes.add(iter.getLabel());
         }
     }
-
-
-
-
-
-
 
     public static void main (String args[]){
 
