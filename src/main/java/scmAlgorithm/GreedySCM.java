@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 import java.util.Random;
+import org.jgrapht.traverse.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,7 +52,15 @@ public class GreedySCM {
         }
         return output;
     }
-    
+
+    public List<TreeNode> helpgetTreeNodesFromLabels(List<String> li, Tree input){
+        List<TreeNode> output = new ArrayList<TreeNode>();
+        for (String x : li){
+            output.add(input.getVertex(x));
+        }
+        return output;
+    }
+
 
     /*public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
         boolean foundcorrectiteration = false;
@@ -77,6 +86,7 @@ public class GreedySCM {
     }*/
 
     public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
+
         boolean foundcorrectiteration = false;
         //if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
         List<String> list1 = helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves()));
@@ -301,6 +311,11 @@ public class GreedySCM {
     }
 
 
+    public void takeCareOfCollisions () {
+
+
+    }
+
 
     public Tree SCM (Tree one, Tree two){
         ArrayList<String> nodesofboth = getOverLappingNodes(one, two);
@@ -318,6 +333,8 @@ public class GreedySCM {
         else {
             one = CutTree(one, nodesofboth);
             two = CutTree(two, nodesofboth);
+
+            takeCareOfCollisions();
 
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
             result = hangInNodes(between);
@@ -751,19 +768,22 @@ public class GreedySCM {
     }
 
     public Tree CutTree (Tree input, List<String> keep){
-        List<String> originalleaves = new ArrayList<String>();
+
+        //List<String> originalleaves = new ArrayList<String>();
+        List<String> originalleaves = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(input.getLeaves())));
         //makes a list that contains all leaves in the input tree
-        for (TreeNode iter : input.getLeaves()){
-            originalleaves.add(iter.getLabel());
-        }
+        //for (TreeNode iter : input.getLeaves()){
+        //    originalleaves.add(iter.getLabel());
+        //}
         if (keep.isEmpty()) return new Tree();
         Tree output = input.cloneTree();
-        List<TreeNode> tokeep = new ArrayList<TreeNode>();
+        List<TreeNode> tokeep = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(keep, output));
         //Problem mit neuem Objekt
-        for (String x : keep){
-            tokeep.add(output.getVertex(x));
-        }
-        List<TreeNode> cut = new ArrayList<TreeNode>(Arrays.asList(output.getLeaves()));
+        //for (String x : keep){
+        //    tokeep.add(output.getVertex(x));
+        //}
+        //List<TreeNode> cut = new ArrayList<TreeNode>(Arrays.asList(output.getLeaves()));
+        List<TreeNode> cut = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(generateDepthFirstListChildren(output), output));
 
         for (TreeNode iter : tokeep){
             cut.remove(iter);
@@ -854,7 +874,38 @@ public class GreedySCM {
         return output;
     }
 
+    public List<String> generateDepthFirstListChildren (Tree input){
+        List<String> nlist = new ArrayList<String>();
+        TreeNode root = input.getRoot();
+        helpGenerateDepthFirstListChildren(input, root, nlist);
+
+        return nlist;
+    }
+
+    public void helpGenerateDepthFirstListChildren (Tree input, TreeNode cur, List<String> nodes){
+        List<TreeNode> children = cur.getChildren();
+        for (TreeNode iter : children){
+            if (!iter.isLeaf()){
+                helpGenerateDepthFirstListChildren(input, iter, nodes);
+            }
+            else nodes.add(iter.getLabel());
+        }
+    }
+
+
+
+
+
+
+
     public static void main (String args[]){
+
+        /*GreedySCM hey = new GreedySCM();
+        Tree b = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,c:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,f:1.0)");
+        List<String> tryout = hey.generateDepthFirstListChildren(b);
+        for (String x : tryout){
+            System.out.println(x);
+        }*/
 
         /*LinkedHashMap<String, String> list = new LinkedHashMap<String,String>(4, 0.75F, true);
         list.put("1", "a");
@@ -883,6 +934,9 @@ public class GreedySCM {
 
         GreedySCM hey = new GreedySCM();
         hey.testSCM();
+
+
+
         //hey.testCuttingAndInserting();
         //hey.testCompareTreeStructure();
 
