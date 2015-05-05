@@ -313,6 +313,119 @@ public class GreedySCM {
     }
 
 
+    public void takeCareOfCollisions(){
+        Set<Map.Entry<String, List<String>>> mapValues1 = TreeCut1.entrySet();
+        Set<Map.Entry<String, List<String>>> mapValues2 = TreeCut2.entrySet();
+        int maplength1 = mapValues1.size();
+        int maplength2 = mapValues2.size();
+        Map.Entry<String,List<String>>[] TreeCut1entries = new Map.Entry[maplength1];
+        Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength2];
+        mapValues1.toArray(TreeCut1entries);
+        mapValues2.toArray(TreeCut2entries);
+        Map<List<String>, List<String>> order = new HashMap();
+        List<String> currvalue;
+        String currkey;
+        List<String> currlist;
+
+        for (int iter1=maplength1-1; iter1>=0; iter1--){
+            currvalue = TreeCut1entries[iter1].getValue();
+            currkey = TreeCut1entries[iter1].getKey();
+            if (order.containsKey(currvalue)){
+                currlist = order.get(currvalue);
+            }
+            else {
+                currlist = new ArrayList<String>();
+            }
+            currlist.add(currkey);
+            currlist.add("Tree1");
+            order.put(currvalue, currlist);
+        }
+
+
+        for (int iter2=maplength2-1; iter2>=0; iter2--){
+            currvalue = TreeCut2entries[iter2].getValue();
+            currkey = TreeCut2entries[iter2].getKey();
+            if (order.containsKey(currvalue)){
+                currlist = order.get(currvalue);
+            }
+            else {
+                currlist = new ArrayList<String>();
+            }
+            currlist.add(currkey);
+            currlist.add("Tree2");
+            order.put(currvalue, currlist);
+        }
+
+
+        for (List<String> ke : order.keySet()){
+            List<String> list = order.get(ke);
+            if (list.contains("Tree1")&&list.contains("Tree2")){
+                list.remove("Tree1");
+                list.remove("Tree2");
+                for (String el : list){
+                    if (TreeCut2.containsKey(el)){
+                        TreeCut2.remove(el);
+                    }
+                    if (TreeCut1.containsKey(el)){
+                        TreeCut1.remove(el);
+                    }
+                }
+                List<String> newlist;
+                List<String> work;
+                for (int iter=list.size()-1; iter>0; iter--){
+                    work = new ArrayList<String>(list);
+                    newlist = work.subList(0,iter);
+                    newlist.addAll(ke);
+                    newlist.add("Polytomy");
+                    TreeCut1.put(list.get(iter), newlist);
+                }
+                TreeCut1.put(list.get(0), ke);
+            }
+        }
+
+    }
+
+    public boolean checkDirectionOfBackbone(List<String> nodes, Tree one, Tree two){
+        List<String> dfiterator1 = generateDepthFirstListChildren (one);
+        List<String> dfiterator2 = generateDepthFirstListChildren (two);
+        boolean foundfirst = false;
+        boolean foundlast = false;
+        int iter = 0;
+        String cur;
+        int posf1;
+        int posl1;
+        String elf1 = "";
+        String ell1 = "";
+        //search for the first occurence of an element both trees have in common in depth first iterator of tree 1
+        do {
+            cur = dfiterator1.get(iter);
+            if (nodes.contains(cur)) {
+                foundfirst = true;
+                //remember the element and its position
+                posf1 = iter;
+                elf1 = cur;
+            }
+            iter ++;
+        } while (!foundfirst);
+        //search for the last occurence of an element both trees have in common in depth first iterator of tree 1
+        iter = dfiterator1.size()-1;
+        do {
+            cur = dfiterator1.get(iter);
+            if (nodes.contains(cur)) {
+                foundlast = true;
+                //remember the element and its position
+                posl1 = iter;
+                ell1 = cur;
+            }
+            iter--;
+        } while (!foundlast);
+        //search for the first and last non-cut element from tree 1 in depth first iterator of tree 2
+        int posf2 = dfiterator2.indexOf(elf1);
+        int posl2 = dfiterator2.indexOf(ell1);
+        //if the first appears later than the last, the list has to be rotated
+        if (posf2 > posl2) return true;
+        else return false;
+    }
 
     public Tree SCM (Tree one, Tree two){
         ArrayList<String> nodesofboth = getOverLappingNodes(one, two);
@@ -328,8 +441,11 @@ public class GreedySCM {
             System.err.println("SCM der Bäume ergab Consensus, da gleiches Taxaset.");
         }
         else {
-            one = CutTree(one, nodesofboth);
-            two = CutTree(two, nodesofboth);
+            boolean turn = checkDirectionOfBackbone(nodesofboth, one, two);
+            one = CutTree(one, nodesofboth, turn);
+            two = CutTree(two, nodesofboth, turn);
+
+            takeCareOfCollisions();
 
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
             result = hangInNodes(between);
@@ -360,9 +476,10 @@ public class GreedySCM {
             currlist = TreeCut1entries[iter].getValue();
             if (currlist.contains("Polytomy")){
                 currlist.remove("Polytomy");
-                for (String x : currlist){
+                finallist = helpgetTreeNodesFromLabels(currlist, output);
+                /*for (String x : currlist){
                     finallist.add(output.getVertex(x));
-                }
+                }*/
                 lca = output.findLeastCommonAncestor(finallist);
                 newvertex = new TreeNode(currlabel);
                 output.addVertex(newvertex);
@@ -519,7 +636,7 @@ public class GreedySCM {
         //tokeep.add(a.getVertex("b"));
         tokeep.add("a");
         tokeep.add("b");
-        result = CutTree(a, tokeep);
+        result = CutTree(a, tokeep, false);
         print = Newick.getStringFromTree(result);
         System.out.println("A eingeschränkt auf a, b: "+print);
 
@@ -541,7 +658,7 @@ public class GreedySCM {
         //tokeep.add(c.getVertex("a"));
         //tokeep.add(c.getVertex("b"));
         Tree result2;
-        result2 = CutTree(c, tokeep);
+        result2 = CutTree(c, tokeep, false);
         print = Newick.getStringFromTree(result);
         System.out.println("C eingeschränkt auf a, b: "+print);
 
@@ -633,8 +750,10 @@ public class GreedySCM {
         System.out.println("Randomisierter Baum erstellt");
         //System.out.println(Newick.getStringFromTree(compare));
         ArrayList<String> nodesofboth = getOverLappingNodes(tree, compare);
-        cuttree = CutTree(tree, nodesofboth);
-        cutcompare = CutTree(compare, nodesofboth);
+
+        boolean turn = checkDirectionOfBackbone(nodesofboth, tree, compare);
+        cuttree = CutTree(tree, nodesofboth, turn);
+        cutcompare = CutTree(compare, nodesofboth, turn);
         consensus = con.consesusTree(new Tree[]{cuttree, cutcompare}, 1.0);
         //if (consensus.equals(tree)){
         if (TreeEquals(tree, consensus)){
@@ -655,8 +774,9 @@ public class GreedySCM {
         //Tree one = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,(e:1.0,f:1.0):1.0);");
         //Tree two = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0);");
         nodesofboth = getOverLappingNodes(one, two);
-        Tree cutone = CutTree(one, nodesofboth);
-        Tree cuttwo = CutTree(two, nodesofboth);
+        turn = checkDirectionOfBackbone(nodesofboth, one, two);
+        Tree cutone = CutTree(one, nodesofboth, turn);
+        Tree cuttwo = CutTree(two, nodesofboth, turn);
         NConsensus nee = new NConsensus();
         Tree res = nee.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
         //consensus = con.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
@@ -727,25 +847,20 @@ public class GreedySCM {
 
 
     public void testSCM(){
-        /*Tree e = Newick.getTreeFromString("((a:1.0,(b:1.0,c:1.0):1.0):1.0,(d:1.0,e:1.0):1.0)");
-        Tree f = Newick.getTreeFromString("(e:1.0,(d:1.0,(a:1.0,(b:1.0,c:1.0):1.0):1.0):1.0);");
+        /*Tree e = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,c:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,f:1.0)");
+        //Tree f = Newick.getTreeFromString("(f:1.0,(z:1.0,(c:1.0,(y:1.0,a:1.0):1.0):1.0):1.0)");
+        Tree f = Newick.getTreeFromString("((((a:1.0,y:1.0):1.0,c:1.0):1.0,z:1.0):1.0,f:1.0)");
         Tree result = SCM(e, f);
-        System.out.println("SCM-Ergebnis von e und f: "+Newick.getStringFromTree(result));
+        System.out.println("SCM-Ergebnis von e und f: "+Newick.getStringFromTree(result));*/
 
-        Tree a = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,e:1.0):1.0,f:1.0)");
-        Tree b = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,g:1.0):1.0,(c:1.0,f:1.0):1.0)");
-        result = SCM(a, b);
-        System.out.println("SCM-Ergebnis von a und b: "+Newick.getStringFromTree(result));
 
-        Tree c = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0)");
-        Tree d = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,e:1.0)");
-        result = SCM(c, d);
-        System.out.println("SCM-Ergebnis von c und d: "+Newick.getStringFromTree(result));*/
+
+
 
         //File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\100\\20\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-//        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        File fi = new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Source_Trees/RaxML/sm.0.sourceTrees_OptSCM-Rooting.tre");
-        Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
+        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
+        //File fi = new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Source_Trees/RaxML/sm.0.sourceTrees_OptSCM-Rooting.tre");
+        //Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
 
 
         try{
@@ -755,13 +870,13 @@ public class GreedySCM {
             //Tree result = getSuperfineConsensus(alltrees);
             Tree result = getPaperConsensus(alltrees);
             System.out.println("Supertree ist "+Newick.getStringFromTree(result));
-            System.out.println(result.vertexCount() - result.getNumTaxa());
-            System.out.println("swenson scm ist "+Newick.getStringFromTree(realSCM));
-            System.out.println(realSCM.vertexCount() - realSCM.getNumTaxa());
+            //System.out.println(result.vertexCount() - result.getNumTaxa());
+            //System.out.println("swenson scm ist "+Newick.getStringFromTree(realSCM));
+            //System.out.println(realSCM.vertexCount() - realSCM.getNumTaxa());
             //todo mach was damit :)
 
-            FN_FP_RateComputer.calculateSumOfRates(result,alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
-            FN_FP_RateComputer.calculateRates(result, realSCM,false);
+            //FN_FP_RateComputer.calculateSumOfRates(result,alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+            //FN_FP_RateComputer.calculateRates(result, realSCM,false);
 
         }
         catch (FileNotFoundException e){
@@ -773,7 +888,7 @@ public class GreedySCM {
 
     }
 
-    public Tree CutTree (Tree input, List<String> keep){
+    public Tree CutTree (Tree input, List<String> keep, boolean turn){
 
         //List<String> originalleaves = new ArrayList<String>();
         List<String> originalleaves = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(input.getLeaves())));
@@ -783,13 +898,17 @@ public class GreedySCM {
         //}
         if (keep.isEmpty()) return new Tree();
         Tree output = input.cloneTree();
+        List<String> depthFirst = generateDepthFirstListChildren(output);
         List<TreeNode> tokeep = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(keep, output));
         //Problem mit neuem Objekt
         //for (String x : keep){
         //    tokeep.add(output.getVertex(x));
         //}
         //List<TreeNode> cut = new ArrayList<TreeNode>(Arrays.asList(output.getLeaves()));
-        List<TreeNode> cut = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(generateDepthFirstListChildren(output), output));
+        List<TreeNode> cut = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(depthFirst, output));
+        if (turn){
+            Collections.reverse(cut);
+        }
 
         for (TreeNode iter : tokeep){
             cut.remove(iter);
@@ -907,12 +1026,21 @@ public class GreedySCM {
             System.out.println(x);
         }*/
 
-        /*LinkedHashMap<String, String> list = new LinkedHashMap<String,String>(4, 0.75F, true);
-        list.put("1", "a");
-        list.put("2", "b");
-        list.put("3", "c");
-        list.put("4", "d");
-        list.put("5", "e");
+        /*LinkedHashMap<String, List<String>> list = new LinkedHashMap<String, List<String>>();
+        ArrayList<String> abc = new ArrayList<String>();
+        abc.add("a");
+        abc.add("b");
+        abc.add("c");
+        ArrayList<String> ab = new ArrayList<String>();
+        ArrayList<String> a = new ArrayList<String>();
+        ab.add("a");
+        ab.add("b");
+        a.add("a");
+        list.put("1", abc);
+        list.put("2", a);
+        list.put("3", abc);
+        list.put("4", ab);
+        list.put("5", ab);
         for (String str : list.keySet()){
             System.out.println(str + " "+ list.get(str));
         }
@@ -923,13 +1051,19 @@ public class GreedySCM {
             System.out.println(key + " " + value);
         }
 
-        Set<Map.Entry<String, String>> mapValues = list.entrySet();
+        Set<Map.Entry<String, List<String>>> mapValues = list.entrySet();
         int maplength = mapValues.size();
-        Map.Entry<String,String>[] test = new Map.Entry[maplength];
-        mapValues.toArray(test);
-        for (int iter=maplength-1; iter>=0; iter--){
-            System.out.println(test[iter].getKey()+" "+test[iter].getValue());
+        Collection<List<String>> values = list.values();
+        System.out.println(values.size());
+        values.toArray();
+        for (List<String> x : values){
+            System.out.println(x);
         }*/
+        //Map.Entry<String,String>[] test = new Map.Entry[maplength];
+        //mapValues.toArray(test);
+        //for (int iter=maplength-1; iter>=0; iter--){
+        //    System.out.println(test[iter].getKey()+" "+test[iter].getValue());
+        //}*/
 
 
         GreedySCM hey = new GreedySCM();
