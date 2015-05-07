@@ -154,7 +154,7 @@ public class TreePair implements Comparable<TreePair> {
                         System.out.println("this schouldn't be possible");//todo this case schould not exist maybe remove if
                     }
                 }else{
-                    st = new SingleTaxon(node, siblingLeaves, new THashSet<>(), numOfSiblings);
+                    st = new SingleTaxon(node, siblingLeaves, new THashSet<String>(), numOfSiblings);
                 }
                 singleTaxa.add(st);
 
