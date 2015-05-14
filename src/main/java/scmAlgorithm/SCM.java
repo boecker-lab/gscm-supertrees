@@ -15,6 +15,8 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.Random;
 import org.jgrapht.traverse.*;
+import treeUtils.TreeEquals;
+import treeUtils.TreeUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,171 +27,28 @@ import org.jgrapht.traverse.*;
  */
 
 
-public class GreedySCM {
+public class SCM {
 
-    protected LinkedHashMap<String, List<String>> TreeCut1 = new LinkedHashMap<String, List<String>>();
-    protected LinkedHashMap<String, List<String>> TreeCut2 = new LinkedHashMap<String, List<String>>();
+    private LinkedHashMap<String, List<String>> TreeCut1 = new LinkedHashMap<String, List<String>>();
+    private LinkedHashMap<String, List<String>> TreeCut2 = new LinkedHashMap<String, List<String>>();
 
-    public boolean StringListsEquals(List<String> one, List<String> two){
-        if (one == null && two == null){
-            return true;
-        }
-        if((one == null && two != null)
-                || one != null && two == null
-                || one.size() != two.size()){
-            return false;
-        }
-        List copyone = new ArrayList<String>(one);
-        List copytwo = new ArrayList<String>(two);
-        Collections.sort(copyone);
-        Collections.sort(copytwo);
-        return copyone.equals(copytwo);
+    public Map.Entry<String,List<String>>[] getTreeCut1EntrySet (){
+        Set<Map.Entry<String, List<String>>> mapValues = TreeCut1.entrySet();
+        int maplength = mapValues.size();
+        Map.Entry<String,List<String>>[] TreeCut1entries = new Map.Entry[maplength];
+        return mapValues.toArray(TreeCut1entries);
     }
 
-    public List<String> helpgetLabelsFromNodes(List<TreeNode> input){
-        List<String> output = new ArrayList<String>();
-        String def = "";
-        for (TreeNode nod : input){
-            output.add(def.concat(nod.getLabel()));
-        }
-        return output;
-    }
-    
-
-    public List<TreeNode> helpgetTreeNodesFromLabels(List<String> li, Tree input){
-        List<TreeNode> output = new ArrayList<TreeNode>();
-        for (String x: li){
-            output.add(input.getVertex(x));
-        }
-        return output;
+    public Map.Entry<String,List<String>>[] getTreeCut2EntrySet (){
+        Set<Map.Entry<String, List<String>>> mapValues = TreeCut2.entrySet();
+        int maplength = mapValues.size();
+        Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength];
+        return mapValues.toArray(TreeCut2entries);
     }
 
 
-    /*public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
-        boolean foundcorrectiteration = false;
-        if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
-        else {
-            List<TreeNode> childrenone = new ArrayList<TreeNode>(nodone.getChildren());
-            List<TreeNode> childrentwo = new ArrayList<TreeNode>(nodtwo.getChildren());
-            subiteration:for (TreeNode iter1 : childrenone){
-                for (TreeNode iter2 : childrentwo){
-                    if (!iter1.isLeaf() && !iter2.isLeaf()){
-                        if (helpCompareTreeStructure(one, iter1, two, iter2)){
-                            foundcorrectiteration = true;
-                            break subiteration;
-                        }
-                    }
-                    else return true; //foundcorrectiteration = true;
-                }
-            }
 
-            if (!foundcorrectiteration) return false;
-            return true;
-        }
-    }*/
-
-    public boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo){
-        boolean foundcorrectiteration = false;
-        //if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves())))) return false;
-        List<String> list1 = helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves()));
-        List<String> list2 = helpgetLabelsFromNodes(Arrays.asList(nodtwo.getLeaves()));
-        if (!StringListsEquals(list1, list2)) return false;
-        else {
-            List<TreeNode> childrenone = new ArrayList<TreeNode>(nodone.getChildren());
-            List<TreeNode> childrentwo = new ArrayList<TreeNode>(nodtwo.getChildren());
-            for (TreeNode iter1 : childrenone){
-                foundcorrectiteration = false;
-                for (TreeNode iter2 : childrentwo){
-                    if (!iter1.isLeaf() && !iter2.isLeaf()){
-                        if (helpCompareTreeStructure(one, iter1, two, iter2)){
-                            foundcorrectiteration = true;
-                            break;
-                        }
-                    }
-                    else if (iter1.getLabel().equalsIgnoreCase(iter2.getLabel())){
-                        //return true;
-                        foundcorrectiteration = true;
-                        break;
-                    }
-                }
-                if (!foundcorrectiteration) return false;
-            }
-            //if (!foundcorrectiteration) return false;
-            return true;
-        }
-    }
-
-    public boolean CompareTreeStructure (Tree one, Tree two){
-        TreeNode start1 = one.getRoot();
-        TreeNode start2 = two.getRoot();
-        if (helpCompareTreeStructure(one, start1, two, start2)) return true;
-        else return false;
-    }
-
-    public void testCompareTreeStructure(){
-        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        List<Tree> alltrees = new ArrayList();
-        try{
-            FileReader re = new FileReader(fi);
-            alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        }
-        catch (FileNotFoundException e){
-            System.err.println("kein File");
-        };
-        Tree tree = alltrees.get(1);
-        Tree copy = tree.cloneTree();
-        if (TreeEquals(tree, copy)) System.out.println("Baum 1 und seine Kopie sind gleich.");
-    }
-
-    public boolean TreeEquals (Tree one, Tree two){
-        if (one==two) return true;
-        else {
-            //compare number of vertices
-            if (one.vertexCount()!=two.vertexCount()) return false;
-            //List<String> leaveslabellistone = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(one.getLeaves())));
-            //List<String> leaveslabellisttwo = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(two.getLeaves())));
-            //if (!StringListsEquals(leaveslabellistone, leaveslabellisttwo)) return false;
-            List<TreeNode> leaveslistone = new ArrayList<TreeNode>(Arrays.asList(one.getLeaves()));
-            List<TreeNode> leaveslisttwo = new ArrayList<TreeNode>(Arrays.asList(two.getLeaves()));
-            //compare number and labeling of leaves
-            if (!StringListsEquals(helpgetLabelsFromNodes(Arrays.asList(one.getLeaves())), helpgetLabelsFromNodes(Arrays.asList(two.getLeaves())))) return false;
-            //compare TreeStructure
-            if (!CompareTreeStructure(one, two)) return false;
-            //TODO is this a valid equals method? What is missing to make it complete? How to change the comparison of vertices for correctness?
-            /*TreeNode leastca = new TreeNode();
-            TreeNode mintwo = new TreeNode();
-            TreeNode nintwo = new TreeNode();
-            for (TreeNode m : leaveslistone){
-                for (TreeNode n : leaveslistone){
-                    if (!m.getLabel().equalsIgnoreCase(n.getLabel())){
-                        leastca = one.findLeastCommonAncestor(m, n);
-                        mintwo = two.getVertex(m.getLabel());
-                        nintwo = two.getVertex(n.getLabel());
-                        //TreeNode lcatwo = two.findLeastCommonAncestor(two.getVertex(m.getLabel()), two.getVertex(n.getLabel()));
-                        TreeNode lcatwo = two.findLeastCommonAncestor(mintwo, nintwo);
-                        //if (!leastca.getLabel().equalsIgnoreCase(two.findLeastCommonAncestor(two.getVertex(m.getLabel()), two.getVertex(n.getLabel())).getLabel())){
-                        if (!leastca.getLabel().equalsIgnoreCase(lcatwo.getLabel())){
-                            return false;
-                        }
-                    }
-                }
-                //if (!vertexequals) return false;
-                //vertexequals = false;
-            }*/
-            //TODO why does consensus method mess up the node-labels so equalsNode doesn't work correctly anymore?
-            /*if (!one.findLeastCommonAncestor(one.getLeaves()).equalsNode(two.findLeastCommonAncestor(two.getLeaves()))){
-                System.out.println("Die Wurzel ist wohl ungleich.");
-                return false;
-            }
-            if (!one.getRoot().equalsNode(two.getRoot())){
-                System.out.println("Die Wurzel ist wohl ungleich.");
-                return false;
-            }*/
-        }
-        return true;
-    }
-
-    public Tree getPaperConsensus (List<Tree> input) {
+    /*public Tree getPaperConsensus (List<Tree> input) {
         List<Tree> output = input.subList(0, input.size()-1);
         List<Tree> save;
         Tree one;
@@ -207,9 +66,9 @@ public class GreedySCM {
             output.add(three);
         }
         return output.get(0);
-    }
+    }*/
 
-    public Tree getSuperfineConsensus (List<Tree> input){
+    /*public Tree getSuperfineConsensus (List<Tree> input){
         List<Tree> output = input.subList(0, input.size()-1);
         List<Tree> save;
         Tree one;
@@ -227,9 +86,9 @@ public class GreedySCM {
             output.add(three);
         }
         return output.get(0);
-    }
+    }*/
 
-    public List<Tree> getTreesForPaperSCM (List<Tree> input){
+    /*public List<Tree> getTreesForPaperSCM (List<Tree> input){
         float curscore;
         float resolution;
         Tree scm;
@@ -279,9 +138,9 @@ public class GreedySCM {
             output.add(maxscm);
         }
         return output;
-    }
+    }*/
 
-    public List<Tree> getTreesWithBiggestOverlap (List<Tree> input){
+    /*public List<Tree> getTreesWithBiggestOverlap (List<Tree> input){
         int cursize;
         int maxsize = 0;
         int mem1 = 0, mem2 = 0;
@@ -311,7 +170,7 @@ public class GreedySCM {
             output.add(input.get(mem2));
         }
         return output;
-    }
+    }*/
 
 
     public void takeCareOfCollisions(){
@@ -367,8 +226,6 @@ public class GreedySCM {
                 while (list.contains("Tree2")){
                     list.remove("Tree2");
                 }
-                //list.remove("Tree1");
-                //list.remove("Tree2");
                 for (String el : list){
                     if (TreeCut2.containsKey(el)){
                         TreeCut2.remove(el);
@@ -393,8 +250,8 @@ public class GreedySCM {
     }
 
     public boolean checkDirectionOfBackbone(List<String> nodes, Tree one, Tree two){
-        List<String> dfiterator1 = generateDepthFirstListChildren (one);
-        List<String> dfiterator2 = generateDepthFirstListChildren (two);
+        List<String> dfiterator1 = TreeUtils.generateDepthFirstListChildren(one);
+        List<String> dfiterator2 = TreeUtils.generateDepthFirstListChildren(two);
         boolean foundfirst = false;
         boolean foundlast = false;
         int iter = 0;
@@ -434,35 +291,34 @@ public class GreedySCM {
         else return false;
     }
 
-    public Tree SCM (Tree one, Tree two){
-        ArrayList<String> nodesofboth = getOverLappingNodes(one, two);
+
+    public Tree getSCM (Tree one, Tree two){
+        ArrayList<String> nodesofboth = TreeUtils.getOverLappingNodes(one, two);
         Tree result;
         Tree between;
         NConsensus con = new NConsensus();
         con.getLog().setLevel(Level.OFF);
         if (nodesofboth.size()==0){
             System.err.println("Kein SCM möglich, da kein Overlap");
+            return new Tree();
         }
         if (nodesofboth.size() == one.getLeaves().length && nodesofboth.size() == two.getLeaves().length){
             result = con.consesusTree(new Tree[]{one, two}, 1.0);
-            System.err.println("SCM der Bäume ergab Consensus, da gleiches Taxaset.");
+            //System.err.println("SCM der Bäume ergab Consensus, da gleiches Taxaset.");
         }
         else {
             boolean turn = checkDirectionOfBackbone(nodesofboth, one, two);
             one = CutTree(one, nodesofboth, turn);
             two = CutTree(two, nodesofboth, turn);
-
             takeCareOfCollisions();
-
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
             result = hangInNodes(between);
         }
-
         return result;
 
     }
 
-    public Tree hangInNodes (Tree input){
+    /*public Tree hangInNodes (Tree input){
         Tree output = input.cloneTree();
         String currlabel;
         List<String> currlist;
@@ -483,10 +339,7 @@ public class GreedySCM {
             currlist = TreeCut1entries[iter].getValue();
             if (currlist.contains("Polytomy")){
                 currlist.remove("Polytomy");
-                finallist = helpgetTreeNodesFromLabels(currlist, output);
-                /*for (String x : currlist){
-                    finallist.add(output.getVertex(x));
-                }*/
+                finallist = TreeUtils.helpgetTreeNodesFromLabels(currlist, output);
                 lca = output.findLeastCommonAncestor(finallist);
                 newvertex = new TreeNode(currlabel);
                 output.addVertex(newvertex);
@@ -534,7 +387,6 @@ public class GreedySCM {
         Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength];
         mapValues.toArray(TreeCut2entries);
         for (int iter=maplength-1; iter>=0; iter--){
-            //System.out.println(test[iter].getKey()+" "+test[iter].getValue());
             currlabel = TreeCut2entries[iter].getKey();
             currlist = TreeCut2entries[iter].getValue();
             if (currlist.contains("Polytomy")){
@@ -584,335 +436,100 @@ public class GreedySCM {
         TreeCut2.clear();
 
         return output;
+    }*/
+
+    public Tree hangInNodes (Tree input){
+        Tree output = input.cloneTree();
+
+        Set<Map.Entry<String, List<String>>> mapValues = TreeCut1.entrySet();
+        int maplength = mapValues.size();
+        Map.Entry<String,List<String>>[] TreeCut1entries = new Map.Entry[maplength];
+        mapValues.toArray(TreeCut1entries);
+        output = helphangInNodes(output, maplength, TreeCut1entries);
+        TreeCut1.clear();
+
+        mapValues = TreeCut2.entrySet();
+        maplength = mapValues.size();
+        Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength];
+        mapValues.toArray(TreeCut2entries);
+        output = helphangInNodes(output, maplength, TreeCut2entries);
+        TreeCut2.clear();
+
+        return output;
     }
 
-    public ArrayList<String> getOverLappingNodes (Tree one, Tree two){
-        List<TreeNode> leavesone = new ArrayList<TreeNode>(Arrays.asList(one.getLeaves()));
-        List<TreeNode> leavestwo = new ArrayList<TreeNode>(Arrays.asList(two.getLeaves()));
-        ArrayList<String> tokeep = new ArrayList<String>();
 
-        for (TreeNode x : leavesone){
-            for (TreeNode y : leavestwo){
-                if (x.getLabel().equals(y.getLabel())){
-                    tokeep.add(x.getLabel());
+    private Tree helphangInNodes(Tree input, int maplength, Map.Entry<String,List<String>>[] TreeCutentries){
+        Tree output = input.cloneTree();
+        String currlabel;
+        List<String> currlist;
+        List<TreeNode> finallist = new ArrayList<TreeNode>();
+        TreeNode lca = new TreeNode();
+        TreeNode newvertex;
+        TreeNode betw1;
+        TreeNode betw2;
+
+        for (int iter=maplength-1; iter>=0; iter--){
+            currlabel = TreeCutentries[iter].getKey();
+            currlist = TreeCutentries[iter].getValue();
+            if (currlist.contains("Polytomy")){
+                currlist.remove("Polytomy");
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
                 }
+                lca = output.findLeastCommonAncestor(finallist);
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
+            }
+            else {
+                for (String x : currlist){
+                    finallist.add(output.getVertex(x));
+                }
+
+                if (finallist.size()==1){
+                    lca = finallist.get(0);
+                }
+                else {
+                    lca = output.findLeastCommonAncestor(finallist);
+                }
+                if (lca.getParent()!=null){
+                    betw1 = lca.getParent();
+                    betw2 = new TreeNode();
+                    output.removeEdge(betw1, lca);
+                    output.addVertex(betw2);
+                    output.addEdge(betw1, betw2);
+                    output.addEdge(betw2, lca);
+                    lca = betw2;
+                }
+                else {
+                    betw1 = new TreeNode();
+                    output.addVertex(betw1);
+                    output.addEdge(betw1, lca);
+                    output.setRoot(betw1);
+                    lca = betw1;
+                }
+                newvertex = new TreeNode(currlabel);
+                output.addVertex(newvertex);
+                output.addEdge(lca, newvertex);
+                finallist.clear();
             }
         }
-
-        return tokeep;
-
-    }
-
-    public void testCutTree(){
-        Tree a = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(d:1.0,c:1.0):1.0);");
-        Tree b = Newick.getTreeFromString("((b:1.0,a:1.0):1.0,(c:1.0,d:1.0):1.0);");
-        Tree c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
-        Tree d = Newick.getTreeFromString("((a:1.0,(b:1.0,c:1.0):1.0):1.0,d:1.0);");
-        Tree e = Newick.getTreeFromString("((a:1.0,(b:1.0,c:1.0):1.0):1.0,(d:1.0,e:1.0):1.0)");
-        Tree f = Newick.getTreeFromString("(e:1.0,(d:1.0,(a:1.0,(b:1.0,c:1.0):1.0):1.0):1.0);");
-        Tree g = Newick.getTreeFromString("((d:1.0,e:1.0):1.0,(a:1.0,(c:1.0,b:1.0):1.0):1.0)");
-        Tree h = Newick.getTreeFromString("(d:1.0,(a:1.0,(b:1.0,(e:1.0,c:1.0):1.0):1.0):1.0)");
-        Tree result = new Tree();
-        //List<TreeNode> tokeep = new ArrayList<TreeNode>();
-        List<String> tokeep = new ArrayList<String>();
-
-        TreeNode ah = a.getVertex("a");
-        TreeNode be = a.getVertex("b");
-        TreeNode ce = a.getVertex("c");
-        TreeNode de;
-        TreeNode eh;
-        String print = "";
-
-           /*
-        //BEISPIEL A eingeschränkt auf a, b, c
-        //tokeep.add(ah);
-        //tokeep.add(be);
-        //tokeep.add(ce);
-        tokeep.add("a");
-        tokeep.add("b");
-        tokeep.add("c");
-        result = CutTree(a, tokeep);
-        print = Newick.getStringFromTree(result);
-        System.out.println("A eingeschränkt auf a, b, c: "+print);
-        */
-
-        //BEISPIEL A eingeschränkt auf a, b
-        tokeep.clear();
-        a = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(d:1.0,c:1.0):1.0);");
-        //tokeep.add(a.getVertex("a"));
-        //tokeep.add(a.getVertex("b"));
-        tokeep.add("a");
-        tokeep.add("b");
-        result = CutTree(a, tokeep, false);
-        print = Newick.getStringFromTree(result);
-        System.out.println("A eingeschränkt auf a, b: "+print);
-
-        //BEISPIEL C eingeschränkt auf a, b
-        tokeep.clear();
-
-        boolean te = a.getVertex("a").equalsNode(c.getVertex("a"));
-        List<TreeNode> testt = new ArrayList(Arrays.asList(a.getLeaves()));
-        boolean ze = testt.contains(c.getVertex("a"));
-
-        ah = c.getVertex("a");
-        be = c.getVertex("b");
-        ce = c.getVertex("c");
-        de = c.getVertex("d");
-        //tokeep.add(ah);
-        //tokeep.add(be);
-        tokeep.add("a");
-        tokeep.add("b");
-        //tokeep.add(c.getVertex("a"));
-        //tokeep.add(c.getVertex("b"));
-        Tree result2;
-        result2 = CutTree(c, tokeep, false);
-        print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschränkt auf a, b: "+print);
-
-        //NConsensus con = new NConsensus();
-        //result = con.consesusTree(new Tree[]{result, result2}, 1.0);
-
-
-        /*
-        //BEISPIEL C eingeschränkt auf c, d
-        tokeep.clear();
-        //c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
-        //tokeep.add(c.getVertex("c"));
-        //tokeep.add(c.getVertex("d"));
-        //tokeep.add(ce);
-        //tokeep.add(de);
-        tokeep.add("c");
-        tokeep.add("d");
-        result = CutTree(c, tokeep);
-        print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschränkt auf c, d: "+print);
-        */
-        /*
-        //BEISPIEL C eingeschränkt auf d
-        //tokeep.remove(ce);
-        tokeep.clear();
-        c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
-        //tokeep.add(c.getVertex("d"));
-        tokeep.add("d");
-        result = CutTree(c, tokeep);
-        print = Newick.getStringFromTree(result);
-        System.out.println("C eingeschränkt auf d : "+print);
-        */
-
-        Object zwischen = TreeCut2.get("d");
-        System.out.println(zwischen.toString());
-
-        //result = hangInNodes(result);
-
-        System.out.println(Newick.getStringFromTree(result));
-
-    }
-
-    public Tree randomInsert(Tree tre, int nodenumber){
-        //don't hang nodes at leaves
-        Tree out = tre.cloneTree();
-        String label = "";
-        int vertexsize = 0;
-        int randnumber = 0;
-        boolean correct = false;
-        Random rand = new Random();
-        for (int iter=0; iter<nodenumber; iter++){
-            label = "hangsatnode";
-            vertexsize = tre.vertexCount();
-            while (!correct){
-                randnumber = rand.nextInt(vertexsize);
-                if (!out.getVertex(randnumber).isLeaf()) correct = true;
-            }
-            label = label.concat(Integer.toString(randnumber));
-            label = label.concat(",labeled_"+out.getVertex(randnumber).getLabel());
-            label = label.concat(",try_"+Integer.toString(iter));
-            TreeNode nod = new TreeNode(label);
-            out.addVertex(nod);
-            out.addEdge(out.getVertex(randnumber),nod);
-        }
-        return out;
-    }
-
-    public void testCuttingAndInserting(){
-        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        List<Tree> alltrees = new ArrayList();
-        try{
-            FileReader re = new FileReader(fi);
-            alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-            //Tree result = getPaperConsensus(alltrees);
-            //System.out.println("Supertree ist "+Newick.getStringFromTree(result));
-        }
-        catch (FileNotFoundException e){
-            System.err.println("kein File");
-        };
-        Tree tree = alltrees.get(1);
-        Tree compare = tree.cloneTree();
-        Tree cutcompare;
-        Tree cuttree;
-        Tree hanginconsensus;
-        Tree consensus = new Tree();
-        //System.out.println(Newick.getStringFromTree(compare));
-        NConsensus con = new NConsensus();
-        compare = randomInsert(compare, 100);
-        System.out.println("Randomisierter Baum erstellt");
-        //System.out.println(Newick.getStringFromTree(compare));
-        ArrayList<String> nodesofboth = getOverLappingNodes(tree, compare);
-
-        boolean turn = checkDirectionOfBackbone(nodesofboth, tree, compare);
-        cuttree = CutTree(tree, nodesofboth, turn);
-        cutcompare = CutTree(compare, nodesofboth, turn);
-        consensus = con.consesusTree(new Tree[]{cuttree, cutcompare}, 1.0);
-        //if (consensus.equals(tree)){
-        if (TreeEquals(tree, consensus)){
-            System.out.println ("Konsensusbaum ist gleich Ursprungsbaum");
-        }
-        else System.out.println("Fehler, Konsensusbaum ungleich Ursprungsbaum");
-        hanginconsensus = hangInNodes(consensus);
-        if (TreeEquals(compare, hanginconsensus)){
-            System.out.println("Baum mit eingefügten Vertices ist gleich Vergleichsbaum");
-        }
-        else System.out.println("Fehler, Baum mit eingefügten Verticees ungleich Vergleichsbaum");
-
-
-
-        Tree one = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,e:1.0):1.0,((f:1.0,g:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0);");
-        Tree two = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0):1.0,((g:1.0,f:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0):1.0,(k:1.0,l:1.0):1.0);");
-        //Tree two = Newick.getTreeFromString("((k:1.0,l:1.0):1.0,(((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0):1.0,((g:1.0,f:1.0):1.0,((h:1.0,i:1.0):1.0,j:1.0):1.0):1.0):1.0);");
-        //Tree one = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,(e:1.0,f:1.0):1.0);");
-        //Tree two = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(c:1.0,e:1.0):1.0);");
-        nodesofboth = getOverLappingNodes(one, two);
-        turn = checkDirectionOfBackbone(nodesofboth, one, two);
-        Tree cutone = CutTree(one, nodesofboth, turn);
-        Tree cuttwo = CutTree(two, nodesofboth, turn);
-        NConsensus nee = new NConsensus();
-        Tree res = nee.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
-        //consensus = con.consesusTree(new Tree[]{cutone, cuttwo}, 1.0);
-        Tree hungin = hangInNodes(res);
-        System.out.println(Newick.getStringFromTree(hungin));
-
-
+        return output;
     }
 
 
-    public void testStrictConsensus(){
-
-        Tree a = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(d:1.0,c:1.0):1.0);");
-        Tree b = Newick.getTreeFromString("((b:1.0,a:1.0):1.0,(c:1.0,d:1.0):1.0);");
-        Tree c = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0):1.0,d:1.0);");
-        Tree d = Newick.getTreeFromString("((a:1.0,(b:1.0,c:1.0):1.0):1.0,d:1.0);");
-        Tree e = Newick.getTreeFromString("((a:1.0,(b:1.0,c:1.0):1.0):1.0,(d:1.0,e:1.0):1.0)");
-        //Tree f = Newick.getTreeFromString("(((d:1.0,(a:1.0,(b:1.0,c:1.0):1.0):1.0):1.0),e:1.0)");
-        Tree f = Newick.getTreeFromString("(e:1.0,(d:1.0,(a:1.0,(b:1.0,c:1.0):1.0):1.0):1.0);");
-        Tree g = Newick.getTreeFromString("((d:1.0,e:1.0):1.0,(a:1.0,(c:1.0,b:1.0):1.0):1.0)");
-        Tree h = Newick.getTreeFromString("(d:1.0,(a:1.0,(b:1.0,(e:1.0,c:1.0):1.0):1.0):1.0)");
-
-        String s = Newick.getStringFromTree(a);
-        String t = Newick.getStringFromTree(b);
-        String u = Newick.getStringFromTree(c);
-        String v = Newick.getStringFromTree(d);
-        String w = Newick.getStringFromTree(e);
-        String x = Newick.getStringFromTree(f);
-        String y = Newick.getStringFromTree(g);
-
-        String z = Newick.getStringFromTree(h);
-
-        System.out.println("Baum a: "+s);
-        System.out.println("Baum b: "+t);
-        System.out.println("Baum c: "+u);
-        System.out.println("Baum d: "+v);
-        System.out.println("Baum e: "+w);
-        System.out.println("Baum f: "+x);
-        System.out.println("Baum g: "+y);
-        System.out.println("Baum h: "+z);
-
-
-        NConsensus eins = new NConsensus();
-        NConsensus zwei = new NConsensus();
-        NConsensus drei = new NConsensus();
-        NConsensus vier = new NConsensus();
-        NConsensus fuenf = new NConsensus();
-
-        Tree reseins = eins.consesusTree(new Tree[]{a,b},1.0);
-        Tree reszwei = zwei.consesusTree(new Tree[]{c,d},1.0);
-        Tree resdrei = drei.consesusTree(new Tree[]{e,f},1.0);
-        Tree resvier = vier.consesusTree(new Tree[]{e,g},1.0);
-        Tree resfuenf = fuenf.consesusTree(new Tree[]{e,h},1.0);
-
-        v = Newick.getStringFromTree(reseins);
-        w = Newick.getStringFromTree(reszwei);
-        x = Newick.getStringFromTree(resdrei);
-        y = Newick.getStringFromTree(resvier);
-        z = Newick.getStringFromTree(resfuenf);
-
-        System.out.println("Baum 1: "+v);
-        System.out.println("Baum 2: "+w);
-        System.out.println("Baum 3: "+x);
-        System.out.println("Baum 4: "+y);
-        System.out.println("Baum 5: "+z);
-
-    }
-
-
-    public void testSCM(){
-        /*Tree e = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,c:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,f:1.0)");
-        //Tree f = Newick.getTreeFromString("(f:1.0,(z:1.0,(c:1.0,(y:1.0,a:1.0):1.0):1.0):1.0)");
-        Tree f = Newick.getTreeFromString("((((a:1.0,y:1.0):1.0,c:1.0):1.0,z:1.0):1.0,f:1.0)");
-        Tree result = SCM(e, f);
-        System.out.println("SCM-Ergebnis von e und f: "+Newick.getStringFromTree(result));*/
-
-
-
-
-
-        //File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\100\\20\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        File fi = new File ("C:\\Eigene Dateien\\Studium\\7. Semester\\Bachelorarbeit\\SMIDGen_Anika\\500\\50\\Source_Trees\\RaxML\\sm.0.sourceTrees_OptSCM-Rooting.tre");
-        //File fi = new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Source_Trees/RaxML/sm.0.sourceTrees_OptSCM-Rooting.tre");
-        //Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
-
-
-        try{
-            FileReader re = new FileReader(fi);
-            List<Tree> alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-            //alltrees.get(1).
-            //Tree result = getSuperfineConsensus(alltrees);
-            Tree result = getPaperConsensus(alltrees);
-            System.out.println("Supertree ist "+Newick.getStringFromTree(result));
-            //System.out.println(result.vertexCount() - result.getNumTaxa());
-            //System.out.println("swenson scm ist "+Newick.getStringFromTree(realSCM));
-            //System.out.println(realSCM.vertexCount() - realSCM.getNumTaxa());
-            //todo mach was damit :)
-
-            //FN_FP_RateComputer.calculateSumOfRates(result,alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
-            //FN_FP_RateComputer.calculateRates(result, realSCM,false);
-
-        }
-        catch (FileNotFoundException e){
-            System.err.println("kein File");
-        };
-
-
-
-
-    }
 
     public Tree CutTree (Tree input, List<String> keep, boolean turn){
-
-        //List<String> originalleaves = new ArrayList<String>();
-        List<String> originalleaves = new ArrayList<String>(helpgetLabelsFromNodes(Arrays.asList(input.getLeaves())));
-        //makes a list that contains all leaves in the input tree
-        //for (TreeNode iter : input.getLeaves()){
-        //    originalleaves.add(iter.getLabel());
-        //}
-        if (keep.isEmpty()) return new Tree();
         Tree output = input.cloneTree();
-        List<String> depthFirst = generateDepthFirstListChildren(output);
-        List<TreeNode> tokeep = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(keep, output));
-        //Problem mit neuem Objekt
-        //for (String x : keep){
-        //    tokeep.add(output.getVertex(x));
-        //}
-        //List<TreeNode> cut = new ArrayList<TreeNode>(Arrays.asList(output.getLeaves()));
-        List<TreeNode> cut = new ArrayList<TreeNode>(helpgetTreeNodesFromLabels(depthFirst, output));
+        //makes a list that contains all leaves in the input tree
+        List<String> originalleaves = new ArrayList<String>(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(output.getLeaves())));
+        if (keep.isEmpty()) return new Tree();
+
+        List<String> depthFirst = TreeUtils.generateDepthFirstListChildren(output);
+        List<TreeNode> tokeep = new ArrayList<TreeNode>(TreeUtils.helpgetTreeNodesFromLabels(keep, output));
+        List<TreeNode> cut = new ArrayList<TreeNode>(TreeUtils.helpgetTreeNodesFromLabels(depthFirst, output));
         if (turn){
             Collections.reverse(cut);
         }
@@ -924,24 +541,26 @@ public class GreedySCM {
         int savewhere;
         if (TreeCut1.isEmpty()) savewhere = 1;
         else savewhere = 2;
-        //List<TreeNode> savenodes = new ArrayList<TreeNode>();
+
         if (cut.size()==0) return output;
-        int iteration = -1;
+
+        List<TreeNode> between;
+        List<TreeNode> between2;
+        TreeNode par;
+        String label;
+        List<String> finallist;
+
         while (cut.size()!=0){
             for (TreeNode iter : cut){
-                iteration++;
                 if (firstpass){
-                    String label = "";
-                    List<TreeNode> between;
-                    List<TreeNode> between2;
-                    TreeNode par = iter.getParent();
-                    List<String> finallist = new ArrayList<String>();
+                    label = "";
+                    par = iter.getParent();
+                    finallist = new ArrayList<String>();
                     between = new ArrayList<TreeNode>(Arrays.asList(par.getLeaves()));
                     between2 = new ArrayList<TreeNode>(between);
                     for (TreeNode el : between2){
                         if (!originalleaves.contains(el.getLabel())) between.remove(el);
                     }
-                    //while (between.size() <= 1 && !between.get(0).equalsNode(output.getRoot())){
                     while (between.size() <= 1 && between.get(0).getParent()!=null){
                         par = par.getParent();
                         between = new ArrayList<TreeNode>(Arrays.asList(par.getLeaves()));
@@ -949,12 +568,7 @@ public class GreedySCM {
                         for (TreeNode el : between2){
                             if (!originalleaves.contains(el.getLabel())) between.remove(el);
                         }
-                        //between = new ArrayList<TreeNode>(Arrays.asList(between.get(0).getParent().getLeaves()));
                     }
-                    /*between = new ArrayList<TreeNode>(Arrays.asList(iter.getParent().getLeaves()));
-                    if (between.size()==1){
-                        between = new ArrayList<TreeNode>(Arrays.asList(iter.getParent().getParent().getLeaves()));
-                    }*/
                     between.remove(iter);
                     if (between.size()==0){
                         System.err.println("Fehler bei CutTree");
@@ -968,26 +582,18 @@ public class GreedySCM {
                     if (savewhere == 1){
                         TreeCut1.put(label.concat(iter.getLabel()), finallist);
                     }
-
                     else {
                         TreeCut2.put(label.concat(iter.getLabel()), finallist);
                     }
                 }
                 output.removeVertex(iter);
             }
-            /*for (TreeNode iter : cut){
-                output.removeVertex(iter);
-            }*/
             firstpass = false;
             cut = new ArrayList<TreeNode>(Arrays.asList(output.getLeaves()));
             for (TreeNode iter : tokeep){
                 cut.remove(iter);
             }
         }
-        /*if (!output.getRoot().equalsNode(output.findLeastCommonAncestor(tokeep))){
-            output.setRoot(output.findLeastCommonAncestor(tokeep));
-        }*/
-        //TODO !!
         for (TreeNode x : output.vertices()){
             if (x.degree() == 2 && x!=output.getRoot()){
                 for (TreeNode y : x.children()){
@@ -999,35 +605,14 @@ public class GreedySCM {
         }
         TreeNode newroot = output.findLeastCommonAncestor(tokeep);
         if (!output.getRoot().equalsNode(newroot)){
-
-            //output.setRoot(newroot);
             Tree finaltree = output.getSubtree(newroot);
-            //output.removeEdge(newroot,newroot.getParent());
-            //output.removeVertex(newroot.getParent());
             return finaltree;
 
         }
-        //return output;
         return output;
     }
 
-    public List<String> generateDepthFirstListChildren (Tree input){
-        List<String> dnodes = new ArrayList<String>();
-        TreeNode root = input.getRoot();
-        helpgenerateDepthFirstListChildren(input, root, dnodes);
 
-        return dnodes;
-    }
-
-    public void helpgenerateDepthFirstListChildren(Tree input, TreeNode cur, List<String> dnodes){
-        List<TreeNode> children = new ArrayList<TreeNode>(cur.getChildren());
-        for (TreeNode iter : children){
-            if (!iter.isLeaf()){
-                helpgenerateDepthFirstListChildren(input, iter, dnodes);
-            }
-            else dnodes.add(iter.getLabel());
-        }
-    }
 
     public static void main (String args[]){
 
@@ -1078,8 +663,25 @@ public class GreedySCM {
         //}*/
 
 
-        GreedySCM hey = new GreedySCM();
-        hey.testSCM();
+        SCM hey = new SCM();
+        //hey.testSCM();
+
+        Tree test1 = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0):1.0,(e:1.0,f:1.0):1.0)");
+        Tree test2 = Newick.getTreeFromString("(((a:1.0,b:1.0):1.0,c:1.0,d:1.0):1.0,(e:1.0,f:1.0):1.0)");
+
+        double resolution = (test1.vertexCount()-1-test1.getLeaves().length) / (test1.getLeaves().length-2);
+        System.out.println("Auflösung von test1 ist "+resolution);
+        resolution = TreeUtilsBasic.calculateTreeResolution(test1.getNumTaxa(), test1.vertexCount());
+        System.out.println("Auflösung von test1 ist "+resolution);
+        int one = test2.vertexCount()-1-test2.getNumTaxa();
+        int two = test2.getNumTaxa()-2;
+        int three = 3/4;
+        resolution = (test2.vertexCount()-1-test2.getNumTaxa()) / (test2.getNumTaxa()-2);
+        System.out.println("Auflösung von test2 ist "+resolution);
+        resolution = (test2.vertexCount()-1-test2.getLeaves().length) / (test2.getLeaves().length-2);
+        System.out.println("Auflösung von test2 ist "+resolution);
+        resolution = TreeUtilsBasic.calculateTreeResolution(test2.getNumTaxa(), test2.vertexCount());
+        System.out.println("Auflösung von test2 ist "+resolution);
 
         //Tree a = Newick.getTreeFromString("((t169:0.02056467440428987,t108:0.02563947678634368)100:0.06741310372226965,(((t495:0.10917012927375173,((t195:0.10340996876048182,t165:0.11249025586572521)40:1.28060618246117E-6,(t131:0.07252526964244901,((t4:0.06020329392131871,t312:0.038910241371599416)87:0.008360685022321818,t321:0.06830399985073354)99:0.01817592679073262)100:0.033484662747521245)88:0.012555393545572216)100:0.022777591692494933,t450:0.15388230193294133)100:0.02961663027317288,((t371:0.1389421237592064,(t92:0.1104898929326545,(t262:0.06916278290604252,t189:0.07459192428798872)100:0.03799810581845313)74:0.010270676287150152)100:0.03459439554786425,((t53:0.14110769660303102,(t181:0.11864673721728795,(t444:0.0671338216135925,(t261:0.0064592410178400585,t188:0.0041711215026039835)100:0.045561424248944334)100:0.10528041235376885)22:1.28060618246117E-6)100:0.03138328605910244,((t184:0.07901238266767743,(t414:0.08025856413488873,t144:0.09485297213022711)82:0.022352501216084276)100:0.07144367623540092,(((t47:0.056946757852635504,(t347:0.051978139057718226,(t481:0.04487642130752454,t235:0.05146445129010096)98:0.014032739588420958)98:0.014494878675988742)100:0.08167640798578357,((t290:0.09380134252475787,t202:0.048200537341168005)100:0.06780361910503069,(t421:0.1864277665012198,(t38:0.07738252450442691,(t341:0.09682860678743666,(t17:0.05137261558852251,t413:0.03917676869216877)100:0.07572430436185493)96:0.015898650714822025)100:0.04607997971513339)72:0.001213390885099741)96:0.01440099617743572)98:0.02337555299190737,(((((t225:0.006079313520494399,t103:0.008628640410399334)100:0.154833547526221,((t340:0.1953872336483595,(((t356:0.1262352768726709,t146:0.12662551532687943)98:0.044577805358935595,t483:0.14897544322315748)94:0.010395074741298025,((t161:0.1093188866266506,t221:0.08462512319398661)100:0.055228146719204174,(t26:0.07836240081104719,t349:0.07879123175734319)100:0.05695631440031426)97:0.01767013450317087)98:0.012403251964888425)100:0.013753862469104433,(((t156:0.05693835336392994,(t392:0.017564930888416885,(t231:0.00699556786714038,t296:0.003804812892347839)100:0.01330816082971064)100:0.02565141211010015)100:0.07626977834655616,(t440:0.03035186316395571,(t425:0.01785688347618177,(t79:1.28060618246117E-6,t252:1.28060618246117E-6)100:0.009681268247012622)100:0.02158456240997149)100:0.09821598003253676)100:0.05676905338552688,(((((t186:0.11495119124464204,t407:0.1363001988749887)83:0.010639182448428305,t14:0.13329635082098512)99:0.023044511958417092,t384:0.15166839397357673)100:0.020633790051151128,(((t279:0.08731762674954793,t96:0.0792598555900757)100:0.04944195696395667,(t368:0.1251460829029792,((((t378:0.022165305791404008,t315:0.029860920562994334)79:0.0066808351074927885,(t381:0.04021282019037454,t376:0.034465952754769796)30:0.0015123688117842761)100:0.04765112417502503,((t398:0.04681819603171684,t138:0.046006940287527734)39:0.0034283827064993,t34:0.04665607553569118)100:0.0355865494168686)100:0.030375845471925386,((t224:0.024170594849546218,t247:0.02016989692954509)100:0.0731182445972318,t18:0.07005229651658874)98:0.01594451607962281)98:0.010981939864435374)100:0.0272707950361778)100:0.021578419380139362,(t460:0.15057955272098647,(t269:0.08662750293115233,t136:0.07907697770944722)100:0.07255907188506434)68:0.004267348273175963)94:0.01227417876092108)60:0.0010631874147168621,(((t193:0.11505204903157051,(t267:0.12034264613322426,t302:0.13471494438483753)56:0.005794552889002644)97:0.016097234495596583,(t428:0.07352944842925313,(t228:0.03999016331613156,t37:0.03456088479610629)100:0.030977018385112177)100:0.06132770131142908)95:0.011245806528194643,((t187:0.11607085005577038,t180:0.08705894592470814)100:0.023783168035472528,((t452:0.028186089194060945,t395:0.026722208476295285)100:0.07552406732622392,t248:0.13356369306812604)99:0.023335799574215034)100:0.030969981322034917)82:0.005541446723073026)87:0.006962607165375047)80:0.0026723596896034356)100:0.011530490816767526)30:0.003596166440894441,(((t170:0.18139284735075084,((t191:0.12645728264204895,t462:0.0988045073549861)99:0.04041844494472375,((((t328:0.06372607114752471,t245:0.07907983855139955)99:0.03465159146308438,t3:0.1375945063734816)29:0.004297750628000487,(t369:0.1325504178166916,(t408:0.0714687051026849,t90:0.07968994192553958)100:0.03417270648204351)100:0.037517704704581295)88:0.014066514148964324,t49:0.1330166055152802)43:0.0044448638031386765)92:0.014767617445623856)44:0.009182903818733861,(((((t227:0.08205837435802442,(t200:0.05121219110636751,t303:0.07546493751308447)99:0.022650245772673973)100:0.07235110626290213,(t117:0.09244019804230474,(t401:0.07097925346726283,t137:0.06225843077175492)100:0.05777769244971311)98:0.022054134965792605)71:0.005851372077016756,(((t276:0.043126005218409834,(t222:0.009067033328298413,t362:0.011514153398918979)100:0.04084202671388816)100:0.05057720972285346,(t270:0.03876101139619697,(t380:0.003980966850629527,t390:0.0017858735142845048)100:0.0277014109914246)100:0.08047783772528755)100:0.05050445344424672,t327:0.11666750321285278)46:0.005585447068656795)53:0.004552864949622901,(t406:0.15021547063390955,(t500:0.03150488929538157,t367:0.017283020603765655)100:0.15541308435636889)35:0.012595479115761846)92:0.01615101409934024,((t223:0.13774925763357904,(t467:0.07492314708577083,t326:0.0639541841389407)100:0.05020278846663257)96:0.028996429932755537,t461:0.150342270299734)89:0.007427905043916359)100:0.03456257083898455)10:1.28060618246117E-6,(((t419:0.12630518623726733,(t490:0.0425279752398842,t81:0.032707038752805215)100:0.08293209737575868)97:0.03268151176585493,(t466:0.1276641988332817,(t399:0.13906554866472629,t151:0.14774998424640592)41:1.28060618246117E-6)100:0.03335503299234976)94:0.014702170122309361,((((t268:0.07081231268621989,(t29:0.05314239800413978,t281:0.0378578942268506)100:0.010971664115323243)100:0.07373254172377845,((t83:0.0947179463694813,t113:0.06973493760494509)100:0.06571402833079533,((t101:0.11088184214596145,((t265:0.09281739031849372,(t336:0.061506203315363946,t354:0.07210017487481564)99:0.029238095321665117)98:0.025762800116516854,t118:0.1014108732141534)87:0.014733752875598086)53:0.002598101346617261,t12:0.11772707761399336)100:0.0323683046613994)62:0.002191362089417505)100:0.019563835970112152,(t218:0.12374986683485793,(t58:0.11188623244772537,(t106:0.07217544088033027,t66:0.058766603855361914)97:0.020793085712610522)93:0.020136491923846662)100:0.0464878795764104)34:1.28060618246117E-6,(((((t121:0.12924788308414653,t93:0.15741892500820695)48:0.014209198457489983,((t474:0.041567922183912025,(t443:0.02734134286427507,(t438:0.01194149372227841,t299:0.006588604579050394)100:0.03066520418672206)41:0.0014785114631333037)100:0.09044274864750067,((t62:0.02759939919459967,t119:0.03474186855473828)80:1.28060618246117E-6,t64:0.04133201473118848)100:0.0978040610590435)100:0.041438421249138366)13:1.28060618246117E-6,t204:0.12200047921642883)55:0.0045724471639626875,(t288:0.1084120167506601,(t496:0.018079855489872124,t45:0.016222585899287073)100:0.08583826362153472)100:0.04679808117271949)45:0.0059589899835981374,((t464:0.12094100431651676,t67:0.10789050286291058)100:0.07991960516598831,(t124:0.07927095559501597,(t488:0.012723461585328824,t190:0.020826342144274763)100:0.06987076099305793)100:0.06284623802428504)19:1.28060618246117E-6)47:0.006729742226452831)79:0.014540405825929236)20:1.28060618246117E-6)26:0.0010383543954154085)10:1.28060618246117E-6,(t387:0.20538009218891223,((t182:0.10750773749970059,(t348:0.07271193853990027,(t198:0.06173016953396456,t431:0.04313362132159189)91:0.012908774316778362)100:0.024326757924139977)100:0.06603975551178011,((t346:0.07901530468419846,t24:0.13008253203494713)86:0.013901492546563685,t427:0.11177236945076131)100:0.04469989998477104)67:0.005127223770719831)92:0.015676675244401247)20:9.819960638786517E-4,((((t491:0.004057606692687111,t291:0.005742348191867697)100:0.1806042929454614,t497:0.2037315064451476)26:1.28060618246117E-6,(((t201:0.06754884943478977,t23:0.07858095462910024)100:0.06481873580614268,((t454:0.05054594094182899,t373:0.03784461690682863)100:0.09931538450474162,(((t179:0.08974545354222763,(t50:0.05910134374913718,(t423:0.009744594974440367,t389:1.28060618246117E-6)100:0.05014941655881632)100:0.046809609580083886)88:0.010118310247607436,(t84:0.05966438136457367,t420:0.05177841475604175)100:0.05436377093702334)84:0.006534449373480624,(t343:0.09001051086099993,t55:0.11119858867753188)88:0.01753588443638785)100:0.0314713909919055)94:0.00751249734848586)99:0.01839491344455796,(((t42:0.15337280855607727,t148:0.12722870273522469)86:0.009016327931657386,(((t256:0.09285029043063348,t183:0.07465982516101954)99:0.01990165479300553,t404:0.1197365819711296)70:0.0032061546513792675,((t274:0.006002912980422437,t36:0.011908877280136572)100:0.09285931717084228,(t259:0.058916801034139134,t44:0.05154962566903489)100:0.05722433334460059)69:0.007584791552409706)100:0.02899418744823094)100:0.024746638897693442,((t432:0.14104820660010747,((t48:0.08538504026682084,(t128:0.09161574533532613,(t143:0.0669272240471088,t309:0.06768246825124911)90:0.007612315227007921)100:0.04094044435166495)100:0.02182864670849406,(t499:0.12330326240925596,t22:0.1343574145058776)71:0.0016018876381818608)100:0.02296722933545503)100:0.021228651301429313,((t375:0.08707345632559439,((t403:0.0746048794502126,t139:0.0900721509934046)76:1.28060618246117E-6,((t229:0.018900720380834794,t88:0.01898603458577885)100:0.03168180697299456,t147:0.054028080272321914)100:0.03579908920016309)98:0.017671839004118048)100:0.04696848733192598,(t25:0.10413680555977896,(t171:0.060605593795599565,t174:0.07100976449969716)100:0.0360396489468767)100:0.03150014553669344)100:0.02302293124654936)100:0.01317639641055689)100:0.008535576038117845)74:0.001614968699715294)87:0.01095415641889886,((((t8:0.11598922228238877,((t411:0.03285691675243413,t263:0.0721851818170049)100:0.08939924099637697,t40:0.09792413001391818)81:0.011542560106631428)98:0.02161665278970565,((t155:0.07214886766246043,(t159:0.10041757737781204,t391:0.07184333387561968)1 8:0.0018813766339229303)51:0.0065035594315923356,t243:0.12039069066540481)100:0.03482018392251097)83:0.0053643758329177775,(((t360:0.10137098292243726,((t434:0.03908774950820112,t441:0.037457497470598164)100:0.09444134063157548,(t104:0.05378227422548194,(t453:0.051480242869899634,t337:0.03757857164379937)100:0.011829227901388807)100:0.08383084336080066)49:1.28060618246117E-6)100:0.03255679045732144,(t220:0.1274025581866953,((t366:0.09296725273237437,t210:0.08771438404139376)100:0.03679518869045666,t355:0.13203925959832258)65:0.0061965187400838916)94:0.0083008015081342)96:0.011323366875271359,(t426:0.09213943454916147,(t197:0.08561585098374117,t319:0.05696590785020593)90:1.28060618246117E-6)100:0.0780582882030906)76:0.005249149022060012)100:0.030256378332758276,(((t482:0.12345564313438066,(t329:0.091628458013025,t339:0.15007705248853567)86:0.016910723487421068)78:0.009652274533722175,((t194:0.1287896085573261,(t95:0.10332302961004684,(t433:0.07847880709080887,t257:0.03937381788978546)100:0.05762504147869876)91:0.013317630031816095)41:1.28060618246117E-6,t393:0.14374224381631429)94:0.011795111115484059)100:0.0265886198780697,((t98:0.009164086209246698,t485:0.00446672248485915)100:0.14945007105963737,((t470:0.1285659328361837,(t365:0.09915869660120957,(t277:0.05191713799030193,t436:0.04661760908780692)100:0.08381852382419772)92:0.017398827571112028)99:0.01867680026522861,(((t287:0.033762859856260326,t451:0.029172486323449282)100:0.029011418512700025,(t294:0.0027206339031963433,t325:0.001084117903976444)100:0.11188303299813171)100:0.03378704967060549,t13:0.14871987688563515)99:0.02020468791066357)68:0.0023735160255263336)100:0.023938052497163652)99:0.01434631237193819)62:0.00751774574616681)19:1.28060618246117E-6)75:0.0037749039628434825)99:0.01097836922577562)94:0.008739769423865673)83:0.007499766326436678)35:1.28060618246117E-6)100:0.06741310372226965);");
         //Tree b = Newick.getTreeFromString("((((t170:1.0,t469:1.0):1.0,((t49:1.0,(((t328:1.0,(t145:1.0,(t245:1.0,t463:1.0):1.0):1.0):1.0,((t10:1.0,t3:1.0):1.0,t478:1.0,t353:1.0):1.0):1.0,(t369:1.0,(t408:1.0,t90:1.0):1.0):1.0):1.0):1.0,(((t462:1.0,t65:1.0):1.0,t383:1.0):1.0,t480:1.0):1.0):1.0):1.0,((((t335:1.0,((t119:1.0,t62:1.0):1.0,t64:1.0):1.0):1.0,(((t443:1.0,t135:1.0):1.0,((t474:1.0,t71:1.0):1.0,t157:1.0):1.0):1.0,(t226:1.0,(t438:1.0,t299:1.0):1.0):1.0):1.0):1.0,t308:1.0,(t212:1.0,(t93:1.0,(t59:1.0,t253:1.0):1.0):1.0,(t97:1.0,t121:1.0):1.0):1.0,t204:1.0,(((t344:1.0,(t496:1.0,t45:1.0):1.0):1.0,((t206:1.0,t288:1.0):1.0,t310:1.0):1.0):1.0,(t293:1.0,((t89:1.0,t289:1.0):1.0,t120:1.0):1.0):1.0):1.0):1.0,(((t268:1.0,t422:1.0,((t456:1.0,(t7:1.0,(t281:1.0,t72:1.0):1.0):1.0):1.0,t29:1.0):1.0):1.0,((t439:1.0,((t113:1.0,((t83:1.0,t127:1.0):1.0,t260:1.0):1.0):1.0,t19:1.0):1.0):1.0,((t292:1.0,t118:1.0,((t354:1.0,t336:1.0):1.0,(t242:1.0,t265:1.0):1.0):1.0):1.0,(((t46:1.0,t101:1.0):1.0,t492:1.0):1.0,(t12:1.0,t150:1.0):1.0):1.0):1.0):1.0):1.0,(((((t133:1.0,t58:1.0):1.0,(t192:1.0,t305:1.0):1.0):1.0,(((t106:1.0,t284:1.0):1.0,t285:1.0):1.0,t66:1.0):1.0):1.0,((t218:1.0,(t31:1.0,t475:1.0):1.0):1.0,t217:1.0):1.0):1.0,t435:1.0):1.0):1.0,(t190:1.0,(t488:1.0,t358:1.0):1.0):1.0):1.0):1.0,(((t396:1.0,t464:1.0):1.0,t2:1.0):1.0,(((t67:1.0,t168:1.0):1.0,t85:1.0):1.0,t278:1.0):1.0):1.0);");
