@@ -240,12 +240,12 @@ public class SCMTest {
         //File fi = new File("100_20_sourceTree:sm.o.sourceTrees_OptSCM-Rooting.tre");
         //File fi2 = new File("500_50_sourceTree:sm.o.sourceTrees_OptSCM-Rooting.tre");
 
-        CalculateSupertree res = new CalculateSupertree("resolution");
+        CalculateSupertree res = new CalculateSupertree("resolution", "off");
         result = res.getSupertree(alltrees);
         System.out.println("Supertree 100/20 resolution ist "+Newick.getStringFromTree(result));
         //Tree realSCM = Newick.getTreeFromFile(new File ("/home/fleisch/Work/data/simulated/SMIDGen_Anika/500/50/Super_Trees/Superfine/RaxML_Source/sm.0.sourceTrees.scmTree.tre"))[0];
         //Tree realSCM = Newick.getTreeFromFile(new File ("100_20_superTree_sm.0.sourceTrees.scmTree.tre"))[0];
-        in = SCMTest.class.getResourceAsStream("/100_20_superTree_sm.0.sourceTrees.scmTree.tre");
+        in = SCMTest.class.getResourceAsStream("/100_20_superTree_sm.0.sourceTrees.scmTree.tre_OptRoot.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
         Tree realSCM = alltrees.get(0);
@@ -279,10 +279,10 @@ public class SCMTest {
         in = SCMTest.class.getResourceAsStream("/100_20_sourceTree_sm.0.sourceTrees_OptSCM-Rooting.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        res = new CalculateSupertree("overlap");
+        res = new CalculateSupertree("overlap", "off");
         result = res.getSupertree(alltrees);
         System.out.println("Supertree 100/20 overlap ist "+Newick.getStringFromTree(result));
-        in = SCMTest.class.getResourceAsStream("/100_20_superTree_sm.0.sourceTrees.scmTree.tre");
+        in = SCMTest.class.getResourceAsStream("/100_20_superTree_sm.0.sourceTrees.scmTree.tre_OptRoot.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
         realSCM = alltrees.get(0);
@@ -317,10 +317,10 @@ public class SCMTest {
         in = SCMTest.class.getResourceAsStream("/500_50_sourceTree_sm.0.sourceTrees_OptSCM-Rooting.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        res = new CalculateSupertree("resolution");
+        res = new CalculateSupertree("resolution", "off");
         result = res.getSupertree(alltrees);
         System.out.println("Supertree 500/50 resolution ist "+Newick.getStringFromTree(result));
-        in = SCMTest.class.getResourceAsStream("/500_50_superTree_sm.0.sourceTrees.scmTree.tre");
+        in = SCMTest.class.getResourceAsStream("/500_50_superTree_sm.0.sourceTrees.scmTree.tre_OptRoot.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
         realSCM = alltrees.get(0);
@@ -330,6 +330,11 @@ public class SCMTest {
         //todo mach was damit :)
         System.out.println("500/50 resolution FNFP gegen Eingabebaeume");
         print = FN_FP_RateComputer.calculateSumOfRates(result, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+        for (double a : print){
+            System.out.print(a + " ");
+        }
+        System.out.println("\n"+"500/50 SWENSON FNFP gegen Eingabebaeume");
+        print = FN_FP_RateComputer.calculateSumOfRates(realSCM, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
         for (double a : print){
             System.out.print(a + " ");
         }
@@ -347,6 +352,11 @@ public class SCMTest {
         for (double a : print){
             System.out.print(a + " ");
         }
+        System.out.println("\n"+"500/50 SWENSON FNFP gegen Modeltree");
+        print = FN_FP_RateComputer.calculateRates(realSCM, modelSCM, false);
+        for (double a : print){
+            System.out.print(a + " ");
+        }
         System.out.println("\n"+"\n");
 
 
@@ -357,10 +367,10 @@ public class SCMTest {
         in = SCMTest.class.getResourceAsStream("/500_50_sourceTree_sm.0.sourceTrees_OptSCM-Rooting.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        res = new CalculateSupertree("overlap");
+        res = new CalculateSupertree("overlap", "off");
         result = res.getSupertree(alltrees);
         System.out.println("Supertree 500/50 overlap ist "+Newick.getStringFromTree(result));
-        in = SCMTest.class.getResourceAsStream("/500_50_superTree_sm.0.sourceTrees.scmTree.tre");
+        in = SCMTest.class.getResourceAsStream("/500_50_superTree_sm.0.sourceTrees.scmTree.tre_OptRoot.tre");
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
         realSCM = alltrees.get(0);
@@ -391,6 +401,30 @@ public class SCMTest {
 
 
 
+    }
+
+    @Test
+    public void testtakeCareOfCollisions (){
+        Tree a = Newick.getTreeFromString("((((a:1.0,c:1.0):1.0,d:1.0):1.0,b:1.0):1.0,f:1.0)");
+        Tree b = Newick.getTreeFromString("((((a:1.0,x:1.0):1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
+        TreeEquals t = new TreeEquals();
+        SCM s = new SCM();
+        Tree result = s.getSCM(a, b);
+        Tree expected = Newick.getTreeFromString("(((a:1.0,c:1.0,d:1.0,x:1.0,y:1.0):1.0,b:1.0):1.0,(z:1.0,f:1.0):1.0)");
+        assertTrue(t.getTreeEquals(result, expected));
+        List<Tree> trees = new ArrayList<Tree>();
+        trees.add(a);
+        trees.add(b);
+        double[] print = FN_FP_RateComputer.calculateSumOfRates(result, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
+        for (double ac : print){
+            System.out.print(ac + " ");
+        }
+        Tree maybe = Newick.getTreeFromString("((((a:1.0,c:1.0,x:1.0):1.0,d:1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
+        print = FN_FP_RateComputer.calculateSumOfRates(maybe, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
+        System.out.println();
+        for (double ac : print){
+            System.out.print(ac + " ");
+        }
     }
 
 

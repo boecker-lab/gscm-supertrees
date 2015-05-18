@@ -3,6 +3,7 @@ package scmAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,17 +12,23 @@ import java.util.List;
 public class CalculateSupertree {
 
     String type = "";
+    String info = "";
+
 
     //public enum type{}
 
-    CalculateSupertree(String type){
+    public CalculateSupertree(String type, String info){
         if (type.equalsIgnoreCase("overlap")) this.type = "overlap";
         else if (type.equalsIgnoreCase("resolution")) this.type = "resolution";
+        if (info.equalsIgnoreCase("on")) this.info = "on";
+        else if (info.equalsIgnoreCase("off")) this.info = "off";
     }
 
-    CalculateSupertree(int type){
+    public CalculateSupertree(int type, String info){
         if (type == 0) this.type = "overlap";
         else if (type == 1) this.type = "resolution";
+        if (info.equalsIgnoreCase("on")) this.info = "on";
+        else if (info.equalsIgnoreCase("off")) this.info = "off";
         //else System.err.println()
     }
 
@@ -42,7 +49,7 @@ public class CalculateSupertree {
             sc = new ResolutionScorer();
         }
 
-        List<Tree> output = input.subList(0, input.size()-1);
+        List<Tree> output = new ArrayList<Tree> (input.subList(0, input.size()-1));
         List<Tree> save;
         Tree one;
         Tree two;
@@ -53,8 +60,10 @@ public class CalculateSupertree {
             one = save.get(0);
             two = save.get(1);
             three = save.get(2);
-            System.out.println("Got one SCM: " + Newick.getStringFromTree(three));
-            System.out.println(output.size()+" left.");
+            if (this.info == "on") {
+                System.out.println("Got one SCM: " + Newick.getStringFromTree(three));
+                System.out.println(output.size()+" left.");
+            }
             output.remove(one);
             output.remove(two);
             output.add(three);
