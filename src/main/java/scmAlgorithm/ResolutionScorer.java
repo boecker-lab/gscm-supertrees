@@ -5,6 +5,7 @@ import epos.model.tree.treetools.TreeUtilsBasic;
 import treeUtils.TreeUtils;
 import scmAlgorithm.SCM;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,6 +18,11 @@ public class ResolutionScorer extends Scorer{
     public double getScore (Tree one, Tree two){
         SCM s = new SCM();
         scm = s.getSCM(one, two);
+        //TODO !
+        List<String> check = TreeUtils.StringListMultipleElements(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(scm.getLeaves())));
+        if (!check.isEmpty()){
+            System.out.println("Mehrere Elemente: "+check);
+        }
         double resolution = TreeUtilsBasic.calculateTreeResolution(scm.getNumTaxa(), scm.vertexCount());
         return resolution / scm.getLeaves().length;
     }
@@ -30,6 +36,7 @@ public class ResolutionScorer extends Scorer{
         int a, b, c = 0;
         List<Tree> output = new ArrayList<Tree>();
         SCM strict = new SCM();
+        int counter = 0;
         for (Tree iter : input){
             for (Tree cur : input){
                 if (!iter.equals(cur)){
@@ -39,6 +46,8 @@ public class ResolutionScorer extends Scorer{
                         //resolution = scm.vertexCount() / (scm.getLeaves().length-3);
                         //TODO test resolution
                         //resolution = (scm.vertexCount() - 1 - scm.getLeaves().length) / (scm.getLeaves().length - 3);
+                        counter++;
+                        //System.out.println(counter);
                         curscore = getScore(iter, cur);
                         if (curscore > maxscore) {
                             maxscm = scm;

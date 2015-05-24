@@ -23,8 +23,18 @@ public class FNFPEvaluation {
     CalculateSupertree calc;
     Tree supertree;
     Tree modeltree;
+    Tree swensonsupertree;
     double[] rates;
+    boolean swenson;
     //String path;
+
+    FNFPEvaluation(){
+        this.swenson = false;
+    }
+
+    FNFPEvaluation(boolean swenson){
+        this.swenson = swenson;
+    }
 
     public void readData (String taxa, String scaffold, int num){
         String path = "/" + taxa + "/" + scaffold + "/Model_Trees/" + "sm_data." + num + ".model_tree";
@@ -32,11 +42,19 @@ public class FNFPEvaluation {
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
         modeltree = alltrees.get(0);
+        if (swenson){
+            path = "/" + taxa + "/" + scaffold + "/Super_Trees/" + "sm." + num + ".sourceTrees.scmTree.tre_OptRoot.tre";
+            in = FNFPEvaluation.class.getResourceAsStream(path);
+            re = new BufferedReader(new InputStreamReader(in));
+            alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
+            swensonsupertree = alltrees.get(0);
+
+        }
         path = "/" + taxa + "/" + scaffold + "/Source_Trees/" + "sm." + num + ".sourceTrees_OptSCM-Rooting.tre";
         in = FNFPEvaluation.class.getResourceAsStream(path);
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        System.out.println("\n"+taxa+" "+scaffold+" "+num+":");
+        System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
     public void calculateSupertree (String kind){
@@ -70,6 +88,18 @@ public class FNFPEvaluation {
         for (double a : rates){
             System.out.print(a + " ");
         }
+        if (swenson){
+            rates = FN_FP_RateComputer.calculateSumOfRates(swensonsupertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+            System.out.println("\n"+"FNFP source trees swenson");
+            for (double a : rates){
+                System.out.print(a + " ");
+            }
+            rates = FN_FP_RateComputer.calculateRates(swensonsupertree, modeltree, false);
+            System.out.println("\n"+"FNFP modeltree swenson");
+            for (double a : rates){
+                System.out.print(a + " ");
+            }
+        }
     }
 
     public void readAndProcess (String taxa, String scaffold, List<Integer> notthere, int number){
@@ -82,7 +112,7 @@ public class FNFPEvaluation {
     }
 
     public static void main (String[] args){
-        FNFPEvaluation ev = new FNFPEvaluation();
+        FNFPEvaluation ev = new FNFPEvaluation(true);
         Integer[] hundert_zwanzig = {5, 13};
         List empty = new ArrayList();
         Integer[] fuenfhundert_zwanzig = {4, 5, 7, 16, 21, 22};

@@ -25,6 +25,40 @@ import static org.junit.Assert.assertTrue;
 public class SCMTest {
 
 
+    @Test
+    public void testtakeCareOfCollisions (){
+        SCM s = new SCM();
+        TreeEquals t = new TreeEquals();
+        Tree one = Newick.getTreeFromString("(((((a:1.0,b:1.0):1.0,c:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,((f:1.0,((g:1.0,h:1.0):1.0,(i:1.0,j:1.0):1.0):1.0):1.0,(k:1.0,(l:1.0,m:1.0):1.0):1.0):1.0):1.0,((ab:1.0,((ac:1.0,ad:1.0):1.0,(ae:1.0,af:1.0):1.0):1.0):1.0,(((n:1.0,o:1.0):1.0,(p:1.0,q:1.0):1.0):1.0,(ba:1.0,(r:1.0,s:1.0):1.0):1.0):1.0):1.0)");
+        Tree two = Newick.getTreeFromString("(((((a:1.0,t:1.0):1.0,u:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,((i:1.0,y:1.0):1.0,(w:1.0,(x:1.0,m:1.0):1.0):1.0):1.0):1.0,((ab:1.0,ag:1.0):1.0,(((n:1.0,o:1.0):1.0,(p:1.0,q:1.0):1.0):1.0,(((ba:1.0,bb:1.0):1.0,bc:1.0):1.0,(v:1.0,s:1.0):1.0):1.0):1.0):1.0)");
+        System.out.println("Hier ist das Beispiel!");
+        Tree result = s.getSCM(one, two);
+        String re = Newick.getStringFromTree(result);
+        System.out.println("Das falsche Ergebnis ist:" +re);
+        //TODO do it right
+        Tree expected = Newick.getTreeFromString("((((a:1.0,b:1.0,c:1.0,t:1.0,u:1.0):1.0(d:1.0,e:1.0):1.0):1.0,((i:1.0,j:1.0,y:1.0,f:1.0,(g:1.0,h:1.0):1.0):1.0,(k:1.0,l:1.0,w:1.0,x:1.0,m:1.0):1.0):1.0):1.0,((ab:1.0,ag:1.0,((ac:1.0,ad:1.0):1.0,(ae:1.0,af:1.0):1.0):1.0):1.0,(((n:1.0,o:1.0):1.0,(p:1.0,q:1.0):1.0):1.0,((bc:1.0,(ba:1.0,bb:1.0):1.0):1.0,(v:1.0,r:1.0,s:1.0):1.0):1.0):1.0):1.0)");
+        assertTrue(t.getTreeEquals(result,expected));
+
+        Tree a = Newick.getTreeFromString("((((a:1.0,c:1.0):1.0,d:1.0):1.0,b:1.0):1.0,f:1.0)");
+        Tree b = Newick.getTreeFromString("((((a:1.0,x:1.0):1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
+        result = s.getSCM(a, b);
+        expected = Newick.getTreeFromString("(((a:1.0,c:1.0,d:1.0,x:1.0,y:1.0):1.0,b:1.0):1.0,(z:1.0,f:1.0):1.0)");
+        assertTrue(t.getTreeEquals(result, expected));
+        List<Tree> trees = new ArrayList<Tree>();
+        trees.add(a);
+        trees.add(b);
+        double[] print = FN_FP_RateComputer.calculateSumOfRates(result, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
+        for (double ac : print){
+            System.out.print(ac + " ");
+        }
+        Tree maybe = Newick.getTreeFromString("((((a:1.0,c:1.0,x:1.0):1.0,d:1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
+        print = FN_FP_RateComputer.calculateSumOfRates(maybe, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
+        System.out.println();
+        for (double ac : print){
+            System.out.print(ac + " ");
+        }
+    }
+
 
     @Test
     public void testCutTree() throws Exception {
@@ -403,29 +437,6 @@ public class SCMTest {
 
     }
 
-    @Test
-    public void testtakeCareOfCollisions (){
-        Tree a = Newick.getTreeFromString("((((a:1.0,c:1.0):1.0,d:1.0):1.0,b:1.0):1.0,f:1.0)");
-        Tree b = Newick.getTreeFromString("((((a:1.0,x:1.0):1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
-        TreeEquals t = new TreeEquals();
-        SCM s = new SCM();
-        Tree result = s.getSCM(a, b);
-        Tree expected = Newick.getTreeFromString("(((a:1.0,c:1.0,d:1.0,x:1.0,y:1.0):1.0,b:1.0):1.0,(z:1.0,f:1.0):1.0)");
-        assertTrue(t.getTreeEquals(result, expected));
-        List<Tree> trees = new ArrayList<Tree>();
-        trees.add(a);
-        trees.add(b);
-        double[] print = FN_FP_RateComputer.calculateSumOfRates(result, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
-        for (double ac : print){
-            System.out.print(ac + " ");
-        }
-        Tree maybe = Newick.getTreeFromString("((((a:1.0,c:1.0,x:1.0):1.0,d:1.0,y:1.0):1.0,b:1.0):1.0,(f:1.0,z:1.0):1.0)");
-        print = FN_FP_RateComputer.calculateSumOfRates(maybe, trees.toArray(new Tree[trees.size()])); //sum FP has to be 0 for any SCM result [1]
-        System.out.println();
-        for (double ac : print){
-            System.out.print(ac + " ");
-        }
-    }
 
 
     @Test

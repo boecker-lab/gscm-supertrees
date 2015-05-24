@@ -2,10 +2,8 @@ package treeUtils;
 
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * Created by Anika on 13.05.2015.
@@ -26,20 +24,29 @@ public class TreeUtils {
         return tokeep;
     }
 
-    public static List<String> generateDepthFirstListChildren (Tree input){
+    public static List<String> generateCustomDepthFirstListChildren (Tree input){
         List<String> dnodes = new ArrayList<String>();
         TreeNode root = input.getRoot();
-        helpgenerateDepthFirstListChildren(input, root, dnodes);
+        helpgenerateCustomDepthFirstListChildren(input, root, dnodes);
         return dnodes;
     }
 
-    private static void helpgenerateDepthFirstListChildren(Tree input, TreeNode cur, List<String> dnodes){
+    private static void helpgenerateCustomDepthFirstListChildren(Tree input, TreeNode cur, List<String> dnodes){
         List<TreeNode> children = new ArrayList<TreeNode>(cur.getChildren());
+        Stack<TreeNode> depth = new Stack<TreeNode>();
         for (TreeNode iter : children){
-            if (!iter.isLeaf()){
-                helpgenerateDepthFirstListChildren(input, iter, dnodes);
+            if (iter.getChildren().isEmpty()) depth.add(iter);
+        }
+        for (TreeNode iter: children){
+            if (!iter.getChildren().isEmpty()) depth.add(iter);
+        }
+        int size = depth.size();
+        for (int iter=0; iter<size; iter++){
+            TreeNode act = depth.pop();
+            if (!act.isLeaf()){
+                helpgenerateCustomDepthFirstListChildren(input, act, dnodes);
             }
-            else dnodes.add(iter.getLabel());
+            else dnodes.add(act.getLabel());
         }
     }
 
@@ -56,6 +63,18 @@ public class TreeUtils {
         List<TreeNode> output = new ArrayList<TreeNode>();
         for (String x: li){
             output.add(input.getVertex(x));
+        }
+        return output;
+    }
+
+    public static List<String> StringListMultipleElements (List<String> input){
+        List<String> save = new ArrayList<String>();
+        List<String> output = new ArrayList<String>();
+        for (String s : input){
+            if (save.contains(s)){
+                output.add(s);
+            }
+            else save.add(s);
         }
         return output;
     }
