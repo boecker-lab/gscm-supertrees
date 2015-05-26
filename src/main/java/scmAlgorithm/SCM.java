@@ -493,6 +493,7 @@ public class SCM {
             one = CutTree(one, nodesofboth, turn);
             two = CutTree(two, nodesofboth, turn);
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
+            System.out.println(Newick.getStringFromTree(between));
             takeCareOfCollisions(between, originalone, originaltwo);
             result = hangInNodes(between);
         }

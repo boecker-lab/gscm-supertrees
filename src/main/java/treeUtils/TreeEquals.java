@@ -48,7 +48,8 @@ public class TreeEquals {
                             break;
                         }
                     }
-                    else if (iter1.getLabel().equalsIgnoreCase(iter2.getLabel())){
+                    else if ((iter1.isLeaf() && !iter2.isLeaf())||(!iter1.isLeaf() && iter2.isLeaf()));
+                    else if (iter1.getLabel().equalsIgnoreCase(iter2.getLabel())) {
                         foundcorrectiteration = true;
                         break;
                     }

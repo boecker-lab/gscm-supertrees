@@ -2,6 +2,7 @@ package scmAlgorithm;
 
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
+import epos.model.tree.treetools.FN_FP_RateComputer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,8 @@ public class CalculateSupertree {
 
     String type = "";
     String info = "";
-
+    //TODO
+    List<Tree> inputtrees;
 
     //public enum type{}
 
@@ -41,6 +43,7 @@ public class CalculateSupertree {
     }
 
     public Tree getSupertree (List<Tree> input) {
+        inputtrees = new ArrayList<Tree> (input);
         Scorer sc;
         if (getType() == "overlap"){
             sc = new OverlapScorer();
@@ -49,7 +52,12 @@ public class CalculateSupertree {
             sc = new ResolutionScorer();
         }
 
-        List<Tree> output = new ArrayList<Tree> (input.subList(0, input.size()-1));
+        //List<Tree> output = new ArrayList<Tree> (input.subList(0, input.size()-1));
+        List<Tree> output = new ArrayList<Tree> (input);
+        //TODO
+        for (Tree t : output){
+            System.out.println("Tree "+t+" "+Newick.getStringFromTree(t));
+        }
         List<Tree> save;
         Tree one;
         Tree two;
@@ -62,7 +70,13 @@ public class CalculateSupertree {
             three = save.get(2);
             if (this.info == "on") {
                 System.out.println("Got one SCM: " + Newick.getStringFromTree(three));
-                System.out.println(output.size()+" left.");
+                System.out.println("named "+three);
+                System.out.println("aus Tree "+one+": "+Newick.getStringFromTree(one)+", Tree "+two+": "+Newick.getStringFromTree(two));
+                double[] a = FN_FP_RateComputer.calculateSumOfRates(three, inputtrees.toArray(new Tree[inputtrees.size()]));
+                for (double pr : a){
+                    System.out.print(pr+" ");
+                }
+                System.out.println("\n"+output.size()+" left.");
             }
             output.remove(one);
             output.remove(two);
