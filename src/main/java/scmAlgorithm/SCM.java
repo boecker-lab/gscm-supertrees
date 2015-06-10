@@ -31,6 +31,8 @@ public class SCM {
 
     private LinkedHashMap<String, List<String>> TreeCut1 = new LinkedHashMap<String, List<String>>();
     private LinkedHashMap<String, List<String>> TreeCut2 = new LinkedHashMap<String, List<String>>();
+    private List<String> tolerated = new ArrayList<String>();
+    //private List<String> store2pathnnodes = new ArrayList<String>();
 
     public Map.Entry<String,List<String>>[] getTreeCut1EntrySet (){
         Set<Map.Entry<String, List<String>>> mapValues = TreeCut1.entrySet();
@@ -46,6 +48,13 @@ public class SCM {
         return mapValues.toArray(TreeCut2entries);
     }
 
+    public List<String> getTolerated(){
+        return this.tolerated;
+    }
+
+    public void setTolerated(List<String> tolerated){
+        this.tolerated = tolerated;
+    }
 
 
     /*public Tree getPaperConsensus (List<Tree> input) {
@@ -195,10 +204,16 @@ public class SCM {
         List<String> innernodechildrenhelp;
         List<TreeNode> innernodet1children = new ArrayList<TreeNode>();
         List<TreeNode> innernodet2children = new ArrayList<TreeNode>();
+        TreeNode curnode;
+        TreeNode innernodet1;
+        TreeNode innernodet2;
         //while (nodes.iterator().hasNext()){
         while (iterator.hasNext()){
             //TreeNode curnode = nodes.iterator().next();
-            TreeNode curnode = iterator.next();
+            curnode = iterator.next();
+            //if (curnode.getLabel().equalsIgnoreCase("t73")){
+            //    System.out.print("");
+            //}
             innernodet1children.clear();
             innernodet2children.clear();
             if (!curnode.isLeaf()){
@@ -209,14 +224,17 @@ public class SCM {
                 }
                 innernodeleaves = Arrays.asList(curnode.getLeaves());
                 innernodechildren = curnode.getChildren();
-                TreeNode innernodet1 = one.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, one));
-                TreeNode innernodet2 = two.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, two));
+                innernodet1 = one.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, one));
+                innernodet2 = two.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, two));
                 int numinnernodechildren = innernodechildren.size();
                 for (int iter=0; iter<numinnernodechildren; iter++){
                     innernodet1children.add(one.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(innernodechildren.get(iter).getLeaves())), one)));
                     innernodet2children.add(two.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(innernodechildren.get(iter).getLeaves())), two)));
                     //innernodet2children.add(two.findLeastCommonAncestor(innernodechildren.get(iter).getLeaves()));
                     //innernodet2children.add(two.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodechildrenhelp, two).get(iter).getLeaves()));
+                }
+                if (innernodet1children.contains("t10")){
+                    System.out.print("");
                 }
                 int numinnernodet1children = innernodet1children.size();
                 int numinnernodet2children = innernodet2children.size();
@@ -229,10 +247,60 @@ public class SCM {
                 //for (TreeNode child2 : innernodet2children) helpCollisionsFindNodesAtSameEdge (consensus, two, 2, innernodet2, child2, order, TreeCut2list);
             }
         }
+        curnode = consensus.getRoot();
+        innernodeleaveshelp = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(curnode.getLeaves()));
+        innernodet1 = one.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, one));
+        innernodet2 = two.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(innernodeleaveshelp, two));
+        if (innernodet1.getParent() != null && innernodet2.getParent() != null){
+            System.out.print("");
+            helpCollisionsFindNodesOverRoot(consensus, one, 1, innernodet1, order, TreeCut1list);
+            helpCollisionsFindNodesOverRoot(consensus, two, 2, innernodet2, order, TreeCut2list);
+        }
+
+
 
 
         //System.out.println("Es gibt "+order.size()+" verschiedene Kanten - Collisions.");
 
+        List<String> store2pathnodes = new ArrayList<String>();
+        HashMap<String,List<String>> checkfordoubles = new HashMap<String, List<String>>();
+        List<String> tolerated = new ArrayList<String>();
+        HashMap<String, List<String>> special2nodes = new HashMap<String, List<String>>();
+        List<String> store = new ArrayList<String>();
+        List<String> val;
+        for (List<String> key : order.keySet()){
+            val = order.get(key);
+            for (String iter : val){
+                if (!iter.equalsIgnoreCase("Tree1")&&!iter.equalsIgnoreCase("Tree2")){
+                    if (checkfordoubles.containsKey(iter)){
+                        if (!store2pathnodes.contains(iter)) store2pathnodes.add(iter);
+                        if (special2nodes.containsKey(iter)){
+                            store = new ArrayList<String>(special2nodes.get(iter));
+                            special2nodes.remove(iter);
+                            store.addAll(key);
+                            special2nodes.put(iter, store);
+                        }
+                        else {
+                            store.clear();
+                            store = new ArrayList<String>(checkfordoubles.get(iter));
+                            store.add("Polytomy");
+                            store.addAll(key);
+                            special2nodes.put(iter, store);
+                        }
+                    }
+                    else checkfordoubles.put(iter, key);
+                }
+            }
+        }
+        tolerated.addAll(store2pathnodes);
+        for (String el : store2pathnodes){
+            if (TreeCut2.containsKey(el)){
+                TreeCut2.remove(el);
+            }
+            if (TreeCut1.containsKey(el)){
+                TreeCut1.remove(el);
+            }
+        }
         for (List<String> ke : order.keySet()){
             List<String> list = order.get(ke);
             if (list.contains("Tree1")&&list.contains("Tree2")){
@@ -242,14 +310,24 @@ public class SCM {
                 while (list.contains("Tree2")){
                     list.remove("Tree2");
                 }
-                //TODO neue Elemente muessen zuerst eingefuegt werden
-                for (String el : list){
+                List<String> copylist = new ArrayList<String>(list);
+                for (String el : copylist){
                     if (TreeCut2.containsKey(el)){
                         TreeCut2.remove(el);
                     }
                     if (TreeCut1.containsKey(el)){
                         TreeCut1.remove(el);
                     }
+                    if (store2pathnodes.contains(el)){
+                        list.remove(el);
+                        /*if (special2nodes.containsKey(el)){
+                            store = special2nodes.get(el);
+                            store.addAll(ke);
+                            special2nodes.put(el, store);
+                        }
+                        else special2nodes.put(el, ke);*/
+                    }
+                    else tolerated.add(el);
                 }
                 List<String> newlist;
                 List<String> work;
@@ -266,6 +344,88 @@ public class SCM {
                 TreeCut1.put(list.get(0), ke);
             }
         }
+        for (String el : special2nodes.keySet()){
+            TreeCut1.put(el, special2nodes.get(el));
+        }
+        setTolerated(tolerated);
+    }
+
+
+    private Map<List<String>, List<String>> helpCollisionsFindNodesOverRoot (Tree consensus, Tree input, int treenumber, TreeNode rootintree, Map<List<String>, List<String>> order, List<Map.Entry<String,List<String>>> treeentryset){
+        List<TreeNode> currchildren = new ArrayList<TreeNode>();
+        List<String> consensusleaves = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(consensus.getLeaves()));
+        TreeNode rootinconsensus = consensus.getRoot();
+        TreeNode newparent = rootintree.getParent();
+        List<String> currlist;
+        List<String> currkey;
+        boolean firstnewparent = true;
+        TreeNode formernewparent = new TreeNode();
+        while (newparent.getParent() != null){
+            //currchildren are the child nodes of the node hanging at the path from child to parent at an inner node
+            currchildren = newparent.getChildren();
+            if (firstnewparent){
+                currchildren.remove(rootintree);
+            }
+            else currchildren.remove(formernewparent);
+            if (!currchildren.isEmpty()){
+                for (TreeNode ch : currchildren){
+                    //currkey contains all leaves of the child in the consensus-tree (or if it's a leaf, only the child)
+                    //idea: if an element in currchildren is no leaf, we can find the one node in these nodes that will hang onto the child-polytomy
+                    currkey = consensusleaves;
+                    //make a new entry marking the edge we collect the nodes from
+                    if (order.containsKey(currkey)){
+                        currlist = order.get(currkey);
+                    }
+                    else currlist = new ArrayList<String>();
+                    int currlistsize = currlist.size();
+                    int counter = 0;
+                    //if the found node is a leaf, we can just add it to the collection
+                    if (ch.isLeaf()){
+                        //if (!consensusleaves.contains(ch.getLabel())) currlist.add(ch.getLabel());
+                        currlist.add(ch.getLabel());
+                    }
+                    else {
+                        counter = 0;
+                        //boolean inconsensus = false;
+                        //for (TreeNode leave : ch.getLeaves()){
+                        //    if (consensusleaves.contains(leave.getLabel())){
+                        //        inconsensus = true;
+                        //    }
+                        //}
+                        //if (!inconsensus){
+                        for (TreeNode leave : ch.getLeaves()){
+                            //TODO !
+                            List<String> values = new ArrayList<String>();
+                            for (Map.Entry<String, List<String>> en : treeentryset){
+                                if (en.getKey().equalsIgnoreCase(leave.getLabel())) values = en.getValue();
+                            }
+                            //int index = treeentryset.indexOf(leave);
+                            //if (treeentryset.get(treeentryset.indexOf(leave)).getValue().containsAll(currkey)) currlist.add(leave.getLabel());
+                            //we search for the one leaf that hangs onto the child-polytomy
+                            if (values.containsAll(currkey)){
+                                currlist.add(leave.getLabel());
+                                counter++;
+                            }
+                        }
+                        //}
+
+                    }
+                    //TODO !
+                    if (counter > 1) {
+                        System.out.println("Neeeein! Waruuum?");
+                    }
+                    //TODO Bedingung korrekt?
+                    if (!currlist.isEmpty() && currlistsize!=currlist.size()){
+                        currlist.add("Tree".concat(String.valueOf(treenumber)));
+                        order.put(currkey, currlist);
+                    }
+                }
+            }
+            formernewparent = newparent;
+            firstnewparent = false;
+            newparent = newparent.getParent();
+        }
+        return order;
     }
 
 
@@ -279,7 +439,10 @@ public class SCM {
         TreeNode formernewparent = new TreeNode();
         //TODO ensure equalsNode does the right thing
         //while (!newparent.equalsNode(parent)){
+        //boolean nodeon2childrenpaths = false;
+        //boolean switchnodeon2childrenpaths = false;
         while (newparent != parent){
+            //if (switchnodeon2childrenpaths) nodeon2childrenpaths = true;
             //currchildren are the child nodes of the node hanging at the path from child to parent at an inner node
             currchildren = newparent.getChildren();
             if (firstnewparent){
@@ -288,6 +451,7 @@ public class SCM {
             else currchildren.remove(formernewparent);
             if (!currchildren.isEmpty()){
                 for (TreeNode ch : currchildren){
+
                     //currkey contains all leaves of the child in the consensus-tree (or if it's a leaf, only the child)
                     //idea: if an element in currchildren is no leaf, we can find the one node in these nodes that will hang onto the child-polytomy
                     if (childinconsensus.isLeaf()){
@@ -305,7 +469,13 @@ public class SCM {
                     int counter = 0;
                     //if the found node is a leaf, we can just add it to the collection
                     if (ch.isLeaf()){
-                        if (!consensusleaves.contains(ch.getLabel())) currlist.add(ch.getLabel());
+                        if (!consensusleaves.contains(ch.getLabel())){
+                            currlist.add(ch.getLabel());
+                            //if (nodeon2childrenpaths){
+                            //    store2pathnnodes.add(ch.getLabel());
+                            //}
+                        }
+                        //else switchnodeon2childrenpaths = true;
                     }
                     else {
                         counter = 0;
@@ -327,10 +497,14 @@ public class SCM {
                                 //we search for the one leaf that hangs onto the child-polytomy
                                 if (values.containsAll(currkey)){
                                     currlist.add(leave.getLabel());
+                                    //if (nodeon2childrenpaths){
+                                    //    store2pathnnodes.add(leave.getLabel());
+                                    //}
                                     counter++;
                                 }
                             }
                         }
+                        //else switchnodeon2childrenpaths = true;
 
                     }
                     //TODO !
@@ -471,7 +645,7 @@ public class SCM {
     }
 
 
-    public Tree getSCM (Tree one, Tree two){
+    public Tree getSCM (Tree one, Tree two, boolean print){
         ArrayList<String> nodesofboth = TreeUtils.getOverLappingNodes(one, two);
         Tree result;
         Tree between;
@@ -493,9 +667,21 @@ public class SCM {
             one = CutTree(one, nodesofboth, turn);
             two = CutTree(two, nodesofboth, turn);
             between = con.consesusTree(new Tree[]{one, two}, 1.0);
-            System.out.println(Newick.getStringFromTree(between));
+            if (print){
+                System.out.println("Cut one "+Newick.getStringFromTree(one));
+                System.out.println("Cut two "+Newick.getStringFromTree(two));
+                System.out.println("Consensus "+Newick.getStringFromTree(between));
+                /*double[] printout = FN_FP_RateComputer.calculateSumOfRates(between, new Tree[]{originalone, originaltwo});
+                System.out.print("\n"+"Consensus FNFP Rate ");
+                for (double a : printout){
+                    System.out.print(a+" ");
+                }
+                System.out.println();*/
+            }
             takeCareOfCollisions(between, originalone, originaltwo);
             result = hangInNodes(between);
+            setTolerated(new ArrayList<String>());
+            //store2pathnnodes.clear();
         }
         return result;
 
@@ -623,26 +809,31 @@ public class SCM {
 
     public Tree hangInNodes (Tree input){
         Tree output = input.cloneTree();
-
+        Tree consensus = input.cloneTree();
         Set<Map.Entry<String, List<String>>> mapValues = TreeCut1.entrySet();
         int maplength = mapValues.size();
         Map.Entry<String,List<String>>[] TreeCut1entries = new Map.Entry[maplength];
         mapValues.toArray(TreeCut1entries);
-        output = helphangInNodes(output, maplength, TreeCut1entries);
+        output = helphangInNodes(output, consensus, maplength, TreeCut1entries);
+        List<String> tolerated = getTolerated();
+        tolerated.addAll(TreeCut1.keySet());
+        setTolerated(tolerated);
         TreeCut1.clear();
+        //System.out.println("Baum nach hangin 1 "+Newick.getStringFromTree(output));
 
         mapValues = TreeCut2.entrySet();
         maplength = mapValues.size();
         Map.Entry<String,List<String>>[] TreeCut2entries = new Map.Entry[maplength];
         mapValues.toArray(TreeCut2entries);
-        output = helphangInNodes(output, maplength, TreeCut2entries);
+        output = helphangInNodes(output, consensus, maplength, TreeCut2entries);
         TreeCut2.clear();
 
         return output;
     }
 
 
-    private Tree helphangInNodes(Tree input, int maplength, Map.Entry<String,List<String>>[] TreeCutentries){
+    private Tree helphangInNodes(Tree input, Tree consensus, int maplength, Map.Entry<String,List<String>>[] TreeCutentries){
+        List<String> tolerated = getTolerated();
         Tree output = input.cloneTree();
         String currlabel;
         List<String> currlist;
@@ -651,16 +842,86 @@ public class SCM {
         TreeNode newvertex;
         TreeNode betw1;
         TreeNode betw2;
+        List<String> chcopy;
+        double memoryprint = 0;
 
         for (int iter=maplength-1; iter>=0; iter--){
             currlabel = TreeCutentries[iter].getKey();
             currlist = TreeCutentries[iter].getValue();
             if (currlist.contains("Polytomy")){
                 currlist.remove("Polytomy");
-                for (String x : currlist){
-                    finallist.add(output.getVertex(x));
-                }
+                finallist = TreeUtils.helpgetTreeNodesFromLabels(currlist, output);
+                //for (String x : currlist){
+                //    finallist.add(output.getVertex(x));
+                //}
                 lca = output.findLeastCommonAncestor(finallist);
+                //TODO muss das ueberhaupt bei Polytomien sein?
+                List<String> lcaleaves = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(lca.getLeaves()));
+                if (!TreeUtils.StringListsEquals(lcaleaves,currlist)){
+                    lcaleaves.removeAll(currlist);
+                    if (!tolerated.containsAll(lcaleaves)){
+                        System.out.println("Ah!");
+                        List<String> leavesinconsensus = new ArrayList<String>();
+                        List<String> consensusleaves = new ArrayList<String>(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(consensus.getLeaves())));
+                        for (String i : currlist){
+                            if (consensusleaves.contains(i)) leavesinconsensus.add(i);
+                        }
+
+                        TreeNode lcainconsensus = consensus.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(leavesinconsensus, consensus));
+                        lcaleaves.removeAll(tolerated);
+                        List<String> part2expected = new ArrayList<String>();
+                        List<String> clcaleavesactual = new ArrayList<String>(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(lcainconsensus.getLeaves())));
+                        for (String i : clcaleavesactual){
+                            if (lcaleaves.contains(i)){
+                                part2expected.add(i);
+                            }
+                        }
+                        List<String> clcaleavesexpected = new ArrayList<String> ();
+                        clcaleavesexpected.addAll(leavesinconsensus);
+                        clcaleavesexpected.addAll(part2expected);
+                        if (!TreeUtils.StringListsEquals(clcaleavesactual,clcaleavesexpected)){
+                            System.out.println("Hier klappt was nicht");
+                        }
+                        //else{
+                        //    done = true;
+                        //}
+
+
+
+                /*        List<TreeNode> neededchildren = new ArrayList<TreeNode>();
+                        for (TreeNode ch : lca.getChildren()){
+                            if (ch.isLeaf()){
+                                if (finallist.contains(ch)){
+                                    neededchildren.add(ch);
+                                }
+                            }
+                            else {
+                                chcopy = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(ch.getLeaves()));
+                                boolean contains = false;
+                                for (String el : currlist){
+                                    if (chcopy.contains(el)){
+                                        contains = true;
+                                        break;
+                                    }
+                                }
+                                if (contains){
+                                    neededchildren.add(ch);
+                                }
+                            }
+                        }
+                        TreeNode stretchnode = new TreeNode("");
+                        output.addVertex(stretchnode);
+                        for (TreeNode ch: neededchildren){
+                            output.removeEdge(lca, ch);
+                            output.addEdge(stretchnode, ch);
+                        }
+                        output.addEdge(lca, stretchnode);
+                        lca = output.findLeastCommonAncestor(finallist);
+                        if (lca != stretchnode){
+                            System.out.println("Da müssen wir nochmal drüber reden..");
+                        }*/
+                    }
+                }
                 newvertex = new TreeNode(currlabel);
                 output.addVertex(newvertex);
                 output.addEdge(lca, newvertex);
@@ -670,33 +931,128 @@ public class SCM {
                 for (String x : currlist){
                     finallist.add(output.getVertex(x));
                 }
-
+                boolean allright = true;
                 if (finallist.size()==1){
                     lca = finallist.get(0);
                 }
                 else {
                     lca = output.findLeastCommonAncestor(finallist);
+                    List<String> lcaleaves = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(lca.getLeaves()));
+                    if (!TreeUtils.StringListsEquals(lcaleaves,currlist)){
+                        lcaleaves.removeAll(currlist);
+                        if (!tolerated.containsAll(lcaleaves)) {
+                            allright = false;
+                        }
+                    }
+
                 }
-                if (lca.getParent()!=null){
-                    betw1 = lca.getParent();
-                    betw2 = new TreeNode();
-                    output.removeEdge(betw1, lca);
-                    output.addVertex(betw2);
-                    output.addEdge(betw1, betw2);
-                    output.addEdge(betw2, lca);
-                    lca = betw2;
+                boolean done = false;
+                if (!allright){
+                    System.out.println("Ah!");
+                    List<String> lcaleaves = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(lca.getLeaves()));
+                    lcaleaves.removeAll(currlist);
+                    List<String> leavesinconsensus = new ArrayList<String>();
+                    List<String> consensusleaves = new ArrayList<String>(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(consensus.getLeaves())));
+                    for (String i : currlist){
+                        if (consensusleaves.contains(i)) leavesinconsensus.add(i);
+                    }
+
+                    TreeNode lcainconsensus = consensus.findLeastCommonAncestor(TreeUtils.helpgetTreeNodesFromLabels(leavesinconsensus, consensus));
+                    lcaleaves.removeAll(tolerated);
+                    List<String> part2expected = new ArrayList<String>();
+                    List<String> clcaleavesactual = new ArrayList<String>(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(lcainconsensus.getLeaves())));
+                    for (String i : clcaleavesactual){
+                        if (lcaleaves.contains(i)){
+                            part2expected.add(i);
+                        }
+                    }
+                    List<String> clcaleavesexpected = new ArrayList<String> ();
+                    clcaleavesexpected.addAll(leavesinconsensus);
+                    clcaleavesexpected.addAll(part2expected);
+                    if (!TreeUtils.StringListsEquals(clcaleavesactual,clcaleavesexpected)){
+                        System.out.println("Hier klappt was nicht");
+                    }
+                    else{
+                        done = true;
+
+                    }
+                /*    List<TreeNode> neededchildren = new ArrayList<TreeNode>();
+                    for (TreeNode ch : lca.getChildren()){
+                        if (ch.isLeaf()){
+                            if (finallist.contains(ch)){
+                                neededchildren.add(ch);
+                            }
+                        }
+                        else {
+                            chcopy = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(ch.getLeaves()));
+                            boolean contains = false;
+                            for (String el : currlist){
+                                if (chcopy.contains(el)){
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            if (contains){
+                                neededchildren.add(ch);
+                            }
+                        }
+                    }
+                    TreeNode stretchnode = new TreeNode("");
+                    output.addVertex(stretchnode);
+                    for (TreeNode ch: neededchildren){
+                        output.removeEdge(lca, ch);
+                        output.addEdge(stretchnode, ch);
+                    }
+                    output.addEdge(lca, stretchnode);
+                    lca = output.findLeastCommonAncestor(finallist);
+                    if (lca != stretchnode){
+                        System.out.println("Da müssen wir nochmal drüber reden..");
+                    }*/
                 }
-                else {
-                    betw1 = new TreeNode();
-                    output.addVertex(betw1);
-                    output.addEdge(betw1, lca);
-                    output.setRoot(betw1);
-                    lca = betw1;
+                if (!done){
+                    if (lca.getParent()!=null){
+                        betw1 = lca.getParent();
+                        betw2 = new TreeNode("");
+                        output.removeEdge(betw1, lca);
+                        output.addVertex(betw2);
+                        output.addEdge(betw1, betw2);
+                        output.addEdge(betw2, lca);
+                        lca = betw2;
+                    }
+                    else {
+                        betw1 = new TreeNode("");
+                        output.addVertex(betw1);
+                        output.addEdge(betw1, lca);
+                        output.setRoot(betw1);
+                        lca = betw1;
+                    }
                 }
                 newvertex = new TreeNode(currlabel);
                 output.addVertex(newvertex);
                 output.addEdge(lca, newvertex);
                 finallist.clear();
+                //tolerated.add(currlabel);
+            }
+            //if (currlabel.equalsIgnoreCase("t41")){
+            //    System.out.println("41 eingefuegt "+Newick.getStringFromTree(output));
+            //}
+            //if (currlabel.equalsIgnoreCase("t2")){
+            //    System.out.println("2 eingefuegt "+Newick.getStringFromTree(output));
+            //}
+            Tree one = Newick.getTreeFromString("((t10:0.08894775476215742,(t26:0.03985428974948799,t73:0.02821633593664641)100:0.0653062423018403)24:0.0017507689662846489,((t89:0.067542697327743,t68:0.08106961282357142)100:0.024137679166091212,(t56:0.09388933727299291,(t82:0.11451216649175316,(((t28:0.10067068632474534,(t6:0.062115972448305176,t53:0.07635689001187648)74:0.0069009548417048785)99:0.020728018848596656,(t58:0.055024742708669507,t75:0.06600512927120432)48:0.009395551583782975)17:1.34682794829244E-6,((t12:0.09742851288532818,(t88:0.029829151430107944,t54:0.05618494156896096)100:0.02136894992853153)99:0.009304169105916357,(((t84:0.010334702349869484,t14:0.008693031409483552)91:0.004684925785176115,t64:0.014192578890272554)100:0.055263204323444275,t69:0.04660129207720499)98:0.0230113921516879)87:0.00881020640032454)17:0.0020877436071069194)13:7.778354585524996E-4)16:0.006783841048411207)24:0.0017507689662846489);");
+            Tree two = Newick.getTreeFromString("((t40:0.5642765986294135,((t27:0.04596738031684233,t10:0.04465944458541802)100:0.4935110285523345,t60:0.4620280998200701)85:0.13478395423074496)100:0.23474872431429836,((t58:0.6592918057435115,((t86:0.8168816361372218,(t15:0.45252525840942587,(t35:0.28624420241017584,(t75:0.12895321040121585,(t2:0.11106834046711006,(t95:0.01979516143462739,t20:0.044488496428575795)100:0.04241500044319846)100:0.13239931777943087)88:0.08244039997697482)100:0.25367982508916176)90:0.17778450724681977)95:0.1817789985350968,((t63:0.6236101319446528,t18:0.6719268474144552)100:0.37911686628118785,((t25:0.6577736716889722,(t30:0.4583775454001696,t19:0.42276665221644705)98:0.17329657672200122)99:0.23970620655211639,(t39:0.29827718792250596,(t24:0.0631652168412221,t36:0.09031965533238977)100:0.06989182537035858)100:0.6037301441285537)76:0.079287737318506)55:0.033845347351159766)40:0.030757867528538162)69:0.0677526626915482,(((t13:0.16950395875940258,t56:0.1613765889974485)100:0.6848772326521831,t37:0.9046113535243439)94:0.15318977472845294,((t65:0.03142040964381939,t98:0.060073042912420584)100:0.9658814885188209,(((t78:0.26821783448542424,(t89:0.10837468962143247,t96:0.017168179537107055)100:0.2417786978157017)100:0.6430575475267502,((t3:0.06530358850870746,t5:0.08193313113945493)100:0.5070082511849349,t68:0.38069035060385753)99:0.22537240004162176)100:0.34060701907377705,(((t80:0.29329005370672584,(t67:0.06810271804040097,t62:0.05309582294292591)100:0.2651898398255605)100:0.28580462601527445,(t31:0.5459109984234274,t71:0.44568163507259245)55:0.06316904797911133)100:0.7151053320769016,((t77:0.9593462482282171,((t99:0.8077413721408524,(t28:0.2851129545530663,t9:0.3703556907188251)100:0.7442255596798166)21:1.34842898143532E-6,((((t42:0.05022682389782012,t70:0.056505635675869276)100:0.06136569668686884,t53:0.19309249484117325)100:0.5202948194212101,t21:0.5461385140161974)100:0.44774728355019117,(t4:0.7663294960480718,t49:1.1347067447875487)55:0.07008232772202343)70:0.09550937315792586)56:0.02263377238778113)73:0.18306277757410466,((t79:0.21930509364269132,t82:0.1494072483902726)100:1.0858730021646081,(t87:1.2357743349435864,((((t69:0.5773170285457361,((t11:0.38286176851734943,t47:0.504941992846492)100:0.276413741212672,t61:0.6579610046703622)39:0.08521012399900478)44:0.049324647873264515,((t84:0.056443454073336424,t14:0.06154832969009686)100:0.17847126674136252,t64:0.12867808873957082)100:0.6732398877428349)100:0.3528066547955437,(t94:0.8736682683940032,t45:0.8187108526354588)100:0.5176146827378105)10:1.34842898143532E-6,(((t100:0.25445660258297986,(t85:0.03259945235570368,t66:0.06192521794200038)100:0.2645828324655557)100:0.7167574486833765,(t38:0.880971836112053,(((t93:0.019083893252804376,t57:0.014734095604819628)100:0.8117087583529794,t76:0.5782170346586399)95:0.138442604469865,(t51:0.8163036189862298,(t83:0.327523159744752,(t22:0.3442087061799547,(t41:0.19664909410041703,t17:0.1255134927777769)96:0.01016051852546475)100:0.2332958829940862)100:0.2355383765564445)83:0.14019123833728367)43:1.34842898143532E-6)85:0.08282860227584646)77:0.056824059465323006,(t74:0.7423263761854103,((t72:1.0460150810068918,((t88:0.18826846372441775,t59:0.12757108176959156)100:0.37983853624672637,(t54:0.6813251719851827,(t50:0.4004687419880292,t90:0.2824537814154379)100:0.2629304924027125)79:0.026044688086691588)97:0.12877576102046967)81:0.029741624397714096,(t32:0.7402804442589143,(t52:0.19633597506044315,t81:0.28292736010822134)100:0.38708998152984875)95:0.18546980512890965)57:0.04192872020144604)75:0.10225278886564688)22:0.0336146587995301)21:0.011570799712874016)91:0.11980606658790942)20:0.05501999338186062)13:1.34842898143532E-6)18:0.020796760454031976)14:0.03939710288230341)18:0.01332259376399016)79:0.10459134522251148)100:0.23474872431429836);");
+            Tree three = Newick.getTreeFromString("((t40:0.03733907310781477,(t60:0.04974468606980605,(t10:0.004377282688809392,t27:0.0035497194875559247)100:0.04878540538739086)97:0.007080299861728854)100:0.017513671831767996,(((t37:0.08002346188613733,(t13:0.010756785878271051,t56:0.022077666215809356)100:0.04532466970980053)100:0.02258963804646646,(((t62:0.005262262239080322,t67:0.005690183622642661)100:0.02549022989348961,t80:0.02723876020478056)100:0.01859291240061531,(t71:0.02119713779969507,t31:0.04503977226718123)65:9.7089631289078E-7)100:0.056183351644041264)98:0.011537145936535431,(((t18:0.05256334950211299,t63:0.05351733808321262)100:0.031109431652734998,((t39:0.01703707515290678,(t36:0.005830869340027849,t24:0.004260114289259045)100:0.016449078752881895)100:0.054076188122161105,(t25:0.0435312698865738,(t19:0.02823734074787279,t30:0.05711272194641987)100:0.01212114806882504)100:0.02131646711623323)39:0.0020119574694396924)41:0.0016646835919856677,(t58:0.05586463182976597,(t86:0.07072206708419582,(t15:0.053391613987143045,(t35:0.026175856550720494,(((t20:0.0028886593314911015,t95:0.0014345349795915742)98:0.002873489485425033,t2:0.003635725829111734)100:0.008432933045373443,t75:0.006374803170708947)100:0.014546978846091905)100:0.019828672631333047)96:0.013456957536938052)96:0.012898248489683071)52:0.004779336234353997)37:0.002091010637787482)100:0.017513671831767996);");
+            Tree four = Newick.getTreeFromString("((t87:0.45546907506485174,(((t94:0.3523030512073961,t45:0.2519746607394135)100:0.16349562367943737,(((((t81:0.1270483392639667,t52:0.08634047434721875)100:0.1523750741329205,t12:0.3587510950074339)36:0.006292889487145146,t32:0.2684754605220908)100:0.08759186457103565,(t72:0.3813833926838195,(t54:0.26213063354322685,((t59:0.06428013935544478,t88:0.07077038188966295)100:0.15895371078922876,(t90:0.11364523482627091,t50:0.15809623224616126)100:0.09276503992690989)41:1.35250398208499E-6)99:0.08011019561936077)42:0.014232718513404427)8:1.35250398208499E-6,(t74:0.2885904983681343,t16:0.4120626763152228)31:0.01863293156581301)86:0.030149711618985626)65:0.012080127389208243,((((t64:0.06108998878668425,(t14:0.03294737680531124,t84:0.03691237312020028)100:0.057014598573443126)100:0.25829525121351643,((t47:0.1803023815258389,t11:0.16830954119802458)100:0.13154862542619744,t61:0.2894709102747981)24:0.0013764345034373376)40:0.012896975456119746,t69:0.22249602652057102)100:0.12992345178926276,(((t38:0.35909799690340355,(t51:0.3179604781122556,(t83:0.1380141917410429,(t22:0.12355689889676288,(t41:0.08583766341198493,t17:0.06664142520262081)86:0.02833841566583851)100:0.10272393810141218)100:0.12200110220113695)86:0.04073038614147135)39:1.35250398208499E-6,((t57:0.0063988102546793674,t93:0.008467643712963048)100:0.34818209793075333,t76:0.2540023867059081)93:0.04902210461699647)86:0.022906994215120775,(t100:0.12597233888082485,(t66:0.023131889229564682,t85:0.02451002691246267)100:0.09518615433333819)100:0.25266545008107266)86:0.02482916122837473)31:9.495919573138993E-4)52:0.02874076059964088)100:0.08776357313643807,((t78:0.1149947581525899,(t96:0.010476181891934668,t89:0.04579279396428263)100:0.078721172151805)100:0.2207881671287491,(t68:0.17538774407844374,(t3:0.03196360555206687,t5:0.03940428515221167)100:0.220638559098164)100:0.11759672414717665)100:0.08776357313643807);");
+            Tree five = Newick.getTreeFromString("(((t60:0.0490426627088724,(t27:0.0034680070109926026,t10:0.004290705199215468)100:0.048134290645483406)97:0.006699541713968005,t40:0.036468096659774435)100:0.01573349150938158,(((t31:0.0433026952919029,t71:0.021676079194882156)87:0.0017534262034075813,(t80:0.027385505143122754,(t62:0.005154965794287388,t67:0.0055841220310420435)100:0.024083518897501793)100:0.01677958302959055)100:0.06416310289457224,(((t63:0.05179676198078157,t18:0.05192025882736162)100:0.030225689857041008,((t39:0.01686137928927442,(t36:0.005705557057087696,t24:0.004166740235989693)100:0.01597514618325249)100:0.05322601247124448,(t25:0.043035486309823054,(t19:0.02791934881481156,t30:0.055998266821126574)100:0.01175769068808138)100:0.020969051401044846)33:0.002732077888561074)41:0.002153423307250629,((t86:0.06943119082207976,(t15:0.052074476142482624,(t35:0.02573308267563979,(t75:0.006222154278898244,((t20:0.002829805509374061,t95:0.0014028302470604273)100:0.0028152545857782086,t2:0.0035584904655703836)100:0.008290259045934658)100:0.014239809800308152)100:0.019537886347742426)99:0.01364951569503425)82:0.011141002767653918,t58:0.05560765529907733)48:0.004963697331687693)42:0.0038259635623478796)100:0.01573349150938158);");
+            Tree six = Newick.getTreeFromString("((t94:0.060740485986834014,t45:0.040964775051944416)100:0.025722597113558857,(((t16:0.08061691577252479,t74:0.05673225570001672)49:0.0035897107483803554,(t32:0.04172797576787578,(t12:0.07631292987347321,(t81:0.027318522758643427,t52:0.01409328038242558)100:0.030676926791958367)76:0.0029844206266685007)100:0.016297728990450566)45:0.0016812980534722534,(t72:0.08332509396999005,((t90:0.026779436843129147,t50:0.03347899421676307)100:0.018920071564419348,(t54:0.05137852215496093,(t88:0.007198076423519194,t59:0.012374249699929228)100:0.02782433064160607)53:0.0012602158975253438)100:0.017224578778602263)90:0.006068636198073989)99:0.008436136595551475,((t38:0.08820269624369481,(((t57:1.45133972851916E-6,t93:1.45133972851916E-6)100:0.08403495719189008,t76:0.056778292903422574)71:0.009115631346830641,(t51:0.06555033746812054,(t83:0.03163642144815057,((t41:0.011328286922557164,t17:0.016035498857625688)72:0.0054313597149528384,t22:0.020094966773746444)100:0.02037340041258512)100:0.026422623606083478)82:0.008812314374267985)33:4.265441555331521E-4)80:0.003096857792858868,(t100:0.03075201580336611,(t66:0.005083665573264914,t85:0.0044584945037720765)100:0.005292630030146493)100:0.005292630030146493)99:0.005292630030146493);");
+
+
+            double[] print = FN_FP_RateComputer.calculateSumOfRates(output, new Tree[]{one, two, three, four});
+            if (print[3] > 0){
+                if (print[3]>memoryprint){
+                    System.out.println("Fp beim Einhängen von "+currlabel);
+                }
+                memoryprint = print[3];
             }
         }
         return output;
@@ -761,7 +1117,21 @@ public class SCM {
                         System.err.println("Fehler bei CutTree");
                     }
                     if (between.size()>1 && par.getChildren().size()>2){
-                        finallist.add("Polytomy");
+                        int childcounter = 0;
+                        List<String> chleaves = new ArrayList<String>();
+                        for (TreeNode i : par.getChildren()){
+                            chleaves.addAll(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(i.getLeaves())));
+                            for (String s : chleaves){
+                                if (originalleaves.contains(s)){
+                                    childcounter ++;
+                                    break;
+                                }
+                            }
+                            chleaves.clear();
+                        }
+                        if (childcounter > 2){
+                            finallist.add("Polytomy");
+                        }
                     }
                     for (TreeNode x : between){
                         finallist.add(x.getLabel());
@@ -802,6 +1172,13 @@ public class SCM {
 
 
     public static void main (String args[]){
+        List<String> bla = Arrays.asList(new String[]{"eins", "zwei", "drei", "vier", "fuenf"});
+        List<String> bli = Arrays.asList(new String[]{"sechs", "sieben", "drei", "vier", "fuenf", "eins", "zwei"});
+        bli.removeAll(bla);
+        for (String x : bli){
+            System.out.print(x+" ");
+        }
+        System.out.println(bli.toArray());
 
         /*GreedySCM hey = new GreedySCM();
         Tree b = Newick.getTreeFromString("((((a:1.0,b:1.0):1.0,c:1.0):1.0,(d:1.0,e:1.0):1.0):1.0,f:1.0)");

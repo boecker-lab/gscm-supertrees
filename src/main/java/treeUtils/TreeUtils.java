@@ -50,11 +50,19 @@ public class TreeUtils {
         }
     }
 
+    //public static boolean treeNodeEqualsIgnoreLabel (TreeNode one, TreeNode two){
+    //    if (one == two) return true;
+    //
+    //}
+
     public static List<String> helpgetLabelsFromNodes(List<TreeNode> input){
         List<String> output = new ArrayList<String>();
         String def = "";
         for (TreeNode nod : input){
-            output.add(def.concat(nod.getLabel()));
+            if (nod.getLabel()!=null){
+                output.add(def.concat(nod.getLabel()));
+            }
+            else output.add(def.concat(""));
         }
         return output;
     }

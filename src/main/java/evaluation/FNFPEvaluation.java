@@ -57,16 +57,22 @@ public class FNFPEvaluation {
         System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
-    public void calculateSupertree (String kind){
+    public void calculateSupertree (String kind, String onoff){
         if (alltrees.isEmpty()) System.err.println("Choose a file first");
         else {
-            calc = new CalculateSupertree(kind, "off");
+            if (onoff.equalsIgnoreCase("on")){
+                calc = new CalculateSupertree(kind, "on");
+            }
+            else calc = new CalculateSupertree(kind, "off");
             supertree = calc.getSupertree(alltrees);
         }
     }
 
-    public void evaluate (){
-        calculateSupertree("resolution");
+    public void evaluate (boolean printresolution, boolean printoverlap){
+        if (printresolution){
+            calculateSupertree("resolution", "on");
+        }
+        else calculateSupertree("resolution", "off");
         rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
         System.out.println("\n"+"FNFP source trees resolution");
         for (double a : rates){
@@ -77,7 +83,10 @@ public class FNFPEvaluation {
         for (double a : rates){
             System.out.print(a + " ");
         }
-        calculateSupertree("overlap");
+        if (printoverlap){
+           calculateSupertree("overlap", "on");
+        }
+        else calculateSupertree("overlap", "off");
         rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
         System.out.println("\n"+"FNFP source trees overlap");
         for (double a : rates){
@@ -106,7 +115,16 @@ public class FNFPEvaluation {
         for (int iter=0; iter<number; iter++){
             if (!notthere.contains(iter)){
                 readData(taxa, scaffold, iter);
-                evaluate();
+                if (iter == 18){
+                    //for (Tree x : alltrees){
+                    //    System.out.println("Tree "+Newick.getStringFromTree(x));
+                    //}
+                    evaluate(false, true);
+                    //evaluate(false, false);
+                }
+                else; //{
+                    //evaluate(false, false);
+                //}
             }
         }
     }

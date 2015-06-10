@@ -36,7 +36,7 @@ public class OverlapScorer extends Scorer {
         if (maxsize == 0 && input.size()>=2){
             output.add(input.get(mem1));
             output.add(input.get(mem2));
-            output.add(s.getSCM(input.get(mem1), input.get(mem2)));
+            output.add(s.getSCM(input.get(mem1), input.get(mem2), false));
             System.err.println("In der Liste gibt es keine Bäume mit Overlap");
         }
         else if (input.size()<2){
@@ -45,7 +45,7 @@ public class OverlapScorer extends Scorer {
         else {
             output.add(input.get(mem1));
             output.add(input.get(mem2));
-            output.add(s.getSCM(input.get(mem1), input.get(mem2)));
+            output.add(s.getSCM(input.get(mem1), input.get(mem2), true));
         }
         return output;
     }

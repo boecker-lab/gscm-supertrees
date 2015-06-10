@@ -17,7 +17,7 @@ public class ResolutionScorer extends Scorer{
 
     public double getScore (Tree one, Tree two){
         SCM s = new SCM();
-        scm = s.getSCM(one, two);
+        scm = s.getSCM(one, two, false);
         //TODO !
         List<String> check = TreeUtils.StringListMultipleElements(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(scm.getLeaves())));
         if (!check.isEmpty()){
