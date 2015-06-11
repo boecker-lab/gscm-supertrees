@@ -115,16 +115,17 @@ public class FNFPEvaluation {
         for (int iter=0; iter<number; iter++){
             if (!notthere.contains(iter)){
                 readData(taxa, scaffold, iter);
-                if (iter == 18){
+                if (iter == 26 && scaffold.equalsIgnoreCase("50")){
                     //for (Tree x : alltrees){
                     //    System.out.println("Tree "+Newick.getStringFromTree(x));
                     //}
-                    evaluate(false, true);
-                    //evaluate(false, false);
+                    //evaluate(false, true);
+                    //evaluate(true, false);
+                    evaluate(false, false);
                 }
-                else; //{
-                    //evaluate(false, false);
-                //}
+                else {
+                    evaluate(false, false);
+                }
             }
         }
     }
