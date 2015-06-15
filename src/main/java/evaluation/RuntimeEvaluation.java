@@ -23,6 +23,8 @@ public class RuntimeEvaluation {
     CalculateSupertree calc;
     Tree supertree;
     double time;
+    double timeresolutionmillis = 0.0;
+    double timeoverlapmillis = 0.0;
     //String path;
 
     public void readData (String taxa, String scaffold, int num){
@@ -30,7 +32,7 @@ public class RuntimeEvaluation {
         in = RuntimeEvaluation.class.getResourceAsStream(path);
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
+        //System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
     public void calculateSupertree (String kind){
@@ -47,23 +49,43 @@ public class RuntimeEvaluation {
 
 
 
-    public void evaluate (){
-        //calculateSupertree("resolution");
-        //System.out.println("time resolution "+time);
-
-        calculateSupertree("overlap");
-        System.out.println("time overlap "+time);
-
+    public void evaluate (boolean exampledone, int notthere, int number){
         calculateSupertree("resolution");
-        System.out.println("time resolution "+time);
+        timeresolutionmillis += time;
+        //System.out.println("time resolution "+time);
+        calculateSupertree("overlap");
+        timeoverlapmillis += time;
+        //System.out.println("time overlap "+time);
+
+        if (exampledone){
+            int actualnumber = number-notthere;
+            System.out.println("\n"+"time of resolution millis ");
+            System.out.print((timeresolutionmillis/actualnumber) + " ");
+
+            System.out.println("\n"+"time of overlap millis ");
+            System.out.print((timeoverlapmillis/actualnumber) + " ");
+            System.out.println("\n");
+
+            timeresolutionmillis = 0.0;
+            timeoverlapmillis = 0.0;
+        }
     }
 
     public void readAndProcess (String taxa, String scaffold, List<Integer> notthere, int number){
         for (int iter=0; iter<number; iter++){
-            if (!notthere.contains(iter)){
+            System.out.print(iter+" ");
+            if (number-1 == iter){
+                System.out.println("\n\n"+taxa+" "+scaffold+": ");
                 readData(taxa, scaffold, iter);
-                evaluate();
+                evaluate(true, notthere.size(), number);
             }
+            else {
+                if (!notthere.contains(iter)){
+                    readData(taxa, scaffold, iter);
+                    evaluate(false, notthere.size(), number);
+                }
+            }
+
         }
     }
 
@@ -86,6 +108,10 @@ public class RuntimeEvaluation {
         ev.readAndProcess("1000", "50", Arrays.asList(tausend_fuenfzig), 10);
         ev.readAndProcess("1000", "75", empty, 10);
         ev.readAndProcess("1000", "100", empty, 10);
+        ev.readAndProcess("100", "20", Arrays.asList(hundert_zwanzig), 30);
+        ev.readAndProcess("100", "50", empty, 30);
+        ev.readAndProcess("100", "75", empty, 30);
+        ev.readAndProcess("100", "100", empty, 30);
     }
 
 }
