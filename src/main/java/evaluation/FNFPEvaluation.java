@@ -31,15 +31,22 @@ public class FNFPEvaluation {
     double[] FNFPsourceres = new double[]{0, 0, 0, 0};
     double[] FNFPmodelover = new double[]{0, 0, 0, 0};
     double[] FNFPmodelres = new double[]{0, 0, 0, 0};
-
-    //String path;
+    double[] FNFPmodelswenson;
+    double[] FNFPsourceswenson;
 
     FNFPEvaluation(){
         this.swenson = false;
     }
 
-    FNFPEvaluation(boolean swenson){
+    //if swenson is true, evaluation is also done for an already calculated overlap result
+    //this can be used for comparison of results
+    FNFPEvaluation(boolean swenson)
+    {
         this.swenson = swenson;
+        if (swenson){
+            FNFPmodelswenson = new double[]{0, 0, 0, 0};
+            FNFPsourceswenson = new double[]{0, 0, 0, 0};
+        }
     }
 
     public void readData (String taxa, String scaffold, int num){
@@ -54,82 +61,66 @@ public class FNFPEvaluation {
             re = new BufferedReader(new InputStreamReader(in));
             alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
             swensonsupertree = alltrees.get(0);
-
         }
         path = "/" + taxa + "/" + scaffold + "/Source_Trees/" + "sm." + num + ".sourceTrees_OptSCM-Rooting.tre";
         in = FNFPEvaluation.class.getResourceAsStream(path);
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        //System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
     public void calculateSupertree (String kind, String onoff){
         if (alltrees.isEmpty()) System.err.println("Choose a file first");
         else {
             if (onoff.equalsIgnoreCase("on")){
-                calc = new CalculateSupertree(kind, "on");
+                if (kind.equalsIgnoreCase("resolution")) calc = new CalculateSupertree(CalculateSupertree.Type.RESOLUTION, CalculateSupertree.Info.ON);
+                else calc = new CalculateSupertree(CalculateSupertree.Type.OVERLAP, CalculateSupertree.Info.ON);
+
             }
-            else calc = new CalculateSupertree(kind, "off");
+            else {
+                if (kind.equalsIgnoreCase("resolution")) calc = new CalculateSupertree(CalculateSupertree.Type.RESOLUTION, CalculateSupertree.Info.OFF);
+                else calc = new CalculateSupertree(CalculateSupertree.Type.OVERLAP, CalculateSupertree.Info.OFF);
+            }
             supertree = calc.getSupertree(alltrees);
         }
     }
 
-    public void evaluate (boolean printresolution, boolean printoverlap, boolean exampledone, String taxa, String scaffold, int notthere, int number){
+    //prints out FNFP number and rates for each scaffold factor in each taxa number, results are
+    //averaged arithmetically over all calculated supertree examples of one scaffold factor, results for
+    //overlap and resoslution criterion, FNFP for supertree-modeltree and sum of FNFP for supertree-source trees
+    public void evaluate (boolean exampledone, String taxa, String scaffold, int notthere, int number){
         double curr = 0.0;
-        if (printresolution){
-            calculateSupertree("resolution", "on");
-        }
-        else calculateSupertree("resolution", "off");
-        rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+        calculateSupertree("resolution", "off");
+        rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()]));
         for (int iter=0; iter<4; iter++){
             curr = FNFPsourceres[iter];
             FNFPsourceres[iter] = curr + rates[iter];
         }
-        /*System.out.println("\n"+"FNFP source trees resolution");
-        for (double a : rates){
-            System.out.print(a + " ");
-        }*/
         rates = FN_FP_RateComputer.calculateRates(supertree, modeltree, false);
         for (int iter=0; iter<4; iter++){
             curr = FNFPmodelres[iter];
             FNFPmodelres[iter] = curr + rates[iter];
         }
-        /*System.out.println("\n"+"FNFP modeltree resolution");
-        for (double a : rates){
-            System.out.print(a + " ");
-        }*/
-        if (printoverlap){
-           calculateSupertree("overlap", "on");
-        }
-        else calculateSupertree("overlap", "off");
-        rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
+        calculateSupertree("overlap", "off");
+        rates = FN_FP_RateComputer.calculateSumOfRates(supertree, alltrees.toArray(new Tree[alltrees.size()]));
         for (int iter=0; iter<4; iter++){
             curr = FNFPsourceover[iter];
             FNFPsourceover[iter] = curr + rates[iter];
         }
-        /*System.out.println("\n"+"FNFP source trees overlap");
-        for (double a : rates){
-            System.out.print(a + " ");
-        }*/
         rates = FN_FP_RateComputer.calculateRates(supertree, modeltree, false);
         for (int iter=0; iter<4; iter++){
             curr = FNFPmodelover[iter];
             FNFPmodelover[iter] = curr + rates[iter];
         }
-        /*System.out.println("\n"+"FNFP modeltree overlap");
-        for (double a : rates){
-            System.out.print(a + " ");
-        }*/
         if (swenson){
             rates = FN_FP_RateComputer.calculateSumOfRates(swensonsupertree, alltrees.toArray(new Tree[alltrees.size()])); //sum FP has to be 0 for any SCM result [1]
-            System.out.println("\n"+"FNFP source trees swenson");
-            for (double a : rates){
-                System.out.print(a + " ");
+            for (int iter=0; iter<4; iter++){
+                curr = FNFPsourceswenson[iter];
+                FNFPsourceswenson[iter] = curr + rates[iter];
             }
             rates = FN_FP_RateComputer.calculateRates(swensonsupertree, modeltree, false);
-            System.out.println("\n"+"FNFP modeltree swenson");
-            for (double a : rates){
-                System.out.print(a + " ");
+            for (int iter=0; iter<4; iter++){
+                curr = FNFPmodelswenson[iter];
+                FNFPmodelswenson[iter] = curr + rates[iter];
             }
         }
         if (exampledone){
@@ -150,37 +141,39 @@ public class FNFPEvaluation {
             for (double a : FNFPmodelover){
                 System.out.print((a/actualnumber) + " ");
             }
+            if (swenson){
+                System.out.println("\n"+"FNFP source trees swenson ");
+                for (double a : FNFPsourceswenson){
+                    System.out.print((a/actualnumber) + " ");
+                }
+                System.out.println("\n"+"FNFP modeltree swenson ");
+                for (double a : FNFPmodelswenson){
+                    System.out.print((a/actualnumber) + " ");
+                }
+                FNFPsourceswenson = new double[]{0, 0, 0, 0};
+                FNFPmodelswenson = new double[]{0, 0, 0, 0};
+            }
             System.out.println("\n");
             FNFPsourceres = new double[]{0, 0, 0, 0};
             FNFPmodelres = new double[]{0, 0, 0, 0};
             FNFPsourceover = new double[]{0, 0, 0, 0};
             FNFPmodelover = new double[]{0, 0, 0, 0};
+
         }
     }
 
     public void readAndProcess (String taxa, String scaffold, List<Integer> notthere, int number){
-
         for (int iter=0; iter<number; iter++){
             System.out.print(iter+" ");
             if (number-1 == iter){
                 System.out.println("\n\n"+taxa+" "+scaffold+": ");
                 readData(taxa, scaffold, iter);
-                evaluate(false, false, true, taxa, scaffold, notthere.size(), number);
+                evaluate(true, taxa, scaffold, notthere.size(), number);
             }
             else {
                 if (!notthere.contains(iter)){
                     readData(taxa, scaffold, iter);
-                    //if (iter == 0){
-                        //for (Tree x : alltrees){
-                        //    System.out.println("Tree "+Newick.getStringFromTree(x));
-                        //}
-                        //evaluate(false, true);
-                        //evaluate(true, false);
-                        //evaluate(false, false, false);
-                    //}
-                    //else {
-                        evaluate(false, false, false, taxa, scaffold, notthere.size(), number);
-                    //}
+                    evaluate(false, taxa, scaffold, notthere.size(), number);
                 }
             }
         }
@@ -188,6 +181,7 @@ public class FNFPEvaluation {
 
     public static void main (String[] args){
         FNFPEvaluation ev = new FNFPEvaluation(false);
+        //those arrays contain the examples for which no source trees were available
         Integer[] hundert_zwanzig = {5, 13};
         List empty = new ArrayList();
         Integer[] fuenfhundert_zwanzig = {4, 5, 7, 16, 21, 22};

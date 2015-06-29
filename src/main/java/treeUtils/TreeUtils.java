@@ -24,6 +24,8 @@ public class TreeUtils {
         return tokeep;
     }
 
+    //generates a depth first list of the leaves of ths input tree where if the choice is given, leaves
+    //at a higher tree depth level are visited first
     public static List<String> generateCustomDepthFirstListChildren (Tree input){
         List<String> dnodes = new ArrayList<String>();
         TreeNode root = input.getRoot();
@@ -50,11 +52,7 @@ public class TreeUtils {
         }
     }
 
-    //public static boolean treeNodeEqualsIgnoreLabel (TreeNode one, TreeNode two){
-    //    if (one == two) return true;
-    //
-    //}
-
+    //returns a string list of all labels the input nodes have
     public static List<String> helpgetLabelsFromNodes(List<TreeNode> input){
         List<String> output = new ArrayList<String>();
         String def = "";
@@ -67,6 +65,7 @@ public class TreeUtils {
         return output;
     }
 
+    //returns a list of the tree nodes specified by a label in a defined tree
     public static List<TreeNode> helpgetTreeNodesFromLabels(List<String> li, Tree input){
         List<TreeNode> output = new ArrayList<TreeNode>();
         for (String x: li){
@@ -75,6 +74,7 @@ public class TreeUtils {
         return output;
     }
 
+    //returns a list containing elements that are more than once in the input list
     public static List<String> StringListMultipleElements (List<String> input){
         List<String> save = new ArrayList<String>();
         List<String> output = new ArrayList<String>();
@@ -87,6 +87,7 @@ public class TreeUtils {
         return output;
     }
 
+    //returns true if two lists contain the same elements, their order doesn't matter
     public static boolean StringListsEquals(List<String> one, List<String> two){
         if (one == null && two == null){
             return true;

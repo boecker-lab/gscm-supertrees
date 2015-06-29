@@ -15,6 +15,7 @@ public class OverlapScorer extends Scorer {
         return TreeUtils.getOverLappingNodes(one, two).size();
     }
 
+    //searches for the two trees with biggest overlap and return them plus their SCM
     public List<Tree> getTreeswithbiggestScoreandSCM(List<Tree> input){
         double cursize;
         double maxsize = 0;
@@ -37,15 +38,15 @@ public class OverlapScorer extends Scorer {
             output.add(input.get(mem1));
             output.add(input.get(mem2));
             output.add(s.getSCM(input.get(mem1), input.get(mem2), false));
-            System.err.println("In der Liste gibt es keine Bäume mit Overlap");
+            System.err.println("the list doesn't contain any trees with pairwise overlap");
         }
         else if (input.size()<2){
-            System.err.println("Im Input existieren weniger als 2 Bäume");
+            System.err.println("less than two trees in the input");
         }
         else {
             output.add(input.get(mem1));
             output.add(input.get(mem2));
-            output.add(s.getSCM(input.get(mem1), input.get(mem2), true));
+            output.add(s.getSCM(input.get(mem1), input.get(mem2), false));
         }
         return output;
     }

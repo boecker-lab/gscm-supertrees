@@ -31,6 +31,7 @@ public class TreeEquals {
         return true;
     }
 
+
     private boolean helpCompareTreeStructure (Tree one, TreeNode nodone, Tree two, TreeNode nodtwo, List<String> list1, List<String> list2, List<TreeNode> childrenone, List<TreeNode> childrentwo){
         boolean foundcorrectiteration = false;
         list1 = TreeUtils.helpgetLabelsFromNodes(Arrays.asList(nodone.getLeaves()));

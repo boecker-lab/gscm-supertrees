@@ -25,20 +25,19 @@ public class RuntimeEvaluation {
     double time;
     double timeresolutionmillis = 0.0;
     double timeoverlapmillis = 0.0;
-    //String path;
 
     public void readData (String taxa, String scaffold, int num){
         String path = "/" + taxa + "/" + scaffold + "/Source_Trees/" + "sm." + num + ".sourceTrees_OptSCM-Rooting.tre";
         in = RuntimeEvaluation.class.getResourceAsStream(path);
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        //System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
     public void calculateSupertree (String kind){
         if (alltrees.isEmpty()) System.err.println("Choose a file first");
         else {
-            calc = new CalculateSupertree(kind, "off");
+            if (kind.equalsIgnoreCase("resolution")) calc = new CalculateSupertree(CalculateSupertree.Type.RESOLUTION, CalculateSupertree.Info.OFF);
+            else calc = new CalculateSupertree(CalculateSupertree.Type.OVERLAP, CalculateSupertree.Info.OFF);
             double time1, time2 = 0.0;
             time1 = System.currentTimeMillis();
             supertree = calc.getSupertree(alltrees);
@@ -47,15 +46,13 @@ public class RuntimeEvaluation {
         }
     }
 
-
-
+    //prints run times measured in milliseconds, averaged arithmetically over all calculated supertree
+    //examples in each scaffold factor, results for resolution and overlap criterion
     public void evaluate (boolean exampledone, int notthere, int number){
         calculateSupertree("resolution");
         timeresolutionmillis += time;
-        //System.out.println("time resolution "+time);
         calculateSupertree("overlap");
         timeoverlapmillis += time;
-        //System.out.println("time overlap "+time);
 
         if (exampledone){
             int actualnumber = number-notthere;
@@ -85,12 +82,12 @@ public class RuntimeEvaluation {
                     evaluate(false, notthere.size(), number);
                 }
             }
-
         }
     }
 
     public static void main (String[] args){
         RuntimeEvaluation ev = new RuntimeEvaluation();
+        //those arrays contain the examples where no source trees were available
         Integer[] hundert_zwanzig = {5, 13};
         List empty = new ArrayList();
         Integer[] fuenfhundert_zwanzig = {4, 5, 7, 16, 21, 22};

@@ -27,7 +27,6 @@ public class ResolutionEvaluation {
     double resolution;
     double resolutionresolution = 0.0;
     double resolutionoverlap = 0.0;
-    //String path;
 
     public void readData (String taxa, String scaffold, int num){
         String path = "/" + taxa + "/" + scaffold + "/Model_Trees/" + "sm_data." + num + ".model_tree";
@@ -39,29 +38,27 @@ public class ResolutionEvaluation {
         in = ResolutionEvaluation.class.getResourceAsStream(path);
         re = new BufferedReader(new InputStreamReader(in));
         alltrees = new ArrayList<Tree>(Arrays.asList(Newick.getAllTrees(re)));
-        //System.out.println("\n"+"\n"+taxa+" "+scaffold+" "+num+":");
     }
 
     public void calculateSupertree (String kind){
         if (alltrees.isEmpty()) System.err.println("Choose a file first");
         else {
-            calc = new CalculateSupertree(kind, "off");
+            if (kind.equalsIgnoreCase("resolution")) calc = new CalculateSupertree(CalculateSupertree.Type.RESOLUTION, CalculateSupertree.Info.OFF);
+            else calc = new CalculateSupertree(CalculateSupertree.Type.OVERLAP, CalculateSupertree.Info.OFF);
             supertree = calc.getSupertree(alltrees);
         }
     }
 
+    //prints supertree resolution, averaged arithmetically over all calculated examples
+    //in each scaffold factor, results for resolution and overlap criterion
     public void evaluate (boolean exampledone, int notthere, int number){
         calculateSupertree("resolution");
         resolution = TreeUtilsBasic.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
         resolutionresolution += resolution;
-        //System.out.println("resolution resolution "+resolution);
-        //System.out.println(supertree.getNumTaxa() +" "+ supertree.vertexCount());
 
         calculateSupertree("overlap");
         resolution = TreeUtilsBasic.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
         resolutionoverlap += resolution;
-        //System.out.println("resolution overlap "+resolution);
-        //System.out.println(supertree.getNumTaxa() +" "+supertree.vertexCount());
 
         if (exampledone){
             int actualnumber = number-notthere;
@@ -94,6 +91,7 @@ public class ResolutionEvaluation {
 
     public static void main (String[] args){
         ResolutionEvaluation ev = new ResolutionEvaluation();
+        //arrays contain the examples for which no source trees were available
         Integer[] hundert_zwanzig = {5, 13};
         List empty = new ArrayList();
         Integer[] fuenfhundert_zwanzig = {4, 5, 7, 16, 21, 22};

@@ -14,39 +14,35 @@ import java.util.List;
  */
 public class CalculateSupertree {
 
-    String type = "";
-    String info = "";
-    //TODO
+    Type type;
+    Info info;
     List<Tree> inputtrees;
+    //contains for every SCM tree the two trees that were merged to calculate it
     HashMap<Tree, Tree[]> scmorigins = new HashMap<Tree, Tree[]>();
+    //contains for every SCM tree the numbers of the source tree it was made from
     HashMap<Tree, Integer[]> scmsourcesnumbers = new HashMap<Tree, Integer[]>();
+    //contains for every SCM tree the source trees it was made from
     HashMap<Tree, Tree[]> scmsources = new HashMap<Tree, Tree[]>();
 
-    //public enum type{}
-
-    public CalculateSupertree(String type, String info){
-        if (type.equalsIgnoreCase("overlap")) this.type = "overlap";
-        else if (type.equalsIgnoreCase("resolution")) this.type = "resolution";
-        if (info.equalsIgnoreCase("on")) this.info = "on";
-        else if (info.equalsIgnoreCase("off")) this.info = "off";
-    }
-
-    public CalculateSupertree(int type, String info){
-        if (type == 0) this.type = "overlap";
-        else if (type == 1) this.type = "resolution";
-        if (info.equalsIgnoreCase("on")) this.info = "on";
-        else if (info.equalsIgnoreCase("off")) this.info = "off";
-        //else System.err.println()
-    }
-
-    public String getType(){
-        return this.type;
-    }
-
-    public void setType(String type){
+    //if info is "on", information on the current SCM tree and the trees it was made from will be printed
+    public CalculateSupertree(Type type, Info info){
+        this.info = info;
         this.type = type;
     }
 
+    public enum Info {ON, OFF};
+
+    public enum Type {RESOLUTION, OVERLAP};
+
+    public Type getType(){
+        return this.type;
+    }
+
+    public void setType(Type type){
+        this.type = type;
+    }
+
+    //fills scmsources and scmsourcesnumbers, given an scm and the two trees that were merged to calculate it
     public void helpFillScmSources (Tree[] input, Tree scm){
         List<Tree> sourcetrees = new ArrayList<Tree>();
         int[] sourcetreeindices;
@@ -78,13 +74,11 @@ public class CalculateSupertree {
                 for (int iter=0; iter<sourcetreeindices.length; iter++){
                     betweenint.add(sourcetreeindices[iter]);
                 }
-                //betweenint.addAll(Arrays.asList(sourcetreeindices));
             }
             else {
                 for (int iter=0; iter<sourcetreeindices.length; iter++){
                     betweenint.add(sourcetreeindices[iter]);
                 }
-                //betweenint = Arrays.asList(sourcetreeindices);
             }
             scmsourcesnumbers.put(scm, betweenint.toArray(new Integer[betweenint.size()]));
             if (scmsources.containsKey(scm)){
@@ -97,7 +91,7 @@ public class CalculateSupertree {
         }
     }
 
-
+    //calculates a supertree from a given list of source trees
     public Tree getSupertree (List<Tree> input) {
         for (Tree curr : input){
             scmsourcesnumbers.put(curr, new Integer[]{input.indexOf(curr)+1});
@@ -105,54 +99,48 @@ public class CalculateSupertree {
         }
         inputtrees = new ArrayList<Tree> (input);
         Scorer sc;
-        if (getType() == "overlap"){
+
+        if (getType() == Type.OVERLAP){
             sc = new OverlapScorer();
         }
-        else {
-            sc = new ResolutionScorer();
-        }
+        else sc = new ResolutionScorer();
 
-        //List<Tree> output = new ArrayList<Tree> (input.subList(0, input.size()-1));
         List<Tree> output = new ArrayList<Tree> (input);
-        //TODO
-        if (this.info == "on"){
+        if (this.info == Info.ON){
             for (Tree t : output){
                 System.out.print("\n"+"Tree "+t+" "+Newick.getStringFromTree(t));
             }
         }
-
         List<Tree> save;
         Tree one;
         Tree two;
         Tree three;
+        //while there are more than one tree in the list, two trees with highest score are merged to an SCM tree
         while (output.size() > 1){
             save = sc.getTreeswithbiggestScoreandSCM(output);
-
             one = save.get(0);
             two = save.get(1);
             three = save.get(2);
             scmorigins.put(three, new Tree[]{one, two});
             helpFillScmSources(new Tree[]{one, two}, three);
 
-            if (this.info == "on") {
+            if (this.info == Info.ON) {
                 List<Tree> consistsof = new ArrayList<Tree>();
                 Integer[]consistsofnumbers;
                 System.out.println("\n"+"Got one SCM: " + Newick.getStringFromTree(three));
-                //System.out.println("named "+three);
-                System.out.println("aus Tree "+one+": "+Newick.getStringFromTree(one));
+                System.out.println("from Tree "+one+": "+Newick.getStringFromTree(one));
                 consistsofnumbers = scmsourcesnumbers.get(one);
-                System.out.print("aus den sourcetrees ");
+                System.out.print("made from sourcetrees ");
                 for (Integer i : consistsofnumbers){
                     System.out.print(i+" ");
                 }
-                System.out.println("\n"+"und Tree " + two + ": " + Newick.getStringFromTree(two));
+                System.out.println("\n"+"and Tree " + two + ": " + Newick.getStringFromTree(two));
                 consistsofnumbers = scmsourcesnumbers.get(two);
-                System.out.print("aus den sourcetrees ");
+                System.out.print("made from sourcetrees ");
                 for (Integer i : consistsofnumbers){
                     System.out.print(i+" ");
                 }
 
-                //double[] a = FN_FP_RateComputer.calculateSumOfRates(three, inputtrees.toArray(new Tree[inputtrees.size()]));
                 double[] a = FN_FP_RateComputer.calculateSumOfRates(three, scmsources.get(three));
                 System.out.println();
                 for (double pr : a){

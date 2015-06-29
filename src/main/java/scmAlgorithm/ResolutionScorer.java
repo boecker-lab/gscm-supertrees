@@ -13,17 +13,22 @@ import java.util.List;
  */
 public class ResolutionScorer extends Scorer{
 
+    public static final boolean debug = false;
+
     Tree scm = new Tree();
 
     public double getScore (Tree one, Tree two){
+
         SCM s = new SCM();
         scm = s.getSCM(one, two, false);
-        //TODO !
-        List<String> check = TreeUtils.StringListMultipleElements(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(scm.getLeaves())));
-        if (!check.isEmpty()){
-            System.out.println("Mehrere Elemente: "+check);
+        if (debug){
+            List<String> check = TreeUtils.StringListMultipleElements(TreeUtils.helpgetLabelsFromNodes(Arrays.asList(scm.getLeaves())));
+            if (!check.isEmpty()){
+                System.out.println("tree contains the following leaves more than once: "+check);
+            }
         }
         double resolution = TreeUtilsBasic.calculateTreeResolution(scm.getNumTaxa(), scm.vertexCount());
+        //return normalized resolution
         return resolution / scm.getLeaves().length;
     }
 
@@ -36,18 +41,11 @@ public class ResolutionScorer extends Scorer{
         int a, b, c = 0;
         List<Tree> output = new ArrayList<Tree>();
         SCM strict = new SCM();
-        int counter = 0;
         for (Tree iter : input){
             for (Tree cur : input){
                 if (!iter.equals(cur)){
                     if (TreeUtils.getOverLappingNodes(iter, cur).size()==0);
                     else {
-                        //TODO look up the definition of resolution
-                        //resolution = scm.vertexCount() / (scm.getLeaves().length-3);
-                        //TODO test resolution
-                        //resolution = (scm.vertexCount() - 1 - scm.getLeaves().length) / (scm.getLeaves().length - 3);
-                        counter++;
-                        //System.out.println(counter);
                         curscore = getScore(iter, cur);
                         if (curscore > maxscore) {
                             maxscm = scm;
@@ -63,10 +61,10 @@ public class ResolutionScorer extends Scorer{
             output.add(input.get(mem1));
             output.add(input.get(mem2));
             output.add(maxscm);
-            System.err.println("List contains no trees with a score bigger than 0");
+            System.err.println("List doesn't contain any trees that can be merged into an SCM tree");
         }
         else if (input.size()<2){
-            System.err.println("No supertree. Less than two trees in the input");
+            System.err.println("Less than two trees in the input");
         }
         else {
             output.add(input.get(mem1));
