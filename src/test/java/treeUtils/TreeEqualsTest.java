@@ -33,6 +33,5 @@ public class TreeEqualsTest extends TestCase {
         two = Newick.getTreeFromString("((e:1.0,f:1.0,g:1.0):1.0,(b:1.0,a:1.0):1.0);");
         assertTrue(t.getTreeEquals(one, two));
 
-
     }
 }
