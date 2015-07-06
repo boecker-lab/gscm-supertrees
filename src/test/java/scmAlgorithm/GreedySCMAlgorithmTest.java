@@ -325,7 +325,42 @@ public class GreedySCMAlgorithmTest {
         System.out.println("Clades: " + inner);
     }
 
-    @Test
+    //############################ EVAL TESTS #################################################
+
+
+    private static String[] getScorerNames(){
+        String[] names =  new String[fullStrictCombi.length];
+        for (int i = 0; i < fullStrictCombi.length; i++) {
+            names[i] = fullStrictCombi[i].toString();
+        }
+        return names;
+    }
+
+
+    private static String getMultiScorerName(int[] indices){
+        String[] names =  new String[indices.length];
+        for (int i = 0; i < names.length; i++) {
+            names[i] =  fullStrictCombi[indices[i]].toString();
+        }
+        return Arrays.toString(names);
+    }
+
+    private static Tree getSemiStrict(Tree[] tree, int[] indices) {
+        if (indices == null || indices.length == 0 )
+            return null;
+
+        if (indices.length == 1)
+            return tree[indices[0]];
+
+        Tree[] input = new Tree[indices.length];
+        for (int i = 0; i < indices.length; i++) {
+            input[i] = tree[indices[i]];
+        }
+        LooseConsensus c = new LooseConsensus();
+        return c.getConsensusTree(input);
+    }
+
+    /*    @Test
     public void createCrossTable() throws IOException {
         int[] taxas = {
                 100,
@@ -459,41 +494,9 @@ public class GreedySCMAlgorithmTest {
                 Files.write(sdFile,outputSD.toString().getBytes(),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
             }
         }
-    }
+    }*/
 
-    private static String[] getScorerNames(){
-        String[] names =  new String[fullStrictCombi.length];
-        for (int i = 0; i < fullStrictCombi.length; i++) {
-            names[i] = fullStrictCombi[i].toString();
-        }
-        return names;
-    }
-
-
-    private static String getMultiScorerName(int[] indices){
-        String[] names =  new String[indices.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] =  fullStrictCombi[indices[i]].toString();
-        }
-        return Arrays.toString(names);
-    }
-
-    private static Tree getSemiStrict(Tree[] tree, int[] indices) {
-        if (indices == null || indices.length == 0 )
-            return null;
-
-        if (indices.length == 1)
-            return tree[indices[0]];
-
-        Tree[] input = new Tree[indices.length];
-        for (int i = 0; i < indices.length; i++) {
-            input[i] = tree[indices[i]];
-        }
-        LooseConsensus c = new LooseConsensus();
-        return c.getConsensusTree(input);
-    }
-
-    @Test
+    /*@Test
     public void debugTest() throws IOException {
         int[] taxas = {
 //                100,
@@ -802,9 +805,9 @@ public class GreedySCMAlgorithmTest {
             }
             System.out.println(" ]");
         }
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void scmMultiEval() throws IOException {
         int[] taxas = {
 //                100,
@@ -929,7 +932,7 @@ public class GreedySCMAlgorithmTest {
             }
             Files.write(dataFile,toFile.toString().getBytes(),StandardOpenOption.CREATE);
         }
-    }
+    }*/
 
     @Test
     public void mammalsTest() {
