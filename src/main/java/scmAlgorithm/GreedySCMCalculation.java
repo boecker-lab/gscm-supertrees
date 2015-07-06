@@ -9,8 +9,8 @@ import scmAlgorithm.treeSelector.TreeSelector;
  */
 public interface GreedySCMCalculation {
 
-    TreePair calculateGreedyConsensus(TreeSelector selector);
-    /*default TreePair calculateGreedyConsensus(TreeSelector selector) {
+//    TreePair calculateGreedyConsensus(TreeSelector selector);
+    default TreePair calculateGreedyConsensus(TreeSelector selector) {
         TreePair superCandidatePair = null;
         TreePair pair;
         while((pair = selector.pollTreePair()) != null){
@@ -19,6 +19,6 @@ public interface GreedySCMCalculation {
             superCandidatePair =  pair;
         }
         return superCandidatePair;
-    }*/
+    }
 
 }

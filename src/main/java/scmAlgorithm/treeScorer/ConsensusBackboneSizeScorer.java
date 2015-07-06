@@ -5,10 +5,10 @@ import scmAlgorithm.treeSelector.TreePair;
 import java.util.Set;
 
 /**
- * Created by fleisch on 06.02.15.
+ * Created by fleisch on 16.06.15.
  */
-public class OverlapScorer extends TreeScorer {
-    public OverlapScorer(ConsensusMethods method) {
+public class ConsensusBackboneSizeScorer extends TreeScorer {
+    public ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods method) {
         super(method);
     }
 
@@ -18,7 +18,8 @@ public class OverlapScorer extends TreeScorer {
         pair.setCommonLeafes(common);
         if (common.size() < 3)
             return Double.NEGATIVE_INFINITY;
-//        return pair.getNumOfBackboneTaxa();
-        return pair.getNumOfBackboneTaxa();
+
+        pair.calculateConsensus(getConsensusAlgorithm());
+        return pair.getNumOfConsensusBackboneVertices();
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by fleisch on 24.03.15.
  */
-public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements RandomizedSCMCalculation {
+public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements RandomizedSCMCalculation,MultiResultMergeSupertreeAlgorithm {
     private final Tree[] inputTrees;
     private GreedySCMAlgorithm nonRandomResult;
     private TreeScorer[] scorerArray = null;
@@ -74,7 +74,7 @@ public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements Rand
         return superTrees;
     }
 
-    // todo move to defaut method to interface if java 8 is common
+    /*// todo move to defaut method to interface if java 8 is common
     @Override
     public List<TreePair> calculateRandomizedConsensus(TreeSelector selector, Tree[] inputTrees, int iterations) {
         List<TreePair> superTrees =  new ArrayList<>(iterations);
@@ -97,5 +97,5 @@ public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements Rand
             superCandidatePair =  pair;
         }
         return superCandidatePair;
-    }
+    }*/
 }

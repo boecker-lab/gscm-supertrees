@@ -27,7 +27,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm implements GreedySC
     }
 
     // todo move to defaut method to interface if java 8 is common
-    @Override
+    /*@Override
     public TreePair calculateGreedyConsensus(TreeSelector selector) {
         TreePair superCandidatePair = null;
         TreePair pair;
@@ -37,5 +37,5 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm implements GreedySC
             superCandidatePair =  pair;
         }
         return superCandidatePair;
-    }
+    }*/
 }

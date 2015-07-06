@@ -1,19 +1,17 @@
 package scmAlgorithm.treeScorer;
 
-import epos.model.tree.treetools.TreeUtilsBasic;
 import scmAlgorithm.treeSelector.TreePair;
 
 import java.util.Set;
 
 /**
- * Created by fleisch on 31.03.15.
+ * Created by fleisch on 15.06.15.
  */
-public class BackboneResolutionScorer extends TreeScorer {
-
-    public BackboneResolutionScorer(TreeScorer.ConsensusMethods method) {
+public class CollisionPointNumberScorer extends TreeScorer {
+    public CollisionPointNumberScorer(TreeScorer.ConsensusMethods method) {
         super(method);
     }
-
+    //OK
     @Override
     public double scoreTreePair(TreePair pair) {
         Set<String> common =  calculateCommonLeafes(pair.t1, pair.t2);
@@ -22,6 +20,6 @@ public class BackboneResolutionScorer extends TreeScorer {
             return Double.NEGATIVE_INFINITY;
 
         pair.calculateConsensus(getConsensusAlgorithm());
-        return TreeUtilsBasic.calculateTreeResolution(pair.getNumOfBackboneTaxa(), pair.getNumOfBackboneVertices());
+        return (- pair.getNumOfCollisionPoints());
     }
 }

@@ -7,9 +7,9 @@ import java.util.Set;
 /**
  * Created by fleisch on 16.06.15.
  */
-public class BackboneCladeNumberScorer extends TreeScorer {
+public class BackboneSizeScorer extends TreeScorer {
     // for this score i use the resolution as a ty breaker. because i can!
-    public BackboneCladeNumberScorer(TreeScorer.ConsensusMethods method) {
+    public BackboneSizeScorer(ConsensusMethods method) {
         super(method);
     }
     //OK
@@ -21,7 +21,7 @@ public class BackboneCladeNumberScorer extends TreeScorer {
             return Double.NEGATIVE_INFINITY;
         //todo prune only do not caclulate comple consensus
         pair.calculateConsensus(getConsensusAlgorithm());
-        return (pair.getNumOfBackboneVerticesT1() - pair.getNumOfBackboneTaxa()) + (pair.getNumOfBackboneVerticesT2() - pair.getNumOfBackboneTaxa());
+        return pair.getNumOfBackboneVerticesT1() + pair.getNumOfBackboneVerticesT2() - pair.getNumOfBackboneTaxa();
     }
 
 }

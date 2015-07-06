@@ -2,7 +2,7 @@ package scmAlgorithm.treeScorer;
 
 import epos.algo.consensus.ConsensusAlgorithm;
 import epos.algo.consensus.adams.AdamsConsensus;
-import epos.algo.consensus.loose.PairwiseLooseConsensus;
+import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
@@ -75,7 +75,7 @@ public abstract class TreeScorer {
                 ((NConsensus)a).setMethod(NConsensus.METHOD_MAJORITY);
                 break; // is same as strict for 2 trees...
             case SEMI_STRICT:
-                a = new PairwiseLooseConsensus(false);
+                a = new LooseConsensus(false);
                 break;
             case ADAMS:
                 a =  new AdamsConsensus();
@@ -103,5 +103,8 @@ public abstract class TreeScorer {
         }
     }
 
-
+    @Override
+    public String toString(){
+        return getClass().getSimpleName();
+    }
 }

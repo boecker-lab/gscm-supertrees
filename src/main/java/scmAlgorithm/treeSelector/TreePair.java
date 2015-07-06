@@ -26,7 +26,8 @@ public class TreePair implements Comparable<TreePair> {
     private Tree consensus = null;
     private int consensusNumOfTaxa = -1;
 
-    private int backboneNumOfVertices = -1;
+    private int mergedBackboneNumOfVertices = -1;
+    private int summedBackboneNumOfVertices = -1;
 
     public final double score;
     private Set<String> commonLeafes;
@@ -71,6 +72,8 @@ public class TreePair implements Comparable<TreePair> {
 
         pruneLeafes(t1pruned);
         pruneLeafes(t2pruned);//todo directly and with if? so that we only clone if is is nessesary
+
+
     }
 
     // NOTE: single taxon reduction optimized for 2 trees with known common taxa
@@ -266,7 +269,7 @@ public class TreePair implements Comparable<TreePair> {
         if (commonLeafes.size() > 2) {
             pruneToCommonLeafes();
             consensus = consensorator.getConsensusTree(t1pruned,t2pruned);
-            backboneNumOfVertices =  consensus.vertexCount();
+            mergedBackboneNumOfVertices =  consensus.vertexCount();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }
     }
@@ -283,8 +286,36 @@ public class TreePair implements Comparable<TreePair> {
         return commonLeafes.size();
     }
     //unchecked
-    public int getNumOfBackboneVertices() {
-        return backboneNumOfVertices;
+    public int getNumOfConsensusBackboneVertices() {
+        return mergedBackboneNumOfVertices;
+    }
+    //unchecked
+    public int getNumOfBackboneVerticesT1() {
+        return t1pruned.vertexCount();
+    }
+    //unchecked
+    public int getNumOfBackboneVerticesT2() {
+        return t2pruned.vertexCount();
+    }
+
+    public int getNumOfCollisionPoints(){
+        return commenInsertionPointTaxa.size();
+    }
+
+    public int getNumOfCollisions(){
+        int collsions = 0;
+        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
+            collsions += singleTaxonSet.size();
+        }
+        return collsions;
+    }
+
+    public int getNumOfCollisionDestructedClades(){
+        int destructedClades = 0;
+        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
+            destructedClades += (singleTaxonSet.size()-2);
+        }
+        return destructedClades;
     }
 
     public Tree getT1pruned() {

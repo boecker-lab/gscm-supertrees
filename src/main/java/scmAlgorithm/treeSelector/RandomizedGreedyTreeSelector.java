@@ -84,7 +84,12 @@ public class RandomizedGreedyTreeSelector extends GreedyTreeSelector {
                 double pre =  0d;
                 for (TreePair pair : pairs) {
                     pairToIndex[index] =  pair;
-                    pre += pair.score / sumOfScores;
+                    //this is for compatibility with negative scores
+                    if (sumOfScores > 0d) {
+                        pre += pair.score / sumOfScores;
+                    }else{
+                        pre += 1d - (pair.score / sumOfScores);
+                    }
                     indices[index] = pre;
                     index++;
                 }

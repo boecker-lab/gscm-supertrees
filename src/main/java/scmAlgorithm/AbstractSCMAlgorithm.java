@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by fleisch on 05.02.15.
  */
-public abstract class AbstractSCMAlgorithm{
+public abstract class AbstractSCMAlgorithm implements SupertreeAlgorithm{
 
     protected List<Tree> superTrees;
 
@@ -27,6 +27,7 @@ public abstract class AbstractSCMAlgorithm{
 
     protected abstract List<TreePair> calculateSuperTrees();
 
+    @Override
     public List<Tree> getSupertrees() {
         if (superTrees == null || superTrees.isEmpty()) {
             List<TreePair> finalPairs = calculateSuperTrees();
@@ -44,7 +45,7 @@ public abstract class AbstractSCMAlgorithm{
         }
         return superTrees;
     }
-
+    @Override
     public Tree getSupertree() {
         return getSupertrees().get(0);
     }
