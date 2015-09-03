@@ -6,22 +6,18 @@ import epos.model.tree.TreeNode;
 import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.FN_FP_RateComputer;
 import epos.model.tree.treetools.TreeUtilsBasic;
-import evalUtils.EvalUtils;
 import flipCut.Global;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.Test;
 import scmAlgorithm.treeScorer.*;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
