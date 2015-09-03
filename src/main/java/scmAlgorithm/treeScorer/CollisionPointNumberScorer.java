@@ -19,7 +19,7 @@ public class CollisionPointNumberScorer extends TreeScorer {
         if (common.size() < 3)
             return Double.NEGATIVE_INFINITY;
 
-        pair.calculateConsensus(getConsensusAlgorithm());
+        pair.pruneToCommonLeafes();
         return (- pair.getNumOfCollisionPoints());
     }
 }

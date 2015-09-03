@@ -14,7 +14,7 @@ import java.util.*;
  * Created by fleisch on 10.02.15.
  */
 public class TreePair implements Comparable<TreePair> {
-    public final static TreePair MIN_VALUE =  new TreePair(); //todo node are in several tree druring the resolution scorer?????????
+    public final static TreePair MIN_VALUE = new TreePair(); //todo node are in several tree druring the resolution scorer?????????
 
     public final Tree t1;
     public final Tree t2;
@@ -32,12 +32,12 @@ public class TreePair implements Comparable<TreePair> {
     public final double score;
     private Set<String> commonLeafes;
 
-    private boolean first = true;
-    private List<SingleTaxon> singleTaxa = null;
-    private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null;
+//    private boolean first = true;
+    private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
+    private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
     //just to create min value
-    private TreePair(){
+    private TreePair() {
         t1 = null;
         t2 = null;
         score = Double.NEGATIVE_INFINITY;
@@ -63,17 +63,14 @@ public class TreePair implements Comparable<TreePair> {
     }
 
     //uncheked and uncached
-    private void pruneToCommonLeafes() {
+    public void pruneToCommonLeafes() {
+        singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound for the list --> no resizing
+
         t1pruned = t1.cloneTree();
         t2pruned = t2.cloneTree();
 
-        singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound for the list --> no resizing
-        commenInsertionPointTaxa = new THashMap<>(t1.vertexCount() + t2.vertexCount());
-
         pruneLeafes(t1pruned);
         pruneLeafes(t2pruned);//todo directly and with if? so that we only clone if is is nessesary
-
-
     }
 
     // NOTE: single taxon reduction optimized for 2 trees with known common taxa
@@ -101,7 +98,7 @@ public class TreePair implements Comparable<TreePair> {
 
                 if (singeChilds == childCount) {
                     maxSingleSubtreeRoots.add(node);
-                    maxSingleSubtreeRoots.removeAll(children); //we dont have to remove here, but surprisingly ist good for the performance.
+                    maxSingleSubtreeRoots.removeAll(children); //we dont have to remove here, but surprisingly its good for the performance.
                 }
             }
         }
@@ -129,34 +126,28 @@ public class TreePair implements Comparable<TreePair> {
                     t.removeVertex(node);
                 }
 
-
                 if (numOfSiblings == 1) {
-                    Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves); //todo what todo with empty suff --> is part of subtree an not important for the collision case
+                    Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves); //todo what todo with empty suff --> is part of subtree and not important for the collision case
                     commonSiblingLeafes.retainAll(commonLeafes);
                     st = new SingleTaxon(node, siblingLeaves, commonSiblingLeafes, numOfSiblings);
 
-                    if (!commonSiblingLeafes.isEmpty()) {
-                        Set<SingleTaxon> singles = commenInsertionPointTaxa.get(commonSiblingLeafes);
-                        if (singles == null) {
-                            if (first) {
-                                singles = new THashSet<>();
+                    Set<SingleTaxon> singles = commenInsertionPointTaxa.get(commonSiblingLeafes);
+                    if (singles == null) {
+                        if (this.commenInsertionPointTaxa == null) {
+                            singles = new THashSet<>();
+                            commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
+                            singles.add(st);
+                        } else {
+                            singles = this.commenInsertionPointTaxa.get(commonSiblingLeafes);
+                            if (singles != null) {
                                 commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
                                 singles.add(st);
-                            } else {
-                                singles = this.commenInsertionPointTaxa.get(commonSiblingLeafes);
-                                if (singles != null) {
-                                    commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
-                                    singles.add(st);
-                                }
                             }
-                        } else {
-                            singles.add(st);
                         }
-
                     } else {
-                        System.out.println("this schouldn't be possible");//todo this case schould not exist maybe remove if
+                        singles.add(st);
                     }
-                }else{
+                } else {
                     st = new SingleTaxon(node, siblingLeaves, new THashSet<String>(), numOfSiblings);
                 }
                 singleTaxa.add(st);
@@ -170,7 +161,7 @@ public class TreePair implements Comparable<TreePair> {
         }
 
         //this is to do the switch between first and second tree mode
-        first = false;
+//        first = false;
         this.commenInsertionPointTaxa = commenInsertionPointTaxa;
 
     }
@@ -195,7 +186,6 @@ public class TreePair implements Comparable<TreePair> {
 
 
             //check ist we have to add a new inner node (removed from binary) or not (removed from polytomy)
-            //todo not very nice --> maybe put all single taxa in such a map from begining on --> maybe less confusing code
             Set<SingleTaxon> singles = commenInsertionPointTaxa.get(singleTaxon.commonSiblingLeaves);
             if (singles == null) {
                 singles = new THashSet<>(1);
@@ -207,13 +197,12 @@ public class TreePair implements Comparable<TreePair> {
             if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
                 if (singleTaxon.numOfSiblings == 1) {
                     //todo is there a faster/more elegant way to proof that
-                    Set<String> s =  new THashSet<>(TreeUtilsBasic.getLeafLabels(lca));
+                    Set<String> s = new THashSet<>(TreeUtilsBasic.getLeafLabels(lca));
                     s.retainAll(commonLeafes);
-                    Set<String> s2 =  new HashSet<>(singleTaxon.siblingLeaves);
+                    Set<String> s2 = new HashSet<>(singleTaxon.siblingLeaves);
                     s2.retainAll(commonLeafes);
-                    //todo remove --> DEBUG
 
-                    if (s.equals(s2)){
+                    if (s.equals(s2)) {
                         if (lcaParent != null) { //check if we have to insert a new root
                             TreeNode nuLcaParent = new TreeNode();
                             t.addVertex(nuLcaParent);
@@ -252,24 +241,25 @@ public class TreePair implements Comparable<TreePair> {
             }
         }
         //calculate consensus resolution because we have the information now and do not want to iterate over the tree again.
-        return  labelToNode.size();
+        return labelToNode.size();
     }
 
-    public Tree getConsensus(final ConsensusAlgorithm consensorator){
+    public Tree getConsensus(final ConsensusAlgorithm consensorator) {
         if (consensus == null)
             calculateConsensus(consensorator);
         return consensus;
     }
 
-    public Tree getConsensus(){
+    public Tree getConsensus() {
         return consensus;
     }
 
     public void calculateConsensus(final ConsensusAlgorithm consensorator) {
         if (commonLeafes.size() > 2) {
-            pruneToCommonLeafes();
-            consensus = consensorator.getConsensusTree(t1pruned,t2pruned);
-            mergedBackboneNumOfVertices =  consensus.vertexCount();
+            if (singleTaxa == null)
+                pruneToCommonLeafes();
+            consensus = consensorator.getConsensusTree(t1pruned, t2pruned);
+            mergedBackboneNumOfVertices = consensus.vertexCount();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }
     }
@@ -278,31 +268,36 @@ public class TreePair implements Comparable<TreePair> {
     public int getNumOfConsensusTaxa() {
         return consensusNumOfTaxa;
     }
+
     public int getNumOfConsensusVertices() {
         return consensus.vertexCount();
     }
+
     //unchecked
     public int getNumOfBackboneTaxa() {
         return commonLeafes.size();
     }
+
     //unchecked
     public int getNumOfConsensusBackboneVertices() {
         return mergedBackboneNumOfVertices;
     }
+
     //unchecked
     public int getNumOfBackboneVerticesT1() {
         return t1pruned.vertexCount();
     }
+
     //unchecked
     public int getNumOfBackboneVerticesT2() {
         return t2pruned.vertexCount();
     }
 
-    public int getNumOfCollisionPoints(){
+    public int getNumOfCollisionPoints() {
         return commenInsertionPointTaxa.size();
     }
 
-    public int getNumOfCollisions(){
+    public int getNumOfCollisions() {
         int collsions = 0;
         for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
             collsions += singleTaxonSet.size();
@@ -310,12 +305,29 @@ public class TreePair implements Comparable<TreePair> {
         return collsions;
     }
 
-    public int getNumOfCollisionDestructedClades(){
+    public int getNumOfCollisionDestructedClades() {
         int destructedClades = 0;
         for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            destructedClades += (singleTaxonSet.size()-2);
+            destructedClades += (singleTaxonSet.size() - 1);
         }
         return destructedClades;
+    }
+
+    public int getNumOfMultiCollisionPoints() {
+        int multiCollionsPoints = 0;
+        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
+            if (singleTaxonSet.size()>2)
+                multiCollionsPoints++;
+        }
+        return multiCollionsPoints;
+    }
+
+    public int getNumOfCollisionPointsMultiTieBreak() {
+        int multiCollionsPoints = 0;
+        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
+            multiCollionsPoints += 100000 + (singleTaxonSet.size());
+        }
+        return multiCollionsPoints;
     }
 
     public Tree getT1pruned() {
