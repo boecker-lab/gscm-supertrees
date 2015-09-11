@@ -27,7 +27,6 @@ public class TreePair implements Comparable<TreePair> {
     private int consensusNumOfTaxa = -1;
 
     private int mergedBackboneNumOfVertices = -1;
-    private int summedBackboneNumOfVertices = -1;
 
     public final double score;
     private Set<String> commonLeafes;
@@ -49,7 +48,6 @@ public class TreePair implements Comparable<TreePair> {
         score = scorer.scoreTreePair(this);
     }
 
-
     //unchecked
     public Tree getPartner(Tree t) {
         if (t.equals(t1))
@@ -70,7 +68,7 @@ public class TreePair implements Comparable<TreePair> {
         t2pruned = t2.cloneTree();
 
         pruneLeafes(t1pruned);
-        pruneLeafes(t2pruned);//todo directly and with if? so that we only clone if is is nessesary
+        pruneLeafes(t2pruned);
     }
 
     // NOTE: single taxon reduction optimized for 2 trees with known common taxa

@@ -4,6 +4,10 @@ import epos.model.tree.Tree;
 import scmAlgorithm.treeScorer.TreeScorer;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Created by fleisch on 06.02.15.
@@ -16,8 +20,11 @@ public abstract class TreeSelector {
     }
 
     public abstract TreePair pollTreePair();
+
     public abstract boolean addTree(Tree tree);
+
     public abstract int getNumberOfTrees();
+
     public abstract void init(Tree[] trees);
 
     public TreeScorer getScorer() {
@@ -31,9 +38,10 @@ public abstract class TreeSelector {
     public static abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
         protected final M treeToPairs;
 
-        protected DefaultGreedyTreeSelector(TreeScorer scorer, boolean init,  Tree... trees) {
+        protected DefaultGreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
             super(scorer);
-            this.treeToPairs = getTreeToPairsInstance(trees.length - 1);;
+            this.treeToPairs = getTreeToPairsInstance(trees.length - 1);
+            ;
             if (init)
                 init(trees);
         }
@@ -52,25 +60,48 @@ public abstract class TreeSelector {
         // only one time called
         @Override
         public void init(Tree[] trees) {
-            scorer.clear(new HashSet<>(Arrays.asList(trees)));//todo not very elegant
+            Set<Tree> ts = new HashSet<>(trees.length);
+            Collections.addAll(ts, trees);
+            scorer.clearCache(ts);
+
             treeToPairs.clear();
 
             for (Tree tree : trees) {
                 treeToPairs.put(tree, getTreePairCollectionInstance(trees.length - 1));
             }
 
+            long time = System.currentTimeMillis();
+
+           /* System.out.println("Calculating initial scores of tree pairs (single threaded)...");
             for (int i = 0; i < trees.length - 1; i++) {
                 Tree first = trees[i];
                 for (int j = i + 1; j < trees.length; j++) {
                     Tree second = trees[j];
-                    TreePair pair = new TreePair(first, second, scorer);
-                    if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
-                        addPair(first, pair);
-                        addPair(second, pair);
-
-                    }
+                    TreePair pair = new TreePair(first, second,scorer);
+                    addPair(first, pair);
+                    addPair(second, pair);
                 }
             }
+            */
+
+            //parralel scoring
+            System.out.println("Calculating initial scores of tree pairs (multi threaded)...");
+            List<TreePair> pairsToAdd = IntStream.range(0, trees.length - 1).parallel()
+                    .boxed()
+                    .flatMap(i -> IntStream.range(i + 1, trees.length)
+                            .mapToObj(j -> new TreePair(trees[i], trees[j], scorer)))
+                    .collect(Collectors.toList());
+
+
+            //sequencial adding
+            for (TreePair pair : pairsToAdd) {
+                if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                    addPair(pair.t1, pair);
+                    addPair(pair.t2, pair);
+                }
+            }
+            double runtime = (double) (System.currentTimeMillis() - time) / 1000d;
+            System.out.println("...Done in: " + runtime + "s");
         }
 
         //polls treepair from data structure
@@ -89,33 +120,32 @@ public abstract class TreeSelector {
         public boolean addTree(Tree tree) {
             if (treeToPairs.isEmpty())
                 return false;
-            S pairsToAdd = getTreePairCollectionInstance(treeToPairs.size());
+            S pairsOfnuTree = getTreePairCollectionInstance(treeToPairs.size());
 
             //iterate over trees (O(n)) to add to new list and refresh old entries
-//        for (Map.Entry<Tree, S> entry : treeToPairs.entrySet()) {
-            for (Tree old : treeToPairs.keySet()) {
-//            Tree old = entry.getKey();
-                TreePair pair = new TreePair(tree, old, scorer);
+            List<TreePair> pairsToAdd = treeToPairs.keySet().parallelStream()
+                    .map(old -> new TreePair(tree, old, scorer))
+                    .collect(Collectors.toList());
 
+            for (TreePair pair : pairsToAdd) {
                 if (pair != null && pair.score > Double.NEGATIVE_INFINITY) { //null pair have no overlap
-                    pairsToAdd.add(pair);//add to own list O(log(n))
-                    addPair(old, pair);//resfresh O(log(n)
+                    pairsOfnuTree.add(pair);//add to own list O(log(n))
+                    addPair(pair.t2, pair);//resfresh O(log(n)
 //                entry.getValue().add(pair); //resfresh O(log(n))
                 }
             }
             //add new to map O(1)
-            treeToPairs.put(tree, pairsToAdd);
+            treeToPairs.put(tree, pairsOfnuTree);
             return true;
         }
 
 
         //(O(2nlog(n))
         private void removeTreePair(TreePair pair) {
-
             Tree t1 = pair.t1; //O(1)
             Tree t2 = pair.t2; //O(1)
-            removePair(t1,pair);
-            removePair(t2,pair);
+            removePair(t1, pair);
+            removePair(t2, pair);
             S s1 = treeToPairs.remove(t1); //O(1)
             S s2 = treeToPairs.remove(t2); //O(1)
 //            s1.remove(pair);
