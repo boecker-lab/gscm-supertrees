@@ -2,11 +2,8 @@ package scmAlgorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
 import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
 import epos.model.tree.treetools.TreeUtilsBasic;
-import flipCut.Global;
 import org.junit.Test;
 import scmAlgorithm.treeScorer.*;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
@@ -38,6 +35,7 @@ public class GreedySCMAlgorithmTest {
     public final static String newickInput1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.tre";
     public final static String newickSCM1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.scmTree.tre";
 
+/*
     //tree constants
 //    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML_SCM_OPT;//Global.SM_SOURCE_TREES_RAXML_SCM;//
 //    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
@@ -50,6 +48,7 @@ public class GreedySCMAlgorithmTest {
     final static String scmTreeLocation = Global.SMOG_SCM_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
 //    final static String modelTreeLocation = Global.SM_MODEL_TREE_PATH + "sm_data." + Global.TAG_INSTANCE + ".model_tree"; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
     final static String modelTreeLocation = Global.SMOG_MODEL_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
+*/
 
 
     public static final TreeScorer[] fullStrictCombi = {
@@ -1008,160 +1007,160 @@ public class GreedySCMAlgorithmTest {
     }
 */
 
-    @Test
-    public void bioDataTest() {
-//        Global.BioDataSet[] bioDataSets = {Global.BioDataSet.BEE_TREE, Global.BioDataSet.LEGUMES_SM18, Global.BioDataSet.SAXIFRAGALES, Global.BioDataSet.MAMMALS, Global.BioDataSet.MARSUPIALS, Global.BioDataSet.SEABIRDS, Global.BioDataSet.PRIMATES};
-        Global.BioDataSet[] bioDataSets = {Global.BioDataSet.MAMMALS};
-
-
-        for (Global.BioDataSet bioDataSet : bioDataSets) {
-            System.out.println("########### Calculating SCM comparison for: " + bioDataSet.toString() + " ##########");
-            File inputFile;
-            File scmTreeFile;
-            boolean rootErrorCorection = true;
-            if (rootErrorCorection) {
-                System.out.println("INFO: Root error correction: Rooting after SCM Tree... ");
-                if (!bioDataSet.ROOTED) {
-                    inputFile = new File(bioDataSet.SOURCE_TREES_OPT);
-                    scmTreeFile = new File(bioDataSet.SCM_TREE);
-                } else {
-                    inputFile = new File(bioDataSet.SOURCE_TREES);
-                    scmTreeFile = new File(bioDataSet.SCM_TREE);
-                }
-            } else {
-                System.out.println("INFO: NO root errot correction for FlipCut... ");
-                inputFile = new File(bioDataSet.SOURCE_TREES);
-                scmTreeFile = new File(bioDataSet.SCM_TREE);
-            }
-            Tree[] trees = Newick.getTreeFromFile(inputFile);
-
-            //root check
-            int counter = 0;
-            for (Tree tree : trees) {
-                if (tree.getRoot().childCount() == 2)
-                    counter++;
-            }
-            System.out.println(counter + " of " + trees.length + "are rooted: " + ((double) counter / (double) trees.length) * 100d + "%");
-
-            long t = System.currentTimeMillis();
-            AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
-            Tree stOverlap = algo.getSupertree();
-            double timeOverlap = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println();
-            System.out.println("Overlap Running Time: " + timeOverlap + "s");
-            int taxa = stOverlap.getNumTaxa();
-            System.out.println("Overlap Resolution: taxa: " + taxa + ", innerNodes: " + stOverlap.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stOverlap.vertexCount()));
-            double[] fnfp = FN_FP_RateComputer.calculateSumOfRates(stOverlap, trees);
-            System.out.println("Overlap SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();
-
-            t = System.currentTimeMillis();
-            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            Tree stRes = algo.getSupertree();
-            double timeRes = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("CollidingClades Running Time: " + timeRes + "s");
-            taxa = stRes.getNumTaxa();
-            System.out.println("CollidingClades Resolution: taxa: " + taxa + ", innerNodes: " + stRes.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stRes.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stRes, trees);
-            System.out.println("CollidingClades SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();
-
-            /*t = System.currentTimeMillis();
-            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            Tree stNum = algo.getSupertree();
-            double timeNum = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("CladeNumber Running Time: " + timeNum + "s");
-            taxa = stNum.getNumTaxa();
-            System.out.println("CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNum.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNum.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNum, trees);
-            System.out.println("CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();
-*/
-
-           /* t = System.currentTimeMillis();
-            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            Tree stResBack = algo.getSupertree();
-            double timeResBack = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("Backbone-Resolution Running Time: " + timeResBack + "s");
-            taxa = stResBack.getNumTaxa();
-            System.out.println("Backbone-Resolution Resolution: taxa: " + taxa + ", innerNodes: " + stResBack.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stResBack.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stResBack, trees);
-            System.out.println("Backbone-Resolution SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();*/
-
-            /*t = System.currentTimeMillis();
-            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            Tree stNumBack = algo.getSupertree();
-            double timeNumBack = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("Backbone-CladeNumber Running Time: " + timeNumBack + "s");
-            taxa = stNumBack.getNumTaxa();
-            System.out.println("Backbone-CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNumBack.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumBack.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumBack, trees);
-            System.out.println("Backbone-CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();
-*/
-
-
-            /*//randomized versions
-            t = System.currentTimeMillis();
-            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            Tree stNumRand = algo.getSupertree();
-            double timeNumRand = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("RandOverlap Running Time: " + timeNumRand + "s");
-            taxa = stNumRand.getNumTaxa();
-            System.out.println("RandOverlap Resolution: taxa: " + taxa + ", innerNodes: " + stNumRand.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumRand.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumRand, trees);
-            System.out.println("RandOverlap SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();
-
-            t = System.currentTimeMillis();
-            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.SEMI_STRICT));
-//         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
-            List<Tree> temp =  algo.getSupertrees();
-            NConsensus c =  new NConsensus();
-            c.setMethod(NConsensus.METHOD_MAJORITY);
-            Tree stNumRandRand = c.getConsensusTree(temp.toArray(new Tree[temp.size()]));
-//            Tree stNumRandRand = algo.getSupertree();
-            double timeNumRandRand = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println(Newick.getStringFromTree(stNumRandRand));
-            System.out.println("RandRandOverlap Running Time: " + timeNumRandRand + "s");
-            taxa = stNumRandRand.getNumTaxa();
-            System.out.println("RandRandOverlap Resolution: taxa: " + taxa + ", innerNodes: " + stNumRandRand.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumRandRand.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumRandRand, trees);
-            System.out.println("RandRandOverlap SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();*/
-
-            //multiversion
-          /*  t = System.currentTimeMillis();
-            algo = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(trees), new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),*//*new BackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),*//*new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
-            Tree stNumMulti = ((MultiGreedySCMAlgorithm) algo).getMergedSupertree();
-            double timeNumMulti = (double) (System.currentTimeMillis() - t) / 1000d;
-            System.out.println("Backbone-CladeNumber Running Time: " + timeNumMulti + "s");
-            taxa = stNumMulti.getNumTaxa();
-            System.out.println("Backbone-CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNumMulti.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumMulti.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumMulti, trees);
-            System.out.println("Backbone-CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
-            System.out.println();*/
-
-
-            //the warnow tree
-            Tree warnowSCM = Newick.getTreeFromFile(scmTreeFile)[0];
-            taxa = warnowSCM.getNumTaxa();
-            System.out.println("Warnow Resolution: taxa: " + taxa + ", innerNodes: " + warnowSCM.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, warnowSCM.vertexCount()));
-            fnfp = FN_FP_RateComputer.calculateSumOfRates(warnowSCM, trees);
-            System.out.println("Warnow SFN/SFP to Source: " + Arrays.toString(fnfp));
-
-
-            System.out.println("########### DONE ##########");
-            System.out.println();
-            System.out.println();
-        }
-
-
-    }
+//    @Test
+//    public void bioDataTest() {
+////        Global.BioDataSet[] bioDataSets = {Global.BioDataSet.BEE_TREE, Global.BioDataSet.LEGUMES_SM18, Global.BioDataSet.SAXIFRAGALES, Global.BioDataSet.MAMMALS, Global.BioDataSet.MARSUPIALS, Global.BioDataSet.SEABIRDS, Global.BioDataSet.PRIMATES};
+//        Global.BioDataSet[] bioDataSets = {Global.BioDataSet.MAMMALS};
+//
+//
+//        for (Global.BioDataSet bioDataSet : bioDataSets) {
+//            System.out.println("########### Calculating SCM comparison for: " + bioDataSet.toString() + " ##########");
+//            File inputFile;
+//            File scmTreeFile;
+//            boolean rootErrorCorection = true;
+//            if (rootErrorCorection) {
+//                System.out.println("INFO: Root error correction: Rooting after SCM Tree... ");
+//                if (!bioDataSet.ROOTED) {
+//                    inputFile = new File(bioDataSet.SOURCE_TREES_OPT);
+//                    scmTreeFile = new File(bioDataSet.SCM_TREE);
+//                } else {
+//                    inputFile = new File(bioDataSet.SOURCE_TREES);
+//                    scmTreeFile = new File(bioDataSet.SCM_TREE);
+//                }
+//            } else {
+//                System.out.println("INFO: NO root errot correction for FlipCut... ");
+//                inputFile = new File(bioDataSet.SOURCE_TREES);
+//                scmTreeFile = new File(bioDataSet.SCM_TREE);
+//            }
+//            Tree[] trees = Newick.getTreeFromFile(inputFile);
+//
+//            //root check
+//            int counter = 0;
+//            for (Tree tree : trees) {
+//                if (tree.getRoot().childCount() == 2)
+//                    counter++;
+//            }
+//            System.out.println(counter + " of " + trees.length + "are rooted: " + ((double) counter / (double) trees.length) * 100d + "%");
+//
+//            long t = System.currentTimeMillis();
+//            AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
+//            Tree stOverlap = algo.getSupertree();
+//            double timeOverlap = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println();
+//            System.out.println("Overlap Running Time: " + timeOverlap + "s");
+//            int taxa = stOverlap.getNumTaxa();
+//            System.out.println("Overlap Resolution: taxa: " + taxa + ", innerNodes: " + stOverlap.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stOverlap.vertexCount()));
+//            double[] fnfp = FN_FP_RateComputer.calculateSumOfRates(stOverlap, trees);
+//            System.out.println("Overlap SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();
+//
+//            t = System.currentTimeMillis();
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            Tree stRes = algo.getSupertree();
+//            double timeRes = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("CollidingClades Running Time: " + timeRes + "s");
+//            taxa = stRes.getNumTaxa();
+//            System.out.println("CollidingClades Resolution: taxa: " + taxa + ", innerNodes: " + stRes.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stRes.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stRes, trees);
+//            System.out.println("CollidingClades SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();
+//
+//            /*t = System.currentTimeMillis();
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            Tree stNum = algo.getSupertree();
+//            double timeNum = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("CladeNumber Running Time: " + timeNum + "s");
+//            taxa = stNum.getNumTaxa();
+//            System.out.println("CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNum.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNum.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNum, trees);
+//            System.out.println("CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();
+//*/
+//
+//           /* t = System.currentTimeMillis();
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            Tree stResBack = algo.getSupertree();
+//            double timeResBack = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("Backbone-Resolution Running Time: " + timeResBack + "s");
+//            taxa = stResBack.getNumTaxa();
+//            System.out.println("Backbone-Resolution Resolution: taxa: " + taxa + ", innerNodes: " + stResBack.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stResBack.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stResBack, trees);
+//            System.out.println("Backbone-Resolution SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();*/
+//
+//            /*t = System.currentTimeMillis();
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            Tree stNumBack = algo.getSupertree();
+//            double timeNumBack = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("Backbone-CladeNumber Running Time: " + timeNumBack + "s");
+//            taxa = stNumBack.getNumTaxa();
+//            System.out.println("Backbone-CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNumBack.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumBack.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumBack, trees);
+//            System.out.println("Backbone-CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();
+//*/
+//
+//
+//            /*//randomized versions
+//            t = System.currentTimeMillis();
+//            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            Tree stNumRand = algo.getSupertree();
+//            double timeNumRand = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("RandOverlap Running Time: " + timeNumRand + "s");
+//            taxa = stNumRand.getNumTaxa();
+//            System.out.println("RandOverlap Resolution: taxa: " + taxa + ", innerNodes: " + stNumRand.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumRand.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumRand, trees);
+//            System.out.println("RandOverlap SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();
+//
+//            t = System.currentTimeMillis();
+//            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.SEMI_STRICT));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            List<Tree> temp =  algo.getSupertrees();
+//            NConsensus c =  new NConsensus();
+//            c.setMethod(NConsensus.METHOD_MAJORITY);
+//            Tree stNumRandRand = c.getConsensusTree(temp.toArray(new Tree[temp.size()]));
+////            Tree stNumRandRand = algo.getSupertree();
+//            double timeNumRandRand = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println(Newick.getStringFromTree(stNumRandRand));
+//            System.out.println("RandRandOverlap Running Time: " + timeNumRandRand + "s");
+//            taxa = stNumRandRand.getNumTaxa();
+//            System.out.println("RandRandOverlap Resolution: taxa: " + taxa + ", innerNodes: " + stNumRandRand.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumRandRand.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumRandRand, trees);
+//            System.out.println("RandRandOverlap SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();*/
+//
+//            //multiversion
+//          /*  t = System.currentTimeMillis();
+//            algo = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(trees), new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),*//*new BackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),*//*new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
+//            Tree stNumMulti = ((MultiGreedySCMAlgorithm) algo).getMergedSupertree();
+//            double timeNumMulti = (double) (System.currentTimeMillis() - t) / 1000d;
+//            System.out.println("Backbone-CladeNumber Running Time: " + timeNumMulti + "s");
+//            taxa = stNumMulti.getNumTaxa();
+//            System.out.println("Backbone-CladeNumber Resolution: taxa: " + taxa + ", innerNodes: " + stNumMulti.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, stNumMulti.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(stNumMulti, trees);
+//            System.out.println("Backbone-CladeNumber SFN/SFP to Source: " + Arrays.toString(fnfp));
+//            System.out.println();*/
+//
+//
+//            //the warnow tree
+//            Tree warnowSCM = Newick.getTreeFromFile(scmTreeFile)[0];
+//            taxa = warnowSCM.getNumTaxa();
+//            System.out.println("Warnow Resolution: taxa: " + taxa + ", innerNodes: " + warnowSCM.vertexCount() + ", Resolution: " + TreeUtilsBasic.calculateTreeResolution(taxa, warnowSCM.vertexCount()));
+//            fnfp = FN_FP_RateComputer.calculateSumOfRates(warnowSCM, trees);
+//            System.out.println("Warnow SFN/SFP to Source: " + Arrays.toString(fnfp));
+//
+//
+//            System.out.println("########### DONE ##########");
+//            System.out.println();
+//            System.out.println();
+//        }
+//
+//
+//    }
 }
