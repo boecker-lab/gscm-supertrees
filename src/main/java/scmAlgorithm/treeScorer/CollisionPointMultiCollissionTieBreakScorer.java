@@ -1,10 +1,8 @@
 package scmAlgorithm.treeScorer;
 
-import epos.model.tree.Tree;
-import gnu.trove.set.hash.THashSet;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,17 +13,8 @@ public class CollisionPointMultiCollissionTieBreakScorer extends TreeScorer<Coll
         super(method);
     }
 
-    protected CollisionPointMultiCollissionTieBreakScorer(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        super(method, treeToTaxa);
-    }
-
-    public CollisionPointMultiCollissionTieBreakScorer(ConsensusMethods method, boolean cache, boolean syncedCache) {
-        super(method, cache, syncedCache);
-    }
-
-    @Override
-    protected CollisionPointMultiCollissionTieBreakScorer newInstance(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        return new CollisionPointMultiCollissionTieBreakScorer(method,treeToTaxa);
+    public CollisionPointMultiCollissionTieBreakScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
+        super(method,log, cache, syncedCache);
     }
 
     @Override

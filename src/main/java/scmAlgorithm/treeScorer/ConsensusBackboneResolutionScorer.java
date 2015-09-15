@@ -1,11 +1,9 @@
 package scmAlgorithm.treeScorer;
 
-import epos.model.tree.Tree;
 import epos.model.tree.treetools.TreeUtilsBasic;
-import gnu.trove.set.hash.THashSet;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,17 +15,8 @@ public class ConsensusBackboneResolutionScorer extends TreeScorer<ConsensusBackb
         super(method);
     }
 
-    protected ConsensusBackboneResolutionScorer(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        super(method, treeToTaxa);
-    }
-
-    public ConsensusBackboneResolutionScorer(ConsensusMethods method, boolean cache, boolean syncedCache) {
-        super(method, cache, syncedCache);
-    }
-
-    @Override
-    protected ConsensusBackboneResolutionScorer newInstance(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        return new ConsensusBackboneResolutionScorer(method,treeToTaxa);
+    public ConsensusBackboneResolutionScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
+        super(method,log, cache, syncedCache);
     }
 
     @Override

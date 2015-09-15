@@ -1,11 +1,8 @@
 package scmAlgorithm.treeScorer;
 
-import epos.model.tree.Tree;
-import epos.model.tree.treetools.TreeUtilsBasic;
-import gnu.trove.set.hash.THashSet;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,17 +15,8 @@ public class ConsensusCladeNumberScorer extends TreeScorer<ConsensusCladeNumberS
         super(method);
     }
 
-    protected ConsensusCladeNumberScorer(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        super(method, treeToTaxa);
-    }
-
-    public ConsensusCladeNumberScorer(ConsensusMethods method, boolean cache, boolean syncedCache) {
-        super(method, cache, syncedCache);
-    }
-
-    @Override
-    protected ConsensusCladeNumberScorer newInstance(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        return new ConsensusCladeNumberScorer(method,treeToTaxa);
+    public ConsensusCladeNumberScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
+        super(method,log, cache, syncedCache);
     }
 
     @Override

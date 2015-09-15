@@ -4,10 +4,8 @@ import epos.model.tree.Tree;
 import scmAlgorithm.treeScorer.TreeScorer;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Created by fleisch on 06.02.15.

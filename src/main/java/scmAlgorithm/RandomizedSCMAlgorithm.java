@@ -5,7 +5,6 @@ import scmAlgorithm.treeScorer.TreeScorer;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.RandomizedGreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreePair;
-import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,29 +72,4 @@ public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements Rand
 
         return superTrees;
     }
-
-    /*// todo move to defaut method to interface if java 8 is common
-    @Override
-    public List<TreePair> calculateRandomizedConsensus(TreeSelector selector, Tree[] inputTrees, int iterations) {
-        List<TreePair> superTrees =  new ArrayList<>(iterations);
-        for (int i = 0; i < iterations; i++) {
-            selector.init(inputTrees);
-            superTrees.add(calculateGreedyConsensus(selector));
-        }
-        //sort supertrees
-        return superTrees;
-    }
-
-    // todo move to defaut method to interface if java 8 is common
-    @Override
-    public TreePair calculateGreedyConsensus(TreeSelector selector) {
-        TreePair superCandidatePair = null;
-        TreePair pair;
-        while((pair = selector.pollTreePair()) != null){
-            Tree superCandidate = pair.getConsensus(selector.getScorer().getConsensusAlgorithm());
-            selector.addTree(superCandidate);
-            superCandidatePair =  pair;
-        }
-        return superCandidatePair;
-    }*/
 }

@@ -1,7 +1,6 @@
 package scmAlgorithm;
 
 import epos.model.tree.Tree;
-import scmAlgorithm.treeScorer.OverlapScorer;
 import scmAlgorithm.treeScorer.TreeScorer;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreePair;

@@ -1,7 +1,6 @@
 package scmAlgorithm;
 
 
-import epos.model.tree.Tree;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
@@ -25,17 +24,4 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm implements GreedySC
     protected TreePair calculateSuperTree() {
         return calculateGreedyConsensus(selector);
     }
-
-    // todo move to defaut method to interface if java 8 is common
-    /*@Override
-    public TreePair calculateGreedyConsensus(TreeSelector selector) {
-        TreePair superCandidatePair = null;
-        TreePair pair;
-        while((pair = selector.pollTreePair()) != null){
-            Tree superCandidate = pair.getConsensus(selector.getScorer().getConsensusAlgorithm());
-            selector.addTree(superCandidate);
-            superCandidatePair =  pair;
-        }
-        return superCandidatePair;
-    }*/
 }

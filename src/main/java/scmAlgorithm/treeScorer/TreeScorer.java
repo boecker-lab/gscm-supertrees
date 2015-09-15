@@ -8,9 +8,12 @@ import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,20 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class TreeScorer<T extends TreeScorer> {
     public static enum ConsensusMethods {SEMI_STRICT, STRICT,MAJORITY,ADAMS}
+    protected Logger log;
     public final ConsensusMethods METHOD;
     protected final Map<Tree, THashSet<String>> treeToTaxa;
 
-    protected TreeScorer(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa){
-        this.METHOD = method;
-        this.treeToTaxa = treeToTaxa;
-    }
-
     public TreeScorer(ConsensusMethods method){
-        this(method,true,true);
+        this(method, Logger.getLogger(TreeScorer.class),true,true);
     }
 
-    public TreeScorer(ConsensusMethods method, boolean cache, boolean syncedCache){
+    public TreeScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache){
         this.METHOD = method;
+        this.log =  log;
         if(cache)
             if (syncedCache) {
                 treeToTaxa = new ConcurrentHashMap<>();
@@ -96,26 +96,15 @@ public abstract class TreeScorer<T extends TreeScorer> {
         return s;
     }
 
-  /*  //resturns false if tree was already in map
-    public void addConsensusTree(TreePair pair){
-        Tree c =  pair.getConsensus(getConsensusAlgorithm());
-        THashSet<String> s1 =  treeToTaxa.get(pair.t1);
-        THashSet<String> s2 =  treeToTaxa.get(pair.t2);
-        THashSet<String> taxa =  new THashSet<>(s1.size() + s2.size());
-        taxa.addAll(s1);
-        taxa.addAll(s2);
-        treeToTaxa.put(c, taxa);
-    }*/
-
     public ConsensusAlgorithm getConsensusAlgorithm(){
         ConsensusAlgorithm a;
         switch (METHOD){
             case STRICT:
-                a = new NConsensus();
+                a = new NConsensus(log);
                 ((NConsensus)a).setMethod(NConsensus.METHOD_STRICT);
                 break;
             case MAJORITY:
-                a = new NConsensus();
+                a = new NConsensus(log);
                 ((NConsensus)a).setMethod(NConsensus.METHOD_MAJORITY);
                 break; // is same as strict for 2 trees...
             case SEMI_STRICT:
@@ -154,18 +143,4 @@ public abstract class TreeScorer<T extends TreeScorer> {
     public String toString(){
         return getClass().getSimpleName();
     }
-
-    protected abstract T newInstance(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa);
-
-    public T clone(boolean cache, boolean shareCache){
-        if (cache) {
-            if (shareCache){
-                return newInstance(METHOD,treeToTaxa);
-            }else{
-                return newInstance(METHOD,new THashMap<>());
-            }
-        }
-        return newInstance(METHOD,null);
-    }
-
 }

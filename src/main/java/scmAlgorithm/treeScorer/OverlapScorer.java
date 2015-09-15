@@ -1,31 +1,21 @@
 package scmAlgorithm.treeScorer;
 
-import epos.model.tree.Tree;
-import gnu.trove.set.hash.THashSet;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by fleisch on 06.02.15.
  */
 public class OverlapScorer extends TreeScorer<OverlapScorer> {
+
     public OverlapScorer(ConsensusMethods method) {
         super(method);
     }
 
-    protected OverlapScorer(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        super(method, treeToTaxa);
-    }
-
-    public OverlapScorer(ConsensusMethods method, boolean cache, boolean syncedCache) {
-        super(method, cache, syncedCache);
-    }
-
-    @Override
-    protected OverlapScorer newInstance(ConsensusMethods method, Map<Tree, THashSet<String>> treeToTaxa) {
-        return new OverlapScorer(method,treeToTaxa);
+    public OverlapScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
+        super(method, log, cache, syncedCache);
     }
 
     @Override
