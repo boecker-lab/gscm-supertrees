@@ -1,9 +1,9 @@
 package scmAlgorithm.treeScorer;
 
-import epos.algo.consensus.ConsensusAlgorithm;
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
+import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import gnu.trove.map.hash.THashMap;
@@ -96,8 +96,8 @@ public abstract class TreeScorer<T extends TreeScorer> {
         return s;
     }
 
-    public ConsensusAlgorithm getConsensusAlgorithm(){
-        ConsensusAlgorithm a;
+    public SupertreeAlgorithm getConsensusAlgorithm(){
+        SupertreeAlgorithm a;
         switch (METHOD){
             case STRICT:
                 a = new NConsensus(log);
@@ -108,7 +108,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
                 ((NConsensus)a).setMethod(NConsensus.METHOD_MAJORITY);
                 break; // is same as strict for 2 trees...
             case SEMI_STRICT:
-                a = new LooseConsensus(false);
+                a = new LooseConsensus();
                 break;
             case ADAMS:
                 a =  new AdamsConsensus();

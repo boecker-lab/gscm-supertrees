@@ -352,7 +352,9 @@ public class GreedySCMAlgorithmTest {
             input[i] = tree[indices[i]];
         }
         LooseConsensus c = new LooseConsensus();
-        return c.getConsensusTree(input);
+        c.setInput(Arrays.asList(input));
+        c.run();
+        return c.getResult();
     }
 
     /*    @Test

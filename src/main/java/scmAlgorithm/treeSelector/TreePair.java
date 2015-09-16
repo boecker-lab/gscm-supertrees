@@ -1,6 +1,6 @@
 package scmAlgorithm.treeSelector;
 
-import epos.algo.consensus.ConsensusAlgorithm;
+import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.TreeNode;
 import epos.model.tree.treetools.TreeUtilsBasic;
@@ -242,7 +242,7 @@ public class TreePair implements Comparable<TreePair> {
         return labelToNode.size();
     }
 
-    public Tree getConsensus(final ConsensusAlgorithm consensorator) {
+    public Tree getConsensus(final SupertreeAlgorithm consensorator) {
         if (consensus == null)
             calculateConsensus(consensorator);
         return consensus;
@@ -252,11 +252,13 @@ public class TreePair implements Comparable<TreePair> {
         return consensus;
     }
 
-    public void calculateConsensus(final ConsensusAlgorithm consensorator) {
+    public void calculateConsensus(final SupertreeAlgorithm consensorator) {
         if (commonLeafes.size() > 2) {
             if (singleTaxa == null)
                 pruneToCommonLeafes();
-            consensus = consensorator.getConsensusTree(t1pruned, t2pruned);
+            consensorator.setInput(Arrays.asList(t1pruned,t2pruned));
+            consensorator.run();
+            consensus = consensorator.getResult();
             mergedBackboneNumOfVertices = consensus.vertexCount();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }

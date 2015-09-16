@@ -13,8 +13,10 @@ public interface MultiResultMergeSupertreeAlgorithm extends SupertreeAlgorithm {
 
     default Tree getMergedSupertree() {
         List<Tree> superTrees = getSupertrees();
-        LooseConsensus cons = new LooseConsensus(false);
-        Tree supertree = cons.getConsensusTree(superTrees.toArray(new Tree[superTrees.size()]));
+        LooseConsensus cons = new LooseConsensus();
+        cons.setInput(superTrees);
+        cons.run();
+        Tree supertree = cons.getResult();
         return supertree;
     }
 
