@@ -1,8 +1,10 @@
 package scmAlgorithm;
 
+import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
@@ -10,44 +12,71 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by fleisch on 05.02.15.
  */
-public abstract class AbstractSCMAlgorithm implements SupertreeAlgorithm {
+public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     protected List<Tree> superTrees;
 
     public final TreeSelector selector;
 
-
-    public AbstractSCMAlgorithm(TreeSelector selector) {
+    public AbstractSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
+        super(logger, executorService);
         this.selector = selector;
     }
+
+    public AbstractSCMAlgorithm(Logger logger, TreeSelector selector) {
+        super(logger);
+        this.selector = selector;
+    }
+
+    public AbstractSCMAlgorithm(TreeSelector selector) {
+        super();
+        this.selector = selector;
+    }
+
 
     protected abstract List<TreePair> calculateSuperTrees();
 
     @Override
-    public List<Tree> getSupertrees() {
-        if (superTrees == null || superTrees.isEmpty()) {
-            List<TreePair> finalPairs = calculateSuperTrees();
-            superTrees = new ArrayList<>(finalPairs.size());
-            TreeResolutionComparator comp = new TreeResolutionComparator();
+    public void setInput(List<Tree> trees) {
+        setInput(trees.toArray(new Tree[trees.size()]));
+    }
 
-            for (TreePair pair : finalPairs) {
-                Tree st = pair.getConsensus();
-                TreeUtilsBasic.cleanTree(st);
-                comp.put(st, TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), st.vertexCount()));
-                superTrees.add(st);
-            }
-            Collections.sort(superTrees, comp);
+    public void setInput(Tree... trees) {
+        selector.init(trees);
+    }
 
+    @Override
+    public void run() {
+        superTrees = null;
+        List<TreePair> finalPairs = calculateSuperTrees();
+        superTrees = new ArrayList<>(finalPairs.size());
+        TreeResolutionComparator comp = new TreeResolutionComparator();
+
+        for (TreePair pair : finalPairs) {
+            Tree st = pair.getConsensus();
+            TreeUtilsBasic.cleanTree(st);
+            comp.put(st, TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), st.vertexCount()));
+            superTrees.add(st);
         }
+        Collections.sort(superTrees, comp);
+    }
+
+    @Override
+    public List<Tree> getResults() {
+        if (superTrees == null || superTrees.isEmpty())
+            return null;
         return superTrees;
     }
 
     @Override
-    public Tree getSupertree() {
-        return getSupertrees().get(0);
+    public Tree getResult() {
+        if (superTrees == null || superTrees.isEmpty())
+            return null;
+        return superTrees.get(0);
     }
 
 

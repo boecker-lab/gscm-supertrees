@@ -1,18 +1,21 @@
 package scmAlgorithm;
 
 import epos.model.tree.Tree;
+import org.apache.log4j.Logger;
 import scmAlgorithm.treeScorer.TreeScorer;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.RandomizedGreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreePair;
+import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by fleisch on 24.03.15.
  */
-public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements RandomizedSCMCalculation,MultiResultMergeSupertreeAlgorithm {
+public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements RandomizedSCMCalculation, MultiResultMergeSCMAlgorithm {
     private final Tree[] inputTrees;
     private GreedySCMAlgorithm nonRandomResult;
     private TreeScorer[] scorerArray = null;
@@ -44,7 +47,26 @@ public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements Rand
         this.multipleRandomizedRuns = multipleRandomizedRuns;
     }
 
+    public RandomizedSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
+        super(logger, executorService, selector);
+        this.inputTrees = inputTrees;
+        this.iterations = iterations;
+        this.scorerArray = scorer;
+    }
 
+    public RandomizedSCMAlgorithm(Logger logger, TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
+        super(logger, selector);
+        this.inputTrees = inputTrees;
+        this.iterations = iterations;
+        this.scorerArray = scorer;
+    }
+
+    public RandomizedSCMAlgorithm(TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
+        super(selector);
+        this.inputTrees = inputTrees;
+        this.iterations = iterations;
+        this.scorerArray = scorer;
+    }
 
     @Override
     protected List<TreePair> calculateSuperTrees() {

@@ -3,35 +3,32 @@ package scmAlgorithm;
 import epos.model.tree.Tree;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
+import utils.CLIProgressBar;
 
 /**
  * Created by fleisch on 25.03.15.
  */
 public interface GreedySCMCalculation {
 
-    default TreePair calculateGreedyConsensus(TreeSelector selector) {
+    default TreePair calculateGreedyConsensus(TreeSelector selector, final boolean progress) {
         TreePair superCandidatePair = null;
         TreePair pair;
-        double trees = selector.getNumberOfTrees()-1;
-        double progress = 0;
-        int pCount = 0;
 
-        System.out.print("0% ");
+        //progress bar stuff
+        CLIProgressBar progressBar = null;
+        if (progress)
+            progressBar = new CLIProgressBar();
+        int pCount = 0;
+        int trees = selector.getNumberOfTrees()-1;
+
         while ((pair = selector.pollTreePair()) != null) {
+            if (progress)
+                progressBar.update(pCount++,trees);
             Tree superCandidate = pair.getConsensus(selector.getScorer().getConsensusAlgorithm());
             selector.addTree(superCandidate);
             superCandidatePair = pair;
-            double nuP = ((++pCount / trees)) * 72;
-            double diff =  nuP - progress;
-            if (diff >= 1) {
-                while (diff >= 1) {
-                    System.out.print("#");
-                    diff--;
-                    progress++;
-                }
-            }
+
         }
-        System.out.println(" 100%");
         return superCandidatePair;
     }
 

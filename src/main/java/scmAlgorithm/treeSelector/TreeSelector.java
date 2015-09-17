@@ -70,18 +70,6 @@ public abstract class TreeSelector {
 
             long time = System.currentTimeMillis();
 
-           /* System.out.println("Calculating initial scores of tree pairs (single threaded)...");
-            for (int i = 0; i < trees.length - 1; i++) {
-                Tree first = trees[i];
-                for (int j = i + 1; j < trees.length; j++) {
-                    Tree second = trees[j];
-                    TreePair pair = new TreePair(first, second,scorer);
-                    addPair(first, pair);
-                    addPair(second, pair);
-                }
-            }
-            */
-
             //parralel scoring
             System.out.println("Calculating initial scores of tree pairs (multi threaded)...");
             List<TreePair> pairsToAdd = IntStream.range(0, trees.length - 1).parallel()
@@ -111,8 +99,6 @@ public abstract class TreeSelector {
             }
             return null;
         }
-
-        ;
 
         // adds tree and its paires to the data structure (O(2nlog(n)))
         public boolean addTree(Tree tree) {
