@@ -2,7 +2,7 @@ package scmAlgorithm;
 
 import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
-import scmAlgorithm.treeScorer.TreeScorer;
+import scmAlgorithm.treeSelector.TreeScorer;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
@@ -15,32 +15,32 @@ import java.util.concurrent.ExecutorService;
  * Created by fleisch on 15.06.15.
  */
 public class MultiGreedySCMAlgorithm extends AbstractSCMAlgorithm implements GreedySCMCalculation, MultiResultMergeSCMAlgorithm {
-    TreeScorer[] scorerList;
-    final Tree[] trees;
-    Tree mergedSupertree = null;
+    private final TreeScorer[] scorerList;
+    private final Tree[] inputTrees;
+    private Tree mergedSupertree = null;
 
 
-    public MultiGreedySCMAlgorithm(Tree[] trees, TreeScorer... scorerList) {
-        super(new GreedyTreeSelector(scorerList[0],trees));
+    public MultiGreedySCMAlgorithm(Tree[] inputTrees, TreeScorer... scorerList) {
+        super(new GreedyTreeSelector(scorerList[0], inputTrees));
         this.scorerList = scorerList;
-        this.trees = trees;
+        this.inputTrees = inputTrees;
     }
 
-    public MultiGreedySCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector, Tree[] trees, TreeScorer[] scorerList) {
+    public MultiGreedySCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector, Tree[] inputTrees, TreeScorer[] scorerList) {
         super(logger, executorService, selector);
-        this.trees = trees;
+        this.inputTrees = inputTrees;
         this.scorerList = scorerList;
     }
 
-    public MultiGreedySCMAlgorithm(Logger logger, TreeSelector selector, Tree[] trees, TreeScorer[] scorerList) {
+    public MultiGreedySCMAlgorithm(Logger logger, TreeSelector selector, Tree[] inputTrees, TreeScorer[] scorerList) {
         super(logger, selector);
-        this.trees = trees;
+        this.inputTrees = inputTrees;
         this.scorerList = scorerList;
     }
 
-    public MultiGreedySCMAlgorithm(TreeSelector selector, Tree[] trees, TreeScorer[] scorerList) {
+    public MultiGreedySCMAlgorithm(TreeSelector selector, Tree[] inputTrees, TreeScorer[] scorerList) {
         super(selector);
-        this.trees = trees;
+        this.inputTrees = inputTrees;
         this.scorerList = scorerList;
     }
 
@@ -51,7 +51,7 @@ public class MultiGreedySCMAlgorithm extends AbstractSCMAlgorithm implements Gre
         for (int i = 1; i < scorerList.length; i++) {
             TreeScorer scorer = scorerList[i];
             selector.setScorer(scorer);
-            selector.init(trees);
+            selector.init(inputTrees);
             superTrees.add(calculateGreedyConsensus(selector,false));
         }
         return superTrees;

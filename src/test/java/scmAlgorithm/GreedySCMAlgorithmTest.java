@@ -5,12 +5,13 @@ import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import org.junit.Test;
-import scmAlgorithm.treeScorer.*;
-import scmAlgorithm.treeSelector.GreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreeSelector;
+import scmAlgorithm.treeSelector.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +19,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+//import flipCut.Global;
 
 /**
  * Created by fleisch on 16.02.15.
@@ -35,89 +38,86 @@ public class GreedySCMAlgorithmTest {
     public final static String newickInput1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.tre";
     public final static String newickSCM1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.scmTree.tre";
 
-/*
     //tree constants
-//    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML_SCM_OPT;//Global.SM_SOURCE_TREES_RAXML_SCM;//
+/*//    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML_SCM_OPT;//Global.SM_SOURCE_TREES_RAXML_SCM;//
 //    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
     final static String sourceTreeLocation = Global.SMOG_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-//        final static String alternateSourceTreeLocation =  Global.SM_SOURCE_TREES_RAXML_MODEL_LEAST;//Global.SM_SOURCE_TREES_RAXML_SCM;//
+    //        final static String alternateSourceTreeLocation =  Global.SM_SOURCE_TREES_RAXML_MODEL_LEAST;//Global.SM_SOURCE_TREES_RAXML_SCM;//
     final static String alternateSourceTreeLocation = Global.SMOG_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-//        final static String scmTreeLocation = Global.SM_SCM_TREES_RAXML_OPT_ROOTED; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
+    //        final static String scmTreeLocation = Global.SM_SCM_TREES_RAXML_OPT_ROOTED; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
 //    final static String scmTreeLocation = Global.SM_SCM_TREES_RAXML; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
 //    final static String scmTreeLocation = Global.SMOG_SCM_TREES_SUPER_ROOTED; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
     final static String scmTreeLocation = Global.SMOG_SCM_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-//    final static String modelTreeLocation = Global.SM_MODEL_TREE_PATH + "sm_data." + Global.TAG_INSTANCE + ".model_tree"; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-    final static String modelTreeLocation = Global.SMOG_MODEL_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-*/
+    //    final static String modelTreeLocation = Global.SM_MODEL_TREE_PATH + "sm_data." + Global.TAG_INSTANCE + ".model_tree"; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
+    final static String modelTreeLocation = Global.SMOG_MODEL_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//*/
 
 
     public static final TreeScorer[] fullStrictCombi = {
-            new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),//is automatic included
-            new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new BackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-            new BackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaRateScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)
+            new OverlapScorer(),//is automatic included
+            new CollisionPointNumberScorer(),
+            new CollisionLostCladesNumberScorer(),
+            new CollisionNumberScorer(),
+            new BackboneSizeScorer(),
+            new BackboneCladeNumberScorer(),
+            new UniqueTaxaNumberScorer(),
+            new UniqueTaxaRateScorer(),
+            new ConsensusBackboneCladeNumberScorer(),
+            new ConsensusBackboneResolutionScorer(),
+            new ConsensusBackboneSizeScorer(),
+            new ConsensusCladeNumberScorer(),
+            new ConsensusResolutionScorer()
     };
 
     public static final TreeScorer[] minimalCombi = {
-            new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),//is automatic included
-            new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new UniqueTaxaRateScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)
+            new OverlapScorer(),//is automatic included
+            new CollisionPointNumberScorer(),
+//            new CollisionLostCladesNumberScorer(),
+//            new CollisionNumberScorer(),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+            new UniqueTaxaNumberScorer(),
+//            new UniqueTaxaRateScorer(),
+//            new ConsensusBackboneCladeNumberScorer(),
+            new ConsensusBackboneResolutionScorer(),
+//            new ConsensusBackboneSizeScorer(),
+//            new ConsensusCladeNumberScorer(),
+            new ConsensusResolutionScorer()
     };
     public static final TreeScorer[] b4 = {
-//            new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),//is automatic included
-            new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new UniqueTaxaRateScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)
+//            new OverlapScorer(),//is automatic included
+            new CollisionPointNumberScorer(),
+//            new CollisionLostCladesNumberScorer(),
+//            new CollisionNumberScorer(),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+            new UniqueTaxaNumberScorer(),
+//            new UniqueTaxaRateScorer(),
+//            new ConsensusBackboneCladeNumberScorer(),
+//            new ConsensusBackboneResolutionScorer(),
+//            new ConsensusBackboneSizeScorer(),
+            new ConsensusCladeNumberScorer(),
+            new ConsensusResolutionScorer()
     };
 
     public static final TreeScorer[] greenCombi = {
-            new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),//is automatic included
-            new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new BackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new UniqueTaxaRateScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),
-//            new ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),
-            new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)
+            new OverlapScorer(),//is automatic included
+            new CollisionPointNumberScorer(),
+//            new CollisionLostCladesNumberScorer(),
+            new CollisionNumberScorer(),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+            new UniqueTaxaNumberScorer(),
+            new UniqueTaxaRateScorer(),
+//            new ConsensusBackboneCladeNumberScorer(),
+            new ConsensusBackboneResolutionScorer(),
+//            new ConsensusBackboneSizeScorer(),
+            new ConsensusCladeNumberScorer(),
+            new ConsensusResolutionScorer()
     };
 
 
-
     public static final String[] scorerNames = getScorerNames();
-    public static final String SEP =  System.getProperty("line.separator");
+    public static final String SEP = System.getProperty("line.separator");
 
     @Test
     public void smidgenSample100() {
@@ -126,7 +126,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(s);
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -151,7 +151,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput100_NORoot).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector, true);//rooting stuff
         Tree supertree = algo.getSupertree();
         System.out.println("Strict-25_Root: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
@@ -167,7 +167,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.ADAMS), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), TreeSelector.ConsensusMethod.ADAMS, inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -199,7 +199,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.SEMI_STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), TreeSelector.ConsensusMethod.SEMI_STRICT, inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -232,7 +232,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new CollisionLostCladesNumberScorer(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -251,7 +251,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000_NORoot).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector, true);
         Tree supertree = algo.getSupertree();
         System.out.println("Strict-250_Root: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
@@ -267,7 +267,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.ADAMS), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), TreeSelector.ConsensusMethod.ADAMS, inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -299,7 +299,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.SEMI_STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), TreeSelector.ConsensusMethod.SEMI_STRICT, inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -316,7 +316,7 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000_NORoot).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(new OverlapScorer(), inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
         algo.run();
         Tree supertree = algo.getResult();
@@ -327,11 +327,111 @@ public class GreedySCMAlgorithmTest {
         System.out.println("Clades: " + inner);
     }
 
+    @Test
+    public void largeSample() throws IOException {
+        Path inputFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/RaxML/smo.0.sourceTrees.tre");
+        long t = System.currentTimeMillis();
+        Tree[] inputTrees = Newick.getTreeFromFile(inputFile.toFile());
+         /*Files.copy(inputFile, inputFile.getParent().resolve("smo.0.sourceTrees_UNSUFFICIENT.tre"));
+
+        LinkedHashMap<Object, Set<Tree>> treesSets = new LinkedHashMap<>();
+        Map<Object, Set<Tree>> finished = new HashMap<>();
+        for (int i = 0; i < inputTrees.length; i++) {
+            Tree tree = inputTrees[i];
+            Set<String> leafset = TreeUtilsBasic.getLeafLabels(tree.getRoot());
+            treesSets.put(leafset, new HashSet<>(Arrays.asList(tree)));
+        }
+
+        while (treesSets.size() > 0) {
+            boolean unchanged = false;
+            Map.Entry<Object, Set<Tree>> e = treesSets.entrySet().iterator().next();
+            Set<String> f = (Set<String>) e.getKey();
+            Set<Tree> fset = e.getValue();
+            treesSets.remove(f);
+
+            while (!unchanged) {
+                unchanged = true;
+                Set<Set<String>> toRemove = new HashSet<>();
+                for (Object o : treesSets.keySet()) {
+                    Set<String> n = (Set<String>) o;
+                    Set<String> check = new HashSet<>(n);
+                    check.retainAll(f);
+                    if (check.size() > 2) {
+                        f.addAll(n);
+                        Set<Tree> nset = treesSets.get(n);
+                        fset.addAll(nset);
+                        toRemove.add(n);
+                        unchanged = false;
+                    }
+                }
+
+                for (Set<String> remove : toRemove) {
+                    treesSets.remove(remove);
+                }
+            }
+            finished.put(f, fset);
+        }
+
+        Set<String> best = new HashSet<>();
+        Set<Tree> trees = null;
+        for (Object o : finished.keySet()) {
+            Set<String> n = (Set<String>) o;
+            if (n.size()>best.size()){
+                best =  n;
+                trees = finished.get(n);
+            }
+        }
+        Path modelFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Model_Trees/pruned/smo.0.modelTree.tre");
+        Path modelOLD =  modelFile.getParent().resolve("smo.0.modelTree_UNSUFFICIENT.tre");
+        Tree model  = Newick.getTreeFromFile(modelFile.toFile())[0];
+        Files.copy(modelFile,modelOLD);
+        TreeUtilsBasic.keepLeafesAndPruneTree(model, TreeUtilsBasic.getLeafesFromLabels(best, model));
+        Newick.tree2File(modelFile.toFile(), model);
+
+        Path modelSourceFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/ModelSourceTrees/smo.0.modelSourceTrees.tre");
+        Tree[] modelSourceTrees = Newick.getTreeFromFile(modelSourceFile.toFile());
+        Files.copy(modelSourceFile,modelSourceFile.getParent().resolve("smo.0.modelSourceTrees_UNSUFFICIENT.tre"));
+        Path modelSourceOGFile = modelSourceFile.getParent().resolve("smo.0.modelSourceTreesOGs.dat");
+        List<String> lines = new ArrayList<>(Files.readAllLines(modelSourceOGFile));
+        Files.copy(modelSourceOGFile,modelSourceOGFile.getParent().resolve("smo.0.modelSourceTreesOGs_UNSUFFICIENT.dat"));
+
+
+        List<Tree> modelSourceTreesNu = new ArrayList<>(trees.size());
+        List<Tree> sourceTreesNu = new ArrayList<>(trees.size());
+
+        for (int i = 0; i < inputTrees.length; i++) {
+            Tree inputTree = inputTrees[i];
+            if (trees.contains(inputTree)){
+                modelSourceTreesNu.add(modelSourceTrees[i]);
+                sourceTreesNu.add(inputTree);
+//                lines.remove(i);
+            }
+        }
+
+        Newick.trees2File(modelSourceFile.toFile(), modelSourceTreesNu);
+        Newick.trees2File(inputFile.toFile(), sourceTreesNu);
+
+//        Files.write(modelSourceOGFile,lines);
+
+*/
+
+
+        TreeSelector selector = new GreedyTreeSelector(new UniqueTaxaNumberScorer(), inputTrees);
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
+        algo.run();
+        Tree supertree = algo.getResult();
+        System.out.println("large example: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        assertNotNull(supertree);
+        System.out.println(Newick.getStringFromTree(supertree));
+        int inner = supertree.vertexCount() - supertree.getNumTaxa();
+        System.out.println("Clades: " + inner);
+    }
+
     //############################ EVAL TESTS #################################################
 
 
-    private static String[] getScorerNames(){
-        String[] names =  new String[fullStrictCombi.length];
+    private static String[] getScorerNames() {
+        String[] names = new String[fullStrictCombi.length];
         for (int i = 0; i < fullStrictCombi.length; i++) {
             names[i] = fullStrictCombi[i].toString();
         }
@@ -339,16 +439,16 @@ public class GreedySCMAlgorithmTest {
     }
 
 
-    private static String getMultiScorerName(int[] indices){
-        String[] names =  new String[indices.length];
+    private static String getMultiScorerName(int[] indices) {
+        String[] names = new String[indices.length];
         for (int i = 0; i < names.length; i++) {
-            names[i] =  fullStrictCombi[indices[i]].toString();
+            names[i] = fullStrictCombi[indices[i]].toString();
         }
         return Arrays.toString(names);
     }
 
     private static Tree getSemiStrict(Tree[] tree, int[] indices) {
-        if (indices == null || indices.length == 0 )
+        if (indices == null || indices.length == 0)
             return null;
 
         if (indices.length == 1)
@@ -500,7 +600,7 @@ public class GreedySCMAlgorithmTest {
         }
     }*/
 
-    /*@Test
+   /* @Test
     public void debugTest() throws IOException {
         int[] taxas = {
 //                100,
@@ -516,19 +616,22 @@ public class GreedySCMAlgorithmTest {
         };
 
 
-        Path fnFile = Paths.get("/home/qo53kab/Work/scmResults/fn.scm-rand-25-c4."+ taxas[0]+".csv");
-        Path fpFile =  Paths.get("/home/qo53kab/Work/scmResults/fp.scm-rand-25-c4."+ taxas[0]+".csv");;
-        Path sfnFile =  Paths.get("/home/qo53kab/Work/scmResults/sfn.scm-rand-25-c4."+ taxas[0]+".csv");;
-        Path sfpFile =  Paths.get("/home/qo53kab/Work/scmResults/sfp.scm-rand-25-c4."+ taxas[0]+".csv");;
-        Path resolutionFile =  Paths.get("/home/qo53kab/Work/scmResults/resolution.scm-rand-25-c4."+ taxas[0]+".csv");
+        Path fnFile = Paths.get("/home/qo53kab/Work/scmResults/fn.scm-rand-25-c4." + taxas[0] + ".csv");
+        Path fpFile = Paths.get("/home/qo53kab/Work/scmResults/fp.scm-rand-25-c4." + taxas[0] + ".csv");
+        ;
+        Path sfnFile = Paths.get("/home/qo53kab/Work/scmResults/sfn.scm-rand-25-c4." + taxas[0] + ".csv");
+        ;
+        Path sfpFile = Paths.get("/home/qo53kab/Work/scmResults/sfp.scm-rand-25-c4." + taxas[0] + ".csv");
+        ;
+        Path resolutionFile = Paths.get("/home/qo53kab/Work/scmResults/resolution.scm-rand-25-c4." + taxas[0] + ".csv");
 
-        List<List<Tree>> resultTrees =  new ArrayList<>(4);
+        List<List<Tree>> resultTrees = new ArrayList<>(4);
         for (int i = 0; i < scaffoldFactors.length; i++) {
             resultTrees.add(new ArrayList<>(fullStrictCombi.length));
         }
 
 
-        Path[] files =  {
+        Path[] files = {
                 fnFile,
                 fpFile,
                 sfnFile,
@@ -539,28 +642,28 @@ public class GreedySCMAlgorithmTest {
         String header = "Scorer\t20\t50\t75\t100\n";
         for (Path file : files) {
             Files.deleteIfExists(file);
-            Files.write(file,header.getBytes(), StandardOpenOption.CREATE);
+            Files.write(file, header.getBytes(), StandardOpenOption.CREATE);
         }
 
 //        List<TreeScorer[]> combis =  Arrays.asList(
-//                new TreeScorer[] {new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[] {new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[] {new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[] {new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT)}
+//                new TreeScorer[] {new CollisionPointNumberScorer()},
+//                new TreeScorer[] {new UniqueTaxaNumberScorer()},
+//                new TreeScorer[] {new ConsensusResolutionScorer()},
+//                new TreeScorer[] {new ConsensusCladeNumberScorer()}
 //
-//                new TreeScorer[]{new OverlapScorer(TreeScorer.ConsensusMethods.STRICT)},//is automatic included},
-//                new TreeScorer[]{new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new BackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new BackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new UniqueTaxaRateScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new ConsensusBackboneSizeScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT)},
-//                new TreeScorer[]{new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT)}
+//                new TreeScorer[]{new OverlapScorer()},//is automatic included},
+//                new TreeScorer[]{new CollisionPointNumberScorer()},
+//                new TreeScorer[]{new CollisionLostCladesNumberScorer()},
+//                new TreeScorer[]{new CollisionNumberScorer()},
+//                new TreeScorer[]{new BackboneSizeScorer()},
+//                new TreeScorer[]{new BackboneCladeNumberScorer()},
+//                new TreeScorer[]{new UniqueTaxaNumberScorer()},
+//                new TreeScorer[]{new UniqueTaxaRateScorer()},
+//                new TreeScorer[]{new ConsensusBackboneCladeNumberScorer()},
+//                new TreeScorer[]{new ConsensusBackboneResolutionScorer()},
+//                new TreeScorer[]{new ConsensusBackboneSizeScorer()},
+//                new TreeScorer[]{new ConsensusCladeNumberScorer()},
+//                new TreeScorer[]{new ConsensusResolutionScorer()}
 //                   b4
 //                 minimalCombi,
 //                greenCombi
@@ -568,18 +671,22 @@ public class GreedySCMAlgorithmTest {
 //        );
 
         List<TreeScorer[]> combis = new ArrayList<>();
-        combis.add(new TreeScorer[] {new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT)});
-        combis.add(new TreeScorer[] {new CollisionNumberScorer(TreeScorer.ConsensusMethods.STRICT)});
-        combis.add(new TreeScorer[] {new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT)});
-        combis.add(new TreeScorer[] {new CollisionMultiCollisionPointScorer(TreeScorer.ConsensusMethods.STRICT)});
-        combis.add(new TreeScorer[] {new CollisionPointMultiCollissionTieBreakScorer(TreeScorer.ConsensusMethods.STRICT)});
-//        combis.add(new TreeScorer[] {new UniqueTaxaNumberScorer(TreeScorer.ConsensusMethods.STRICT)});
+//        combis.add(new TreeScorer[] {new CollisionLostCladesNumberScorer()});
+//        combis.add(new TreeScorer[] {new CollisionNumberScorer()});
+        combis.add(new TreeScorer[]{new CollisionPointNumberScorer()});
+        combis.add(new TreeScorer[]{new CollisionMultiCollisionPointScorer()});
+//        combis.add(new TreeScorer[] {new CollisionPointMultiCollissionTieBreakScorer()});
+        combis.add(new TreeScorer[]{new SubsetUnitOverlapScorer()});
+        combis.add(new TreeScorer[]{new SubsetUnitOverlapDifferenceScorer()});
+        combis.add(new TreeScorer[]{new SubsetUnitOverlapRateScorer()});
+        combis.add(new TreeScorer[]{new UniqueTaxaNumberScorer()});
+//        combis.add(new TreeScorer[] {new UniqueTaxaNumberScorer()});
 //        combis.add(b4);
 
 
         int s = -1;
         for (TreeScorer[] scorer : combis) {
-        s++;
+            s++;
 
 //        }
 //        for (int s = 0; s < fullStrictCombi.length; s++) {
@@ -599,13 +706,13 @@ public class GreedySCMAlgorithmTest {
 
             final DescriptiveStatistics[] resolution = new DescriptiveStatistics[4];
 
-            DescriptiveStatistics[][] stats =  {
-                   fn,fp,sfn,sfp,resolution
+            DescriptiveStatistics[][] stats = {
+                    fn, fp, sfn, sfp, resolution
             };
             for (int i = 0; i < stats.length; i++) {
 
                 for (int j = 0; j < stats[i].length; j++) {
-                    stats[i][j] =  new DescriptiveStatistics();
+                    stats[i][j] = new DescriptiveStatistics();
                 }
             }
 
@@ -623,12 +730,12 @@ public class GreedySCMAlgorithmTest {
 
             long scmTime = System.currentTimeMillis();
 
-            StringBuffer fnLine =  new StringBuffer();
-            StringBuffer fpLine =  new StringBuffer();
-            StringBuffer sfnLine =  new StringBuffer();
-            StringBuffer sfpLine =  new StringBuffer();
-            StringBuffer resolutionLine =  new StringBuffer();
-            StringBuffer[] lines =  {
+            StringBuffer fnLine = new StringBuffer();
+            StringBuffer fpLine = new StringBuffer();
+            StringBuffer sfnLine = new StringBuffer();
+            StringBuffer sfpLine = new StringBuffer();
+            StringBuffer resolutionLine = new StringBuffer();
+            StringBuffer[] lines = {
                     fnLine,
                     fpLine,
                     sfnLine,
@@ -672,7 +779,7 @@ public class GreedySCMAlgorithmTest {
 
 
                             Tree modelTree = null;
-                            if (modelFile.exists()){
+                            if (modelFile.exists()) {
                                 modelTree = Newick.getTreeFromFile(modelFile)[0];
                             }
 
@@ -684,14 +791,15 @@ public class GreedySCMAlgorithmTest {
                             System.out.println(Newick.getStringFromTree(swensonSCM));
 
 
-                            GreedySCMAlgorithm scmAlgorithm =  new GreedySCMAlgorithm(new GreedyTreeSelector(scorer[0], TreeUtilsBasic.cloneTrees(input)));
+                            GreedySCMAlgorithm scmAlgorithm = new GreedySCMAlgorithm(new GreedyTreeSelector(scorer[0], TreeUtilsBasic.cloneTrees(input)));
 //                            MultiGreedySCMAlgorithm scmAlgorithm = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(input), fullStrictCombi);
 //                            RandomizedSCMAlgorithm scmAlgorithm =  new RandomizedSCMAlgorithm(true,25,TreeUtilsBasic.cloneTrees(input), scorer);
 
-                            List<Tree> scmTrees = scmAlgorithm.getSupertrees();
+                            scmAlgorithm.run();
+                            List<Tree> scmTrees = scmAlgorithm.getResults();
 //                            Tree scmTree = scmAlgorithm.getMergedSupertree();
 
-                            Tree scmTree = scmAlgorithm.getSupertree();
+                            Tree scmTree = scmAlgorithm.getResult();
                             scmTime = System.currentTimeMillis() - scmTime;
                             scmTimes[scaffoldFactorIndex].addValue(scmTime);
                             c = scmTree.vertexCount() - scmTree.getNumTaxa();
@@ -702,8 +810,10 @@ public class GreedySCMAlgorithmTest {
                             System.out.println("SCM Time " + taxa + "/" + scaffoldFactors[scaffoldFactorIndex] + "/" + instance + ": " + (float) scmTime / 1000f + "s");
 
 
-                            LooseConsensus cons = new LooseConsensus(false);
-                            Tree scmTreesConsensus = cons.getConsensusTreeNaive(scmTree, swensonSCM);
+                            LooseConsensus cons = new LooseConsensus();
+                            cons.setInput(Arrays.asList(scmTree, swensonSCM), false);
+                            cons.run();
+                            Tree scmTreesConsensus = cons.getResult();
                             c = scmTreesConsensus.vertexCount() - scmTreesConsensus.getNumTaxa();
                             consensusClades[scaffoldFactorIndex] += c;
                             System.out.println("SCM-Consensus: " + (c));
@@ -712,13 +822,13 @@ public class GreedySCMAlgorithmTest {
 
 
 //                            Path outFile =  Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance +".standard-scmTrees.tre");
-                            Path outFile =  Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance +".randomized25-c4-scmTrees.tre");
+                            Path outFile = Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance + ".randomized25-c4-scmTrees.tre");
                             Files.createDirectories(outFile.getParent());
-                            if (s == 0){
+                            if (s == 0) {
                                 Files.deleteIfExists(outFile);
-                                Files.write(outFile,(Newick.getStringFromTree(scmTree) + "\n").getBytes(),StandardOpenOption.CREATE);
-                            }else{
-                                Files.write(outFile,(Newick.getStringFromTree(scmTree) + "\n").getBytes(),StandardOpenOption.APPEND);
+                                Files.write(outFile, (Newick.getStringFromTree(scmTree) + "\n").getBytes(), StandardOpenOption.CREATE);
+                            } else {
+                                Files.write(outFile, (Newick.getStringFromTree(scmTree) + "\n").getBytes(), StandardOpenOption.APPEND);
                             }
                             double[] swensonRates = FN_FP_RateComputer.calculateRates(scmTree, swensonSCM, false);
                             double[] consRates = FN_FP_RateComputer.calculateRates(scmTreesConsensus, swensonSCM, false);
@@ -733,7 +843,7 @@ public class GreedySCMAlgorithmTest {
                             sfn[scaffoldFactorIndex].addValue(sumOfRates[0]);
                             sfp[scaffoldFactorIndex].addValue(sumOfRates[1]);
 
-                            resolution[scaffoldFactorIndex].addValue(TreeUtilsBasic.calculateTreeResolution(scmTree.getNumTaxa(),scmTree.vertexCount()));
+                            resolution[scaffoldFactorIndex].addValue(TreeUtilsBasic.calculateTreeResolution(scmTree.getNumTaxa(), scmTree.vertexCount()));
 
                             List<String> order = new ArrayList<>(TreeUtilsBasic.getLeafLabels(scmTree.getRoot()));
                             Collections.sort(order);
@@ -785,12 +895,11 @@ public class GreedySCMAlgorithmTest {
                 }
             }
 
-            Files.write(fnFile,(fnLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(fpFile,(fpLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(sfnFile,(sfnLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(sfpFile,(sfpLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(resolutionFile,(resolutionLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
-
+            Files.write(fnFile, (fnLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(fpFile, (fpLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(sfnFile, (sfnLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(sfpFile, (sfpLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(resolutionFile, (resolutionLine.toString() + "\n").getBytes(), StandardOpenOption.APPEND);
 
 
             System.out.println("trees calculated: " + Arrays.toString(trees));
@@ -1000,9 +1109,9 @@ public class GreedySCMAlgorithmTest {
         System.out.println(counter + " of " + trees.length + "are rooted: " + ((double) counter / (double) trees.length) * 100d + "%");
 
         long t = System.currentTimeMillis();
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT), trees));
-//        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT), trees));
-//        AbstractSCMAlgorithm algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(), trees));
+//        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusResolutionScorer(), trees));
+//        AbstractSCMAlgorithm algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
         Tree st = algo.getSupertree();
         double time = (double) (System.currentTimeMillis() - t) / 1000d;
 
@@ -1052,7 +1161,7 @@ public class GreedySCMAlgorithmTest {
 //            System.out.println(counter + " of " + trees.length + "are rooted: " + ((double) counter / (double) trees.length) * 100d + "%");
 //
 //            long t = System.currentTimeMillis();
-//            AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
+//            AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new OverlapScorer(,true,true), TreeUtilsBasic.cloneTrees(trees)));
 //            Tree stOverlap = algo.getSupertree();
 //            double timeOverlap = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println();
@@ -1064,8 +1173,8 @@ public class GreedySCMAlgorithmTest {
 //            System.out.println();
 //
 //            t = System.currentTimeMillis();
-//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new CollisionLostCladesNumberScorer(TreeScorer.ConsensusMethods.STRICT,true,true), TreeUtilsBasic.cloneTrees(trees)));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new CollisionLostCladesNumberScorer(,true,true), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            Tree stRes = algo.getSupertree();
 //            double timeRes = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("CollidingClades Running Time: " + timeRes + "s");
@@ -1076,8 +1185,8 @@ public class GreedySCMAlgorithmTest {
 //            System.out.println();
 //
 //            /*t = System.currentTimeMillis();
-//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusCladeNumberScorer(), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            Tree stNum = algo.getSupertree();
 //            double timeNum = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("CladeNumber Running Time: " + timeNum + "s");
@@ -1089,8 +1198,8 @@ public class GreedySCMAlgorithmTest {
 //*/
 //
 //           /* t = System.currentTimeMillis();
-//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneResolutionScorer(), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            Tree stResBack = algo.getSupertree();
 //            double timeResBack = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("Backbone-Resolution Running Time: " + timeResBack + "s");
@@ -1101,8 +1210,8 @@ public class GreedySCMAlgorithmTest {
 //            System.out.println();*/
 //
 //            /*t = System.currentTimeMillis();
-//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), TreeUtilsBasic.cloneTrees(trees)));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            algo = new GreedySCMAlgorithm(new GreedyTreeSelector(new ConsensusBackboneCladeNumberScorer(), TreeUtilsBasic.cloneTrees(trees)));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            Tree stNumBack = algo.getSupertree();
 //            double timeNumBack = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("Backbone-CladeNumber Running Time: " + timeNumBack + "s");
@@ -1116,8 +1225,8 @@ public class GreedySCMAlgorithmTest {
 //
 //            /*//randomized versions
 //            t = System.currentTimeMillis();
-//            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT),new ConsensusBackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+//            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(),new ConsensusCladeNumberScorer(),new ConsensusResolutionScorer(),new ConsensusCladeNumberScorer(),new ConsensusBackboneCladeNumberScorer(),new ConsensusBackboneResolutionScorer());
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            Tree stNumRand = algo.getSupertree();
 //            double timeNumRand = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("RandOverlap Running Time: " + timeNumRand + "s");
@@ -1129,7 +1238,7 @@ public class GreedySCMAlgorithmTest {
 //
 //            t = System.currentTimeMillis();
 //            algo = new RandomizedSCMAlgorithm(25,TreeUtilsBasic.cloneTrees(trees),new OverlapScorer(TreeScorer.ConsensusMethods.SEMI_STRICT));
-////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(TreeScorer.ConsensusMethods.STRICT),trees));
+////         algo =  new GreedySCMAlgorithm(new GreedyTreeSelector(new ResolutionScorer(),trees));
 //            List<Tree> temp =  algo.getSupertrees();
 //            NConsensus c =  new NConsensus();
 //            c.setMethod(NConsensus.METHOD_MAJORITY);
@@ -1146,7 +1255,7 @@ public class GreedySCMAlgorithmTest {
 //
 //            //multiversion
 //          /*  t = System.currentTimeMillis();
-//            algo = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(trees), new CollisionPointNumberScorer(TreeScorer.ConsensusMethods.STRICT),*//*new BackboneResolutionScorer(TreeScorer.ConsensusMethods.STRICT),*//*new ConsensusCladeNumberScorer(TreeScorer.ConsensusMethods.STRICT), new ConsensusResolutionScorer(TreeScorer.ConsensusMethods.STRICT));
+//            algo = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(trees), new CollisionPointNumberScorer(),*//*new BackboneResolutionScorer(),*//*new ConsensusCladeNumberScorer(), new ConsensusResolutionScorer());
 //            Tree stNumMulti = ((MultiGreedySCMAlgorithm) algo).getMergedSupertree();
 //            double timeNumMulti = (double) (System.currentTimeMillis() - t) / 1000d;
 //            System.out.println("Backbone-CladeNumber Running Time: " + timeNumMulti + "s");

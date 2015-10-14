@@ -1,7 +1,4 @@
-package scmAlgorithm.treeScorer;
-
-import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreePair;
+package scmAlgorithm.treeSelector;
 
 import java.util.Set;
 
@@ -9,13 +6,6 @@ import java.util.Set;
  * Created by fleisch on 15.06.15.
  */
 public class CollisionPointNumberScorer extends TreeScorer<CollisionPointNumberScorer> {
-    public CollisionPointNumberScorer(TreeScorer.ConsensusMethods method) {
-        super(method);
-    }
-
-    public CollisionPointNumberScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
-        super(method,log, cache, syncedCache);
-    }
     //OK
     @Override
     public double scoreTreePair(TreePair pair) {

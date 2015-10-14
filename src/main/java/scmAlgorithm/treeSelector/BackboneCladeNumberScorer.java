@@ -1,7 +1,4 @@
-package scmAlgorithm.treeScorer;
-
-import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreePair;
+package scmAlgorithm.treeSelector;
 
 import java.util.Set;
 
@@ -10,14 +7,6 @@ import java.util.Set;
  */
 public class BackboneCladeNumberScorer extends TreeScorer<BackboneCladeNumberScorer> {
     // for this score i use the resolution as a ty breaker. because i can!
-    public BackboneCladeNumberScorer(TreeScorer.ConsensusMethods method) {
-        super(method);
-    }
-
-    public BackboneCladeNumberScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
-        super(method,log, cache, syncedCache);
-    }
-
     //OK
     @Override
     public double scoreTreePair(TreePair pair) {
@@ -25,8 +14,7 @@ public class BackboneCladeNumberScorer extends TreeScorer<BackboneCladeNumberSco
         pair.setCommonLeafes(common);
         if (common.size() < 3)
             return Double.NEGATIVE_INFINITY;
-        //todo prune only do not caclulate comple consensus
-        pair.calculateConsensus(getConsensusAlgorithm());
+        pair.pruneToCommonLeafes();
         return (pair.getNumOfBackboneVerticesT1() - pair.getNumOfBackboneTaxa()) + (pair.getNumOfBackboneVerticesT2() - pair.getNumOfBackboneTaxa());
     }
 

@@ -32,6 +32,6 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm implements GreedySC
     }
 
     protected TreePair calculateSuperTree() {
-        return calculateGreedyConsensus(selector,true);
+        return calculateGreedyConsensus(selector, true);
     }
 }

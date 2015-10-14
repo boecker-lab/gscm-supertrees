@@ -18,21 +18,20 @@ import java.util.concurrent.ExecutorService;
  * Created by fleisch on 05.02.15.
  */
 public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
-    protected List<Tree> superTrees;
+    private List<Tree> superTrees;
+    final TreeSelector selector;
 
-    public final TreeSelector selector;
-
-    public AbstractSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
+    AbstractSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
         super(logger, executorService);
         this.selector = selector;
     }
 
-    public AbstractSCMAlgorithm(Logger logger, TreeSelector selector) {
+    AbstractSCMAlgorithm(Logger logger, TreeSelector selector) {
         super(logger);
         this.selector = selector;
     }
 
-    public AbstractSCMAlgorithm(TreeSelector selector) {
+    AbstractSCMAlgorithm(TreeSelector selector) {
         super();
         this.selector = selector;
     }

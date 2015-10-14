@@ -24,7 +24,7 @@ public interface GreedySCMCalculation {
         while ((pair = selector.pollTreePair()) != null) {
             if (progress)
                 progressBar.update(pCount++,trees);
-            Tree superCandidate = pair.getConsensus(selector.getScorer().getConsensusAlgorithm());
+            Tree superCandidate = pair.getConsensus();
             selector.addTree(superCandidate);
             superCandidatePair = pair;
 

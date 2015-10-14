@@ -13,10 +13,10 @@ import java.util.List;
 public interface RandomizedSCMCalculation extends GreedySCMCalculation {
 
     default List<TreePair> calculateRandomizedConsensus(TreeSelector selector, Tree[] inputTrees, int iterations) {
-        List<TreePair> superTrees =  new ArrayList<>(iterations);
+        List<TreePair> superTrees = new ArrayList<>(iterations);
         for (int i = 0; i < iterations; i++) {
             selector.init(inputTrees);
-            superTrees.add(calculateGreedyConsensus(selector,false));
+            superTrees.add(calculateGreedyConsensus(selector, false));
         }
         //sort supertrees
         return superTrees;

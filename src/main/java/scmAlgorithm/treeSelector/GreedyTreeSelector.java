@@ -2,16 +2,20 @@ package scmAlgorithm.treeSelector;
 
 import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
-import scmAlgorithm.treeScorer.TreeScorer;
 
+import java.util.Collection;
 import java.util.PriorityQueue;
 
 /**
- * Created by fleisch on 23.03.15.
+ * Created by fleisch on 14.10.15.
  */
-public class GreedyTreeSelector extends TreeSelector.DefaultGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+public class GreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
 
-    protected GreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
+    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, boolean init, Tree... trees) {
+        super(scorer, method, init, trees);
+    }
+
+    public GreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
         super(scorer, init, trees);
     }
 
@@ -19,20 +23,28 @@ public class GreedyTreeSelector extends TreeSelector.DefaultGreedyTreeSelector<T
         super(scorer, trees);
     }
 
+    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
+        super(scorer, method, trees);
+    }
+
+    public GreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
+        super(scorer, treeCollection);
+    }
+
     @Override
-    protected THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {
+    THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {
         return new THashMap<>(size);
     }
 
 
     @Override
-    protected PriorityQueue<TreePair> getTreePairCollectionInstance(int size) {
+    PriorityQueue<TreePair> getTreePairCollectionInstance(int size) {
         return new PriorityQueue<>(size);
     }
 
     //find best pair (O(nlog(n)))
     @Override
-    protected TreePair getMax() {
+    TreePair getMax() {
         TreePair best = TreePair.MIN_VALUE;
         //iteration in O(n)
         for (PriorityQueue<TreePair> treePairs : treeToPairs.values()) {

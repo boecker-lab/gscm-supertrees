@@ -1,7 +1,4 @@
-package scmAlgorithm.treeScorer;
-
-import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreePair;
+package scmAlgorithm.treeSelector;
 
 import java.util.Set;
 
@@ -9,15 +6,6 @@ import java.util.Set;
  * Created by fleisch on 22.06.15.
  */
 public class UniqueTaxaRateScorer extends TreeScorer<UniqueTaxaRateScorer> {
-
-    public UniqueTaxaRateScorer(ConsensusMethods method) {
-        super(method);
-    }
-
-    public UniqueTaxaRateScorer(ConsensusMethods method, Logger log, boolean cache, boolean syncedCache) {
-        super(method, log, cache, syncedCache);
-    }
-
     @Override
     public double scoreTreePair(TreePair pair) {
         Set<String> common = calculateCommonLeafes(pair.t1, pair.t2);

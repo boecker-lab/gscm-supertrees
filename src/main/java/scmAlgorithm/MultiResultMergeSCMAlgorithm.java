@@ -14,7 +14,7 @@ public interface MultiResultMergeSCMAlgorithm {
     public List<Tree> getResults();
 
     default Tree getMergedSupertree() {
-        List<Tree> superTrees =  getResults();
+        List<Tree> superTrees = getResults();
         LooseConsensus cons = new LooseConsensus();
         cons.setInput(superTrees);
         cons.run();

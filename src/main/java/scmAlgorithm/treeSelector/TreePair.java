@@ -6,7 +6,6 @@ import epos.model.tree.TreeNode;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import scmAlgorithm.treeScorer.TreeScorer;
 
 import java.util.*;
 
@@ -14,15 +13,15 @@ import java.util.*;
  * Created by fleisch on 10.02.15.
  */
 public class TreePair implements Comparable<TreePair> {
-    public final static TreePair MIN_VALUE = new TreePair(); //todo node are in several tree druring the resolution scorer?????????
+    public final static TreePair MIN_VALUE = new TreePair();
 
-    public final Tree t1;
-    public final Tree t2;
+    final Tree t1;
+    final Tree t2;
 
     private Tree t1pruned;
     private Tree t2pruned;
 
-
+    private final SupertreeAlgorithm consensorator;
     private Tree consensus = null;
     private int consensusNumOfTaxa = -1;
 
@@ -31,7 +30,6 @@ public class TreePair implements Comparable<TreePair> {
     public final double score;
     private Set<String> commonLeafes;
 
-//    private boolean first = true;
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
     private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
@@ -39,12 +37,14 @@ public class TreePair implements Comparable<TreePair> {
     private TreePair() {
         t1 = null;
         t2 = null;
+        consensorator = null;
         score = Double.NEGATIVE_INFINITY;
     }
 
-    public TreePair(final Tree t1, final Tree t2, TreeScorer scorer) {
+    public TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final SupertreeAlgorithm consensusAlgorithm) {
         this.t1 = t1;
         this.t2 = t2;
+        consensorator = consensusAlgorithm;
         score = scorer.scoreTreePair(this);
     }
 
@@ -242,21 +242,17 @@ public class TreePair implements Comparable<TreePair> {
         return labelToNode.size();
     }
 
-    public Tree getConsensus(final SupertreeAlgorithm consensorator) {
+    public Tree getConsensus(/*final SupertreeAlgorithm consensorator*/) {
         if (consensus == null)
-            calculateConsensus(consensorator);
+            calculateConsensus();
         return consensus;
     }
 
-    public Tree getConsensus() {
-        return consensus;
-    }
-
-    public void calculateConsensus(final SupertreeAlgorithm consensorator) {
+    public void calculateConsensus(/*final SupertreeAlgorithm consensorator*/) {
         if (commonLeafes.size() > 2) {
             if (singleTaxa == null)
                 pruneToCommonLeafes();
-            consensorator.setInput(Arrays.asList(t1pruned,t2pruned));
+            consensorator.setInput(Arrays.asList(t1pruned, t2pruned));
             consensorator.run();
             consensus = consensorator.getResult();
             mergedBackboneNumOfVertices = consensus.vertexCount();
@@ -316,7 +312,7 @@ public class TreePair implements Comparable<TreePair> {
     public int getNumOfMultiCollisionPoints() {
         int multiCollionsPoints = 0;
         for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            if (singleTaxonSet.size()>2)
+            if (singleTaxonSet.size() > 2)
                 multiCollionsPoints++;
         }
         return multiCollionsPoints;
@@ -354,14 +350,12 @@ public class TreePair implements Comparable<TreePair> {
 
     private class SingleTaxon {
         final TreeNode insertionPoint;
-        //        final Tree subtree;
         final Set<String> siblingLeaves;
         final Set<String> commonSiblingLeaves;
         final int numOfSiblings;
 
         public SingleTaxon(TreeNode insertionPoint, Set<String> siblingLeaves, Set<String> commonSiblingLeaves, int numOfSiblings) {
             this.insertionPoint = insertionPoint;
-//            this.subtree = subtree;
             this.siblingLeaves = siblingLeaves;
             this.numOfSiblings = numOfSiblings;
             this.commonSiblingLeaves = commonSiblingLeaves;
