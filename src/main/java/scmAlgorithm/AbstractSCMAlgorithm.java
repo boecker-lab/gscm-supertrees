@@ -7,6 +7,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
+import utils.CLIProgressBar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,34 +20,20 @@ import java.util.concurrent.ExecutorService;
  */
 public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     private List<Tree> superTrees;
-    final TreeSelector selector;
+    protected int threads;
 
-    AbstractSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
+    public AbstractSCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
-        this.selector = selector;
     }
 
-    AbstractSCMAlgorithm(Logger logger, TreeSelector selector) {
+    public AbstractSCMAlgorithm(Logger logger) {
         super(logger);
-        this.selector = selector;
     }
 
-    AbstractSCMAlgorithm(TreeSelector selector) {
-        super();
-        this.selector = selector;
+    public AbstractSCMAlgorithm() {
     }
-
 
     protected abstract List<TreePair> calculateSuperTrees();
-
-    @Override
-    public void setInput(List<Tree> trees) {
-        setInput(trees.toArray(new Tree[trees.size()]));
-    }
-
-    public void setInput(Tree... trees) {
-        selector.init(trees);
-    }
 
     @Override
     public void run() {
@@ -58,10 +45,36 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
         for (TreePair pair : finalPairs) {
             Tree st = pair.getConsensus();
             TreeUtilsBasic.cleanTree(st);
-            comp.put(st, TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), st.vertexCount()));
+            comp.put(st, TreeUtilsBasic.calculateTreeResolution(pair.getConsensus().getNumTaxa(), st.vertexCount()));
             superTrees.add(st);
         }
         Collections.sort(superTrees, comp);
+
+    }
+
+    protected TreePair calculateGreedyConsensus(TreeSelector selector, final boolean progress) {
+        TreePair superCandidatePair = null;
+        TreePair pair;
+
+        //progress bar stuff
+        CLIProgressBar progressBar = null;
+        if (progress)
+            progressBar = new CLIProgressBar();
+        int pCount = 0;
+
+        selector.init();
+        int trees = selector.getNumberOfTrees() - 1;
+        while ((pair = selector.pollTreePair()) != null) {
+            if (progress)
+                progressBar.update(pCount++, trees);
+            Tree superCandidate = pair.getConsensus();
+            selector.addTree(superCandidate);
+            superCandidatePair = pair;
+
+        }
+
+        selector.shutdown();
+        return superCandidatePair;
     }
 
     @Override
@@ -76,6 +89,10 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
         if (superTrees == null || superTrees.isEmpty())
             return null;
         return superTrees.get(0);
+    }
+
+    public void setThreads(int threads) {
+        this.threads = threads;
     }
 
 

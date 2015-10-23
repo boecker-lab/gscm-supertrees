@@ -5,45 +5,47 @@ package scmAlgorithm.treeSelector;
  */
 
 import epos.model.tree.Tree;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.Random;
 
-public class RandomizedGreedyTreeSelector extends GreedyTreeSelector {
-    private final RandomTreePairPicker selector;
 
-    //todo implementation forn non strict versions???
+//todo change class design... this shit may not work
+public class RandomizedGreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>> {
+    private final RandomTreePairPicker randomPicker;
+
     public RandomizedGreedyTreeSelector(TreeScorer scorer, Tree... trees) {
-        super(scorer, false, trees);
-        selector = new RandomTreePairPicker();
-        init(trees);
+        super(scorer, trees);
+        randomPicker = new RandomTreePairPicker();
     }
 
-    public RandomizedGreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
-        super(scorer, false, trees);
-        selector = new RandomTreePairPicker();
-        if (init)
-            init(trees);
+    public RandomizedGreedyTreeSelector(TreeScorer scorer) {
+        super(scorer);
+        randomPicker = new RandomTreePairPicker();
+    }
+
+    public RandomizedGreedyTreeSelector() {
+        randomPicker = new RandomTreePairPicker();
     }
 
     @Override
     protected boolean addPair(Tree t, TreePair p) {
-        selector.addPair(p);
+        randomPicker.addPair(p);
         return super.addPair(t, p);
     }
 
     @Override
     protected boolean removePair(Tree t, TreePair p) {
-        selector.removePair(p);
+        randomPicker.removePair(p);
         return super.removePair(t, p);
     }
 
     //find best pair (O(nlog(n)))
     @Override
     protected TreePair getMax() {
-        return selector.peekRandomPair();
+        return randomPicker.peekRandomPair();
     }
-
 
     private class RandomTreePairPicker {
         final Random rand = new Random();
@@ -74,7 +76,6 @@ public class RandomizedGreedyTreeSelector extends GreedyTreeSelector {
         private void clearCache() {
             indices = null;
             pairToIndex = null;
-//            pair = null;
         }
 
         private TreePair findNewRandomPair() {
@@ -122,4 +123,11 @@ public class RandomizedGreedyTreeSelector extends GreedyTreeSelector {
         }
     }
 
+    /*public static class RandomizedGreedyTreeSelectorFactory implements TreeSelectorFactory<RandomizedGreedyTreeSelector>{
+        @Override
+        public RandomizedGreedyTreeSelector newTreeSelectorInstance() {
+            return new RandomizedGreedyTreeSelector();
+        }
+    }
+*/
 }

@@ -11,20 +11,28 @@ import java.util.PriorityQueue;
  */
 public class GreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
 
-    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, boolean init, Tree... trees) {
-        super(scorer, method, init, trees);
+    public GreedyTreeSelector(ConsensusMethod method) {
+        super(method);
     }
 
-    public GreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
-        super(scorer, init, trees);
-    }
-
-    public GreedyTreeSelector(TreeScorer scorer, Tree... trees) {
-        super(scorer, trees);
+    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method) {
+        super(scorer, method);
     }
 
     public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
         super(scorer, method, trees);
+    }
+
+    public GreedyTreeSelector() {
+        super();
+    }
+
+    public GreedyTreeSelector(TreeScorer scorer) {
+        super(scorer);
+    }
+
+    public GreedyTreeSelector(TreeScorer scorer, Tree... trees) {
+        super(scorer, trees);
     }
 
     public GreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
@@ -53,5 +61,12 @@ public class GreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree,
                 best = max;
         }
         return best;
+    }
+
+    public static class GreedyTreeSelectorFactory implements TreeSelectorFactory<GreedyTreeSelector>{
+        @Override
+        public GreedyTreeSelector newTreeSelectorInstance() {
+            return new GreedyTreeSelector();
+        }
     }
 }

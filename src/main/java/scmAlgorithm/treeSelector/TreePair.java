@@ -18,20 +18,21 @@ public class TreePair implements Comparable<TreePair> {
     final Tree t1;
     final Tree t2;
 
-    private Tree t1pruned;
-    private Tree t2pruned;
+    Tree t1pruned;
+    Tree t2pruned;
+
+    public double score;
+
+
+    Tree consensus = null;
+    int consensusNumOfTaxa = -1;
+
+    Set<String> commonLeafes;
+    Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
     private final SupertreeAlgorithm consensorator;
-    private Tree consensus = null;
-    private int consensusNumOfTaxa = -1;
-
-    private int mergedBackboneNumOfVertices = -1;
-
-    public final double score;
-    private Set<String> commonLeafes;
-
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
-    private Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
+
 
     //just to create min value
     private TreePair() {
@@ -41,11 +42,21 @@ public class TreePair implements Comparable<TreePair> {
         score = Double.NEGATIVE_INFINITY;
     }
 
-    public TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final SupertreeAlgorithm consensusAlgorithm) {
+    TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final SupertreeAlgorithm consensusAlgorithm) {
+        this(t1,t2,consensusAlgorithm);
+        calculateScore(scorer);
+    }
+
+    TreePair(final Tree t1, final Tree t2, final SupertreeAlgorithm consensusAlgorithm) {
         this.t1 = t1;
         this.t2 = t2;
         consensorator = consensusAlgorithm;
+
+    }
+
+    TreePair calculateScore(TreeScorer scorer){
         score = scorer.scoreTreePair(this);
+        return this;
     }
 
     //unchecked
@@ -255,83 +266,8 @@ public class TreePair implements Comparable<TreePair> {
             consensorator.setInput(Arrays.asList(t1pruned, t2pruned));
             consensorator.run();
             consensus = consensorator.getResult();
-            mergedBackboneNumOfVertices = consensus.vertexCount();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }
-    }
-
-    //unchecked
-    public int getNumOfConsensusTaxa() {
-        return consensusNumOfTaxa;
-    }
-
-    public int getNumOfConsensusVertices() {
-        return consensus.vertexCount();
-    }
-
-    //unchecked
-    public int getNumOfBackboneTaxa() {
-        return commonLeafes.size();
-    }
-
-    //unchecked
-    public int getNumOfConsensusBackboneVertices() {
-        return mergedBackboneNumOfVertices;
-    }
-
-    //unchecked
-    public int getNumOfBackboneVerticesT1() {
-        return t1pruned.vertexCount();
-    }
-
-    //unchecked
-    public int getNumOfBackboneVerticesT2() {
-        return t2pruned.vertexCount();
-    }
-
-    public int getNumOfCollisionPoints() {
-        return commenInsertionPointTaxa.size();
-    }
-
-    public int getNumOfCollisions() {
-        int collsions = 0;
-        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            collsions += singleTaxonSet.size();
-        }
-        return collsions;
-    }
-
-    public int getNumOfCollisionDestructedClades() {
-        int destructedClades = 0;
-        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            destructedClades += (singleTaxonSet.size() - 1);
-        }
-        return destructedClades;
-    }
-
-    public int getNumOfMultiCollisionPoints() {
-        int multiCollionsPoints = 0;
-        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            if (singleTaxonSet.size() > 2)
-                multiCollionsPoints++;
-        }
-        return multiCollionsPoints;
-    }
-
-    public int getNumOfCollisionPointsMultiTieBreak() {
-        int multiCollionsPoints = 0;
-        for (Set<SingleTaxon> singleTaxonSet : commenInsertionPointTaxa.values()) {
-            multiCollionsPoints += 100000 + (singleTaxonSet.size());
-        }
-        return multiCollionsPoints;
-    }
-
-    public Tree getT1pruned() {
-        return t1pruned;
-    }
-
-    public Tree getT2pruned() {
-        return t2pruned;
     }
 
     @Override

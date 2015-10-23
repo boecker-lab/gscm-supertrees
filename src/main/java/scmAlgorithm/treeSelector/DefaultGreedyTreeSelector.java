@@ -1,37 +1,58 @@
 package scmAlgorithm.treeSelector;
 
 import epos.model.tree.Tree;
+import parallel.DefaultIterationCallable;
+import parallel.IterationCallableFactory;
+import parallel.ParallelUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by fleisch on 06.02.15.
  */
 public abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> implements TreeSelector {
+    private int threads = 1;
+    private ExecutorService executor;
+    private TreePairScoringCallableFactory factory;
+
+
     private TreeScorer scorer;
     private ConsensusMethod method;
-    final M treeToPairs;
 
-    DefaultGreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, boolean init, Tree... trees) {
-        this.scorer = scorer;
+    private Tree[] inputTrees;
+    M treeToPairs;
+
+    DefaultGreedyTreeSelector(ConsensusMethod method) {
         this.method = method;
-        this.treeToPairs = getTreeToPairsInstance(trees.length - 1);
-        if (init)
-            init(trees);
     }
 
-    DefaultGreedyTreeSelector(TreeScorer scorer, boolean init, Tree... trees) {
-        this(scorer, ConsensusMethod.STRICT, init, trees);
+
+    DefaultGreedyTreeSelector(TreeScorer scorer, ConsensusMethod method) {
+        this(method);
+        this.scorer = scorer;
+
+    }
+
+    DefaultGreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
+        this(scorer, method);
+        this.inputTrees = trees;
+    }
+
+
+    DefaultGreedyTreeSelector() {
+        this(ConsensusMethod.STRICT);
+    }
+
+    DefaultGreedyTreeSelector(TreeScorer scorer) {
+        this(scorer, ConsensusMethod.STRICT);
     }
 
     DefaultGreedyTreeSelector(TreeScorer scorer, Tree... trees) {
         this(scorer, ConsensusMethod.STRICT, trees);
-    }
-
-    DefaultGreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
-        this(scorer, method, true, trees);
     }
 
     DefaultGreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
@@ -41,38 +62,89 @@ public abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extend
 
     // only one time called
     @Override
-    public void init(Tree[] trees) {
-        Set<Tree> ts = new HashSet<>(trees.length);
-        Collections.addAll(ts, trees);
+    public void init() {
+        Set<Tree> ts = new HashSet<>(inputTrees.length);
+        Collections.addAll(ts, inputTrees);
         scorer.clearCache(ts);
 
-        treeToPairs.clear();
-
-        for (Tree tree : trees) {
-            treeToPairs.put(tree, getTreePairCollectionInstance(trees.length - 1));
+        treeToPairs = getTreeToPairsInstance(inputTrees.length - 1);
+        for (Tree tree : inputTrees) {
+            treeToPairs.put(tree, getTreePairCollectionInstance(inputTrees.length - 1));
         }
 
         long time = System.currentTimeMillis();
 
-        //parralel scoring
-        //todo use nice executaer service
-        System.out.println("Calculating initial scores of tree pairs (multi threaded)...");
-        List<TreePair> pairsToAdd = IntStream.range(0, trees.length - 1).parallel()
-                .boxed()
-                .flatMap(i -> IntStream.range(i + 1, trees.length)
-                        .mapToObj(j -> new TreePair(trees[i], trees[j], scorer, newConsensusCalculatorInstance(method))))
-                .collect(Collectors.toList());
-
-
-        //sequencial adding
-        for (TreePair pair : pairsToAdd) {
-            if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
-                addPair(pair.t1, pair);
-                addPair(pair.t2, pair);
+        if (threads > 1) {
+            try {
+                createPairsParallel(inputTrees);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        } else {
+            createPairsSequencial(inputTrees);
         }
+
+
         double runtime = (double) (System.currentTimeMillis() - time) / 1000d;
         System.out.println("...Done in: " + runtime + "s");
+    }
+
+    @Override
+    public void setInputTrees(Tree... inputTrees) {
+        this.inputTrees = inputTrees;
+//        init();//todo her or not
+    }
+
+    private void createPairsSequencial(Tree[] trees) {
+        for (int i = 0; i < trees.length - 1; i++) {
+            Tree t1 = trees[i];
+            for (int j = i + 1; j < trees.length; j++) {
+                Tree t2 = trees[j];
+                final TreePair pair = new TreePair(t1, t2, scorer, newConsensusCalculatorInstance(method));
+                if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                    addPair(t1, pair);
+                    addPair(t2, pair);
+                }
+            }
+        }
+    }
+
+    private void createPairsParallel(Tree[] trees) throws ExecutionException, InterruptedException {
+        final int size = (trees.length * (trees.length - 1)) / 2;
+        final List<TreePair> pairsToAdd = new ArrayList<>(size);
+
+        //sequential pair creation
+        for (int i = 0; i < trees.length - 1; i++) {
+            Tree t1 = trees[i];
+            for (int j = i + 1; j < trees.length; j++) {
+                Tree t2 = trees[j];
+                pairsToAdd.add(
+                        new TreePair(t1, t2, newConsensusCalculatorInstance(method)));
+            }
+        }
+        // parallel scoring --> we have to score the pairs before adding them into the SORTED data structure
+        scoreAndAddPairsParallel(pairsToAdd);
+    }
+
+    private void scoreAndAddPairsParallel(final List<TreePair> pairsToAdd) throws ExecutionException, InterruptedException {
+        //parralel scoring
+        if (executor == null)
+            executor = Executors.newFixedThreadPool(threads);
+        if (factory == null)
+            factory = new TreePairScoringCallableFactory();
+        List<Future<List<TreePair>>> submittedJobs = ParallelUtils.parallelBucketForEach(executor, factory, pairsToAdd, threads);
+
+        //sequential adding
+        for (Future<List<TreePair>> futures : submittedJobs) {
+            for (TreePair pair : futures.get()) {
+                if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                    addPair(pair.t1, pair);
+                    addPair(pair.t2, pair);
+                }
+            }
+        }
     }
 
     //polls treepair from data structure
@@ -86,29 +158,53 @@ public abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extend
     }
 
     // adds tree and its paires to the data structure (O(2nlog(n)))
-    public boolean addTree(Tree tree) {
-        if (treeToPairs.isEmpty())
-            return false;
-        S pairsOfnuTree = getTreePairCollectionInstance(treeToPairs.size());
+    public boolean addTree(final Tree tree) {
+        if (!treeToPairs.isEmpty()) {
+            try {
+                if (threads > 1) {
+                    addTreeParallel(tree);
+                } else {
+                    addTreeSequencial(tree);
+                }
 
-        //iterate over trees (O(n)) to add to new list and refresh old entries
-        //todo use nice executaer service
-        List<TreePair> pairsToAdd = treeToPairs.keySet().parallelStream()
-                .map(old -> new TreePair(tree, old, scorer, newConsensusCalculatorInstance(method)))
-                .collect(Collectors.toList());
+                if (treeToPairs.get(tree).isEmpty())
+                    throw new IllegalArgumentException("Input tree have insufficient Overlap to calculate a supertree");
 
-        for (TreePair pair : pairsToAdd) {
-            if (pair != null && pair.score > Double.NEGATIVE_INFINITY) { //null pair have no overlap
-                pairsOfnuTree.add(pair);//add to own list O(log(n))
-                addPair(pair.t2, pair);//resfresh O(log(n)
-//                entry.getValue().add(pair); //resfresh O(log(n))
+                return true;
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        if (pairsOfnuTree.isEmpty())
-            throw new IllegalArgumentException("Input tree have insufficient Overlap to calculate a supertree");
+        return false;
+    }
+
+    private void addTreeParallel(final Tree tree) throws ExecutionException, InterruptedException {
+        //iterate over trees (O(n)) to add to new list and refresh old entries
+        List<TreePair> pairsToAdd = new ArrayList<>(treeToPairs.size());
+        for (Tree old : treeToPairs.keySet()) {
+            pairsToAdd.add(
+                    new TreePair(tree, old, newConsensusCalculatorInstance(method)));
+        }
+
         //add new to map O(1)
-        treeToPairs.put(tree, pairsOfnuTree);
-        return true;
+        treeToPairs.put(tree, getTreePairCollectionInstance(treeToPairs.size()));
+
+        //parralel scoring O(n))
+        scoreAndAddPairsParallel(pairsToAdd);
+    }
+
+    private void addTreeSequencial(final Tree tree) {
+        //iterate over trees (O(n)) to add to new list and refresh old entries
+        S nuTreePairs = getTreePairCollectionInstance(treeToPairs.size());
+        for (Tree old : treeToPairs.keySet()) {
+            TreePair pair = new TreePair(tree, old, scorer, newConsensusCalculatorInstance(method));
+            nuTreePairs.add(pair);
+            addPair(old, pair);
+        }
+        //add new to map O(1)
+        treeToPairs.put(tree, nuTreePairs);
     }
 
 
@@ -142,10 +238,27 @@ public abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extend
         this.scorer = scorer;
     }
 
-    //abstract classes
-    abstract M getTreeToPairsInstance(int size);
+    public ConsensusMethod getMethod() {
+        return method;
+    }
 
-    abstract S getTreePairCollectionInstance(int size);
+    @Override
+    public void setThreads(int threads) {
+        this.threads = threads;
+    }
+
+    @Override
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
+    @Override
+    public void shutdown() {
+        if (executor != null) {
+            executor.shutdown();
+        }
+    }
+
 
     boolean addPair(Tree t, TreePair p) {
         return treeToPairs.get(t).add(p);
@@ -157,9 +270,33 @@ public abstract class DefaultGreedyTreeSelector<M extends Map<Tree, S>, S extend
 
     @Override
     public int getNumberOfTrees() {
-        return treeToPairs.size();
+        return inputTrees.length;
     }
 
+    //abstract classes
+    abstract M getTreeToPairsInstance(int size);
+
+    abstract S getTreePairCollectionInstance(int size);
+
     abstract TreePair getMax();
+
+
+    private class TreePairScoringCallable extends DefaultIterationCallable<TreePair, TreePair> {
+        protected TreePairScoringCallable(List<TreePair> jobs) {
+            super(jobs);
+        }
+        @Override
+        public TreePair doJob(TreePair pair) {
+            return pair.calculateScore(scorer);
+        }
+
+    }
+
+    private class TreePairScoringCallableFactory implements IterationCallableFactory<TreePairScoringCallable, TreePair> {
+        @Override
+        public TreePairScoringCallable newIterationCallable(List<TreePair> list) {
+            return new TreePairScoringCallable(list);
+        }
+    }
 }
 

@@ -8,10 +8,8 @@ import java.util.List;
 /**
  * Created by fleisch on 16.06.15.
  */
-public interface MultiResultMergeSCMAlgorithm {
-    static final boolean DEBUG = true;
-
-    public List<Tree> getResults();
+public interface MergedMultipleSCMResults {
+    List<Tree> getResults();
 
     default Tree getMergedSupertree() {
         List<Tree> superTrees = getResults();
