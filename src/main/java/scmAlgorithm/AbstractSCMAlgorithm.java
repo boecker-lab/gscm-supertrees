@@ -31,6 +31,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     }
 
     public AbstractSCMAlgorithm() {
+        super();
     }
 
     protected abstract List<TreePair> calculateSuperTrees();
@@ -70,10 +71,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
             Tree superCandidate = pair.getConsensus();
             selector.addTree(superCandidate);
             superCandidatePair = pair;
-
         }
-
-        selector.shutdown();
         return superCandidatePair;
     }
 

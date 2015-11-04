@@ -47,7 +47,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         return new ArrayList<>(Arrays.asList(calculateSuperTree()));
     }
 
-    protected TreePair calculateSuperTree() {
+    TreePair calculateSuperTree() {
         return calculateGreedyConsensus(selector, true);
     }
 }

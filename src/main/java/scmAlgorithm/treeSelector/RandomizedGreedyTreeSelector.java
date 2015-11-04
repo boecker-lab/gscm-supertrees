@@ -8,126 +8,130 @@ import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
-import java.util.Random;
+import java.util.*;
 
 
-//todo change class design... this shit may not work
-public class RandomizedGreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>> {
-    private final RandomTreePairPicker randomPicker;
+public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
+    private static final RandomizedGreedyTreeSelectorFactory FACTORY = new RandomizedGreedyTreeSelectorFactory();
+    private static final Random RAND = new Random();
 
-    public RandomizedGreedyTreeSelector(TreeScorer scorer, Tree... trees) {
-        super(scorer, trees);
-        randomPicker = new RandomTreePairPicker();
-    }
+    private double sumOfScores = 0d;
+    private THashSet<TreePair> pairs = new THashSet<>();
 
-    public RandomizedGreedyTreeSelector(TreeScorer scorer) {
-        super(scorer);
-        randomPicker = new RandomTreePairPicker();
+    private double[] indices;
+    private TreePair[] pairToIndex;
+
+
+    public RandomizedGreedyTreeSelector(ConsensusMethod method) {
+        super(method);
     }
 
     public RandomizedGreedyTreeSelector() {
-        randomPicker = new RandomTreePairPicker();
+    }
+
+    // only one time called
+    @Override
+    public void init() {
+        super.init();
+        pairs = new THashSet<>(inputTrees.length * (inputTrees.length-1)/2);
     }
 
     @Override
-    protected boolean addPair(Tree t, TreePair p) {
-        randomPicker.addPair(p);
-        return super.addPair(t, p);
+    TreePair getMax() {
+        return peekRandomPair();
     }
 
     @Override
-    protected boolean removePair(Tree t, TreePair p) {
-        randomPicker.removePair(p);
-        return super.removePair(t, p);
+    void addTreePair(Tree t, TreePair p) {
+        super.addTreePair(t,p);
+        addTreePairToRandomStructure(p);
     }
 
-    //find best pair (O(nlog(n)))
     @Override
-    protected TreePair getMax() {
-        return randomPicker.peekRandomPair();
+    THashMap<Tree, THashSet<TreePair>> getTreeToPairsInstance(int size) {
+        return new THashMap<>(size);
     }
 
-    private class RandomTreePairPicker {
-        final Random rand = new Random();
-        double sumOfScores = 0d;
-        final THashSet<TreePair> pairs = new THashSet<>();
+    @Override
+    THashSet<TreePair> getTreePairCollectionInstance(int size) {
+        return new THashSet<>(size);
+    }
 
-        double[] indices;
-        TreePair[] pairToIndex;
-//        TreePair pair = null;
-
-
-        void addPair(TreePair pair) {
-            if (pairs.add(pair)) {
-                sumOfScores += pair.score;
-                clearCache();
-            }
-
+    private void addTreePairToRandomStructure(TreePair pair) {
+        if (pairs.add(pair)) {
+            sumOfScores += pair.score;
+            clearCache();
         }
+    }
 
-        TreePair removePair(TreePair pair) {
-            if (pairs.remove(pair)) {
-                sumOfScores -= pair.score;
-                clearCache();
-            }
-            return pair;
+    @Override
+    void removeTreePair(TreePair pair) {
+        super.removeTreePair(pair);
+        removeTreePairFromRandomStructure(pair);
+    }
+
+    private void removeTreePairFromRandomStructure(TreePair pair) {
+        if (pairs.remove(pair)) {
+            sumOfScores -= pair.score;
+            clearCache();
         }
-
-        private void clearCache() {
-            indices = null;
-            pairToIndex = null;
-        }
-
-        private TreePair findNewRandomPair() {
-            if (indices == null || pairToIndex == null) {
-                indices = new double[pairs.size()];
-                pairToIndex = new TreePair[pairs.size()];
-                int index = 0;
-                double pre = 0d;
-                for (TreePair pair : pairs) {
-                    pairToIndex[index] = pair;
-                    //this is for compatibility with negative scores
-                    if (sumOfScores > 0d) {
-                        pre += pair.score / sumOfScores;
-                    } else {
-                        pre += 1d - (pair.score / sumOfScores);
-                    }
-                    indices[index] = pre;
-                    index++;
-                }
-            }
+    }
 
 
-            double r = rand.nextDouble();
-            int start = 0;
-            int end = indices.length - 1;
-            TreePair pair = pairToIndex[0];
+    private void clearCache() {
+        indices = null;
+        pairToIndex = null;
+    }
 
-            while (start != end) {
 
-                int index = start + (((end - start)) / 2);
-
-                if (r > indices[index]) {
-                    start = index + 1;
-                    pair = pairToIndex[start];
+    private TreePair peekRandomPair() {
+        if (indices == null || pairToIndex == null) {
+            indices = new double[pairs.size()];
+            pairToIndex = new TreePair[pairs.size()];
+            int index = 0;
+            double pre = 0d;
+            for (TreePair pair : pairs) {
+                pairToIndex[index] = pair;
+                //this is for compatibility with negative scores
+                if (sumOfScores > 0d) {
+                    pre += pair.score / sumOfScores;
                 } else {
-                    end = index;
-                    pair = pairToIndex[end];
+                    pre += 1d - (pair.score / sumOfScores);
                 }
+                indices[index] = pre;
+                index++;
             }
-            return pair;
         }
 
-        TreePair peekRandomPair() {
-            return findNewRandomPair();
+
+        double r = RAND.nextDouble();
+        int start = 0;
+        int end = indices.length - 1;
+        TreePair pair = pairToIndex[0];
+
+        while (start != end) {
+
+            int index = start + (((end - start)) / 2);
+
+            if (r > indices[index]) {
+                start = index + 1;
+                pair = pairToIndex[start];
+            } else {
+                end = index;
+                pair = pairToIndex[end];
+            }
         }
+        return pair;
     }
 
-    /*public static class RandomizedGreedyTreeSelectorFactory implements TreeSelectorFactory<RandomizedGreedyTreeSelector>{
+    public static RandomizedGreedyTreeSelectorFactory getFactory() {
+        return FACTORY;
+    }
+
+    private static class RandomizedGreedyTreeSelectorFactory implements TreeSelectorFactory<RandomizedGreedyTreeSelector>{
         @Override
         public RandomizedGreedyTreeSelector newTreeSelectorInstance() {
             return new RandomizedGreedyTreeSelector();
         }
     }
-*/
 }

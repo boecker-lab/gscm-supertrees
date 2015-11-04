@@ -18,13 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class TreeScorer<T extends TreeScorer> {
     final Map<Tree, THashSet<String>> treeToTaxa;
     final Set<String> taxaCache;
+    public final boolean synced;
 
     public TreeScorer() {
         this(true);
     }
 
     public TreeScorer(boolean syncedCache) {
-        if (syncedCache) {
+        synced = syncedCache;
+        if (synced) {
             treeToTaxa = new ConcurrentHashMap<>();
             taxaCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
         } else {
@@ -633,4 +635,5 @@ public abstract class TreeScorer<T extends TreeScorer> {
             return -((tax1 - common.size()) / tax1 + (tax2 - common.size()) / tax2);
         }
     }
+
 }

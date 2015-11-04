@@ -5,6 +5,7 @@ import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import org.junit.Test;
+import scmAlgorithm.treeSelector.BasicTreeSelector;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreeScorer;
 import scmAlgorithm.treeSelector.TreeSelector;
@@ -128,7 +129,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(s);
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector();
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -154,7 +157,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), TreeSelector.ConsensusMethod.ADAMS, inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.ADAMS);
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -172,7 +177,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), TreeSelector.ConsensusMethod.SEMI_STRICT, inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.SEMI_STRICT);
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -190,7 +197,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.CollisionLostCladesNumberScorer(), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector();
+        selector.setScorer(new TreeScorer.CollisionNumberScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -210,7 +219,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), TreeSelector.ConsensusMethod.ADAMS, inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.ADAMS);
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -228,7 +239,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), TreeSelector.ConsensusMethod.SEMI_STRICT, inputTrees);
+        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.SEMI_STRICT);
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
@@ -245,7 +258,9 @@ public class GreedySCMAlgorithmTest {
         File inputFile = new File(getClass().getResource("/" + newickInput1000_NORoot).getFile());
         long t = System.currentTimeMillis();
         Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.OverlapScorer(), inputTrees);
+        TreeSelector selector = new GreedyTreeSelector();
+        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setInputTrees(inputTrees);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
         algo.run();
         Tree supertree = algo.getResult();
@@ -345,7 +360,9 @@ public class GreedySCMAlgorithmTest {
 */
 
 
-        TreeSelector selector = new GreedyTreeSelector(new TreeScorer.ConsensusResolutionScorer(), inputTrees);
+        BasicTreeSelector selector = new GreedyTreeSelector();
+        selector.setScorer(new TreeScorer.ConsensusResolutionScorer());
+        selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());
         selector.setThreads(1);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff

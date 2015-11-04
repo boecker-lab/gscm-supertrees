@@ -3,47 +3,25 @@ package scmAlgorithm.treeSelector;
 import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
 
-import java.util.Collection;
 import java.util.PriorityQueue;
 
 /**
  * Created by fleisch on 14.10.15.
  */
-public class GreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+    private static final GreedyTreeSelectorFactory FACTORY = new GreedyTreeSelectorFactory();
 
     public GreedyTreeSelector(ConsensusMethod method) {
         super(method);
     }
 
-    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method) {
-        super(scorer, method);
-    }
-
-    public GreedyTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
-        super(scorer, method, trees);
-    }
-
     public GreedyTreeSelector() {
-        super();
-    }
-
-    public GreedyTreeSelector(TreeScorer scorer) {
-        super(scorer);
-    }
-
-    public GreedyTreeSelector(TreeScorer scorer, Tree... trees) {
-        super(scorer, trees);
-    }
-
-    public GreedyTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
-        super(scorer, treeCollection);
     }
 
     @Override
     THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {
         return new THashMap<>(size);
     }
-
 
     @Override
     PriorityQueue<TreePair> getTreePairCollectionInstance(int size) {
@@ -63,7 +41,12 @@ public class GreedyTreeSelector extends DefaultGreedyTreeSelector<THashMap<Tree,
         return best;
     }
 
-    public static class GreedyTreeSelectorFactory implements TreeSelectorFactory<GreedyTreeSelector>{
+
+    public static GreedyTreeSelectorFactory getFactory() {
+        return FACTORY;
+    }
+
+    private static class GreedyTreeSelectorFactory implements TreeSelectorFactory<GreedyTreeSelector>{
         @Override
         public GreedyTreeSelector newTreeSelectorInstance() {
             return new GreedyTreeSelector();

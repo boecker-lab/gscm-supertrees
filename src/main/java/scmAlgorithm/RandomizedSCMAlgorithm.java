@@ -1,142 +1,112 @@
 package scmAlgorithm;
 
 import epos.model.tree.Tree;
-import org.apache.log4j.Logger;
-import parallel.DefaultIterationCallable;
-import parallel.IterationCallableFactory;
-import scmAlgorithm.treeSelector.*;
+import parallel.ParallelUtils;
+import scmAlgorithm.treeSelector.GreedyTreeSelector;
+import scmAlgorithm.treeSelector.RandomizedGreedyTreeSelector;
+import scmAlgorithm.treeSelector.TreePair;
+import scmAlgorithm.treeSelector.TreeScorer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created by fleisch on 24.03.15.
  */
-public class RandomizedSCMAlgorithm extends AbstractSCMAlgorithm implements MergedMultipleSCMResults {
-    private final Tree[] inputTrees;
-    private GreedySCMAlgorithm nonRandomResult;
-    private TreeScorer[] scorerArray = null;
-    private final int iterations;
-    private boolean multipleRandomizedRuns = false;
+public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm {
+    private int iterations = 0;
+
+    public RandomizedSCMAlgorithm(TreeScorer... scorer) {
+        this(null, scorer);
+    }
 
     public RandomizedSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
-        super(new RandomizedGreedyTreeSelector());
-        nonRandomResult = new GreedySCMAlgorithm(new GreedyTreeSelector());
-        this.inputTrees = trees;
-        this.scorerArray = scorer;
-        this.iterations = trees.length * trees.length;
+        super(trees, scorer);
+        iterations = defaultIterations();
+    }
+
+    public RandomizedSCMAlgorithm(int numberOfIterations, TreeScorer... scorer) {
+        this(numberOfIterations, null, scorer);
     }
 
     public RandomizedSCMAlgorithm(int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
-        super(new RandomizedGreedyTreeSelector());
-        nonRandomResult = new GreedySCMAlgorithm(new GreedyTreeSelector());
-        this.inputTrees = trees;
-        this.scorerArray = scorer;
+        super(trees, scorer);
         this.iterations = numberOfIterations;
     }
 
-    public RandomizedSCMAlgorithm(boolean multipleRandomizedRuns, int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
-        super(new RandomizedGreedyTreeSelector());
-        nonRandomResult = new GreedySCMAlgorithm(new GreedyTreeSelector());
-        this.inputTrees = trees;
-        this.scorerArray = scorer;
-        this.iterations = numberOfIterations;
-        this.multipleRandomizedRuns = multipleRandomizedRuns;
-    }
-
-    public RandomizedSCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
-        super(logger, executorService, selector);
-        this.inputTrees = inputTrees;
-        this.iterations = iterations;
-        this.scorerArray = scorer;
-    }
-
-    public RandomizedSCMAlgorithm(Logger logger, TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
-        super(logger, selector);
-        this.inputTrees = inputTrees;
-        this.iterations = iterations;
-        this.scorerArray = scorer;
-    }
-
-    public RandomizedSCMAlgorithm(TreeSelector selector, Tree[] inputTrees, int iterations, TreeScorer... scorer) {
-        super(selector);
-        this.inputTrees = inputTrees;
-        this.iterations = iterations;
-        this.scorerArray = scorer;
+    private int defaultIterations() {
+        return inputTrees.length * inputTrees.length;
     }
 
     @Override
-    protected List<TreePair> calculateSuperTrees() {
-        //todo parallelize
-        List<TreePair> superTrees = new ArrayList<>((iterations + 1) * scorerArray.length);
+    protected int numOfJobs() {
+        return (iterations + 1) * scorerArray.length;
+    }
 
-        //some additional, optional non random results with different scorings.
-        for (int i = 0; i < scorerArray.length; i++) {
-            TreeScorer scorer = scorerArray[i];
-            nonRandomResult.selector.setScorer(scorer);
-            superTrees.add(nonRandomResult.calculateSuperTree());
+    protected List<TreePair> calculateSequencial() {
+        final GreedyTreeSelector nonRandomResultSelector = new GreedyTreeSelector();
+        nonRandomResultSelector.setInputTrees(inputTrees);
+        final RandomizedGreedyTreeSelector randomResultSelector = new RandomizedGreedyTreeSelector();
+        randomResultSelector.setInputTrees(inputTrees);
 
-            if (multipleRandomizedRuns  ||  i < 1) {
-                selector.setScorer(scorer);
-                superTrees.addAll(calculateRandomizedConsensusSequencial());
+        List<TreePair> superTrees = new ArrayList<>();
+        for (TreeScorer treeScorer : scorerArray) {
+            List<TreePair> scms = new ArrayList<>(iterations + 1);
+
+            nonRandomResultSelector.setScorer(treeScorer);
+            scms.add((calculateGreedyConsensus(nonRandomResultSelector, false)));
+            randomResultSelector.setScorer(treeScorer);
+            for (int i = 0; i < iterations; i++) {
+                scms.add(calculateGreedyConsensus(randomResultSelector, false));
             }
+            superTrees.addAll(scms);
         }
+
         return superTrees;
     }
 
-    private List<TreePair> calculateRandomizedConsensusSequencial() {
-        List<TreePair> superTrees = new ArrayList<>(iterations);
+    protected List<TreePair> calculateParallel() {
+        List<TreePair> superTrees = new ArrayList<>(numOfJobs());
+        List<Future<List<TreePair>>> futurList = new LinkedList<>();
+
+        //todo maybe bucked parallelism
+        //calculate random results
+        GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeSelector.getFactory(), inputTrees);
         for (int i = 0; i < iterations; i++) {
-            superTrees.add(calculateGreedyConsensus(selector, false));
+            futurList.addAll(
+                    ParallelUtils.parallelForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
         }
-        //sort supertrees
-        return superTrees;
+
+        //calculate nonRandomResults
+        GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeSelector.getFactory(), inputTrees);
+        futurList.addAll(
+                ParallelUtils.parallelForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
+
+        //collect results
+        try {
+            for (Future<List<TreePair>> future : futurList) {
+                superTrees.addAll(future.get());
+            }
+            return superTrees;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private List<TreePair> calculateRandomizedConsensusParallel() {
-        List<TreePair> superTrees = new ArrayList<>(iterations);
-        List<TreeSelector> jobs = new ArrayList<>(iterations);
-
-        for (int i = 0; i < iterations; i++) {
-            jobs.add(factory.newTreeSelectorInstance());
-            selector.init(inputTrees);
-            superTrees.add(calculateGreedyConsensus(selector, false));
-        }
-        //sort supertrees
-        return superTrees;
+    public void setInput(boolean defaultNumOfIterations, Tree... trees) {
+        if (defaultNumOfIterations)
+            iterations = defaultIterations();
+        setInput(trees);
     }
 
-    class GSCMCallable extends DefaultIterationCallable<RandomizedGreedyTreeSelector, TreePair> {
-        final TreeScorer scorer;
-        final Tree[] inputTrees;
-
-        public GSCMCallable(List<RandomizedGreedyTreeSelector> jobs, TreeScorer scorer, Tree[] inputTrees) {
-            super(jobs);
-            this.scorer = scorer;
-            this.inputTrees = inputTrees;
-        }
-
-        @Override
-        public TreePair doJob(RandomizedGreedyTreeSelector selector) {
-            selector.setScorer(scorer);
-            selector.setInputTrees(inputTrees);
-            return calculateGreedyConsensus(selector, false);
-        }
-    }
-
-    class GSCMCallableFactory implements IterationCallableFactory<GSCMCallable, RandomizedGreedyTreeSelector> {
-        final TreeScorer scorer;
-        final Tree[] inputTrees;
-
-        public GSCMCallableFactory(TreeScorer scorer, Tree[] inputTrees) {
-            this.scorer = scorer;
-            this.inputTrees = inputTrees;
-        }
-
-        @Override
-        public GSCMCallable newIterationCallable(List<RandomizedGreedyTreeSelector> list) {
-            return new GSCMCallable(list,scorer,inputTrees);
-        }
+    public void setNumberOfIterations(int iterations) {
+        this.iterations = iterations;
     }
 }

@@ -14,25 +14,15 @@ import java.util.concurrent.ExecutorService;
 public interface TreeSelector {
     enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}
 
+    void init();
     TreePair pollTreePair();
-
     boolean addTree(Tree tree);
 
+    void setInputTrees(Tree[] trees);
     int getNumberOfTrees();
 
-    void init();
-    void setInputTrees(Tree[] trees);
-
     TreeScorer getScorer();
-
     void setScorer(TreeScorer scorer);
-
-    void setThreads(int threads);
-
-    void setExecutor(ExecutorService executor);
-
-    void shutdown();
-
 
     default SupertreeAlgorithm newConsensusCalculatorInstance(final ConsensusMethod METHOD) {
         SupertreeAlgorithm a;
