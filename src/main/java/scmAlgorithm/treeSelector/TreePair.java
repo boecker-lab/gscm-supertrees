@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * Created by fleisch on 10.02.15.
  */
-public class TreePair implements Comparable<TreePair> {
+class TreePair implements Comparable<TreePair> {
     public final static TreePair MIN_VALUE = new TreePair();
 
     final Tree t1;
@@ -267,6 +267,8 @@ public class TreePair implements Comparable<TreePair> {
             consensorator.run();
             consensus = consensorator.getResult();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
+        }else{
+            System.err.println("Trees have nothing in common!");
         }
     }
 

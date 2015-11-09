@@ -14,8 +14,10 @@ import java.util.concurrent.ExecutorService;
 public interface TreeSelector {
     enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}
 
+    void init(boolean clearScorer);
     void init();
-    TreePair pollTreePair();
+
+    Tree pollTreePair();
     boolean addTree(Tree tree);
 
     void setInputTrees(Tree[] trees);

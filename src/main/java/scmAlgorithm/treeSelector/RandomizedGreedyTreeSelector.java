@@ -16,7 +16,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     private static final Random RAND = new Random();
 
     private double sumOfScores = 0d;
-    private THashSet<TreePair> pairs = new THashSet<>();
+    private THashSet<TreePair> pairs;
 
     private double[] indices;
     private TreePair[] pairToIndex;
@@ -29,27 +29,16 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     public RandomizedGreedyTreeSelector() {
     }
 
-    // only one time called
-    @Override
-    public void init() {
-        super.init();
-        pairs = new THashSet<>(inputTrees.length * (inputTrees.length-1)/2);
-    }
-
     @Override
     TreePair getMax() {
+        if (treeToPairs.isEmpty())
+            return TreePair.MIN_VALUE;
         return peekRandomPair();
     }
 
     @Override
-    void addTreePair(Tree t, TreePair p) {
-        super.addTreePair(t,p);
-        addTreePairToRandomStructure(p);
-    }
-
-    @Override
     THashMap<Tree, THashSet<TreePair>> getTreeToPairsInstance(int size) {
-        return new THashMap<>(size);
+        return new THashMap<Tree, THashSet<TreePair>>(size);
     }
 
     @Override
@@ -65,12 +54,19 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     }
 
     @Override
-    void removeTreePair(TreePair pair) {
-        super.removeTreePair(pair);
-        removeTreePairFromRandomStructure(pair);
+    void addTreePair(Tree t, TreePair p) {
+        super.addTreePair(t,p);
+        addTreePairToRandomStructure(p);
     }
 
-    private void removeTreePairFromRandomStructure(TreePair pair) {
+
+    @Override
+    void removePair(Tree tree,TreePair pair) {
+        super.removePair(tree, pair);
+        removePairFromRandomStructure(pair);
+    }
+
+    private void removePairFromRandomStructure(TreePair pair) {
         if (pairs.remove(pair)) {
             sumOfScores -= pair.score;
             clearCache();
@@ -84,29 +80,32 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     }
 
 
-    private TreePair peekRandomPair() {
-        if (indices == null || pairToIndex == null) {
-            indices = new double[pairs.size()];
-            pairToIndex = new TreePair[pairs.size()];
-            int index = 0;
-            double pre = 0d;
-            for (TreePair pair : pairs) {
-                pairToIndex[index] = pair;
-                //this is for compatibility with negative scores
-                if (sumOfScores > 0d) {
-                    pre += pair.score / sumOfScores;
-                } else {
-                    pre += 1d - (pair.score / sumOfScores);
-                }
-                indices[index] = pre;
-                index++;
+    private void initRandomStructures(){
+        indices = new double[pairs.size()];
+        pairToIndex = new TreePair[pairs.size()];//todo, do fany index stuff insteadd of this ugly set thinky
+        int index = 0;
+        double pre = 0d;
+        for (TreePair pair : pairs) {
+            pairToIndex[index] = pair;
+            //this is for compatibility with negative scores
+            if (sumOfScores > 0d) {
+                pre += pair.score / sumOfScores;
+            } else {
+                pre += 1d - (pair.score / sumOfScores);
             }
+            indices[index] = pre;
+            index++;
         }
+    }
 
-
+    private TreePair peekRandomPair() {
+        if (indices == null || pairToIndex == null){
+            initRandomStructures();
+        }
         double r = RAND.nextDouble();
         int start = 0;
         int end = indices.length - 1;
+
         TreePair pair = pairToIndex[0];
 
         while (start != end) {
@@ -121,7 +120,14 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
                 pair = pairToIndex[end];
             }
         }
+
         return pair;
+    }
+
+    @Override
+    public void setInputTrees(Tree... inputTrees) {
+        super.setInputTrees(inputTrees);
+        pairs = new THashSet<>(inputTrees.length * (inputTrees.length-1)/2);
     }
 
     public static RandomizedGreedyTreeSelectorFactory getFactory() {

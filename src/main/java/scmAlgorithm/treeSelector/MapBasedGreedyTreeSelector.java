@@ -21,22 +21,23 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
         super();
     }
 
+
+    @Override
+    public void init(){
+        init(true);
+    }
     // only one time called
     @Override
-    public void init() {
-        clearScorer();
+    public void init(boolean clearScorer) {
+        if (clearScorer)
+            clearScorer();
 
         treeToPairs = getTreeToPairsInstance(inputTrees.length - 1);
         for (Tree tree : inputTrees) {
             treeToPairs.put(tree, getTreePairCollectionInstance(inputTrees.length - 1));
         }
 
-        long time = System.currentTimeMillis();
-
         createPairs();
-
-        double runtime = (double) (System.currentTimeMillis() - time) / 1000d;
-        System.out.println("...Done in: " + runtime + "s");
     }
 
     @Override

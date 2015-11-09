@@ -55,7 +55,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
 
-    private THashSet<String> getLeafLabels(Tree tree1) {
+    THashSet<String> getLeafLabels(Tree tree1) {
         THashSet<String> taxonSet = new THashSet<>(tree1.vertexCount());
         for (TreeNode taxon : tree1.getRoot().depthFirstIterator()) {
             if (taxon.isLeaf()) {
@@ -82,7 +82,6 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
     public void clearCache(Set<Tree> keep) {
         taxaCache.clear();
-
         Iterator<Tree> it = treeToTaxa.keySet().iterator();
         while (it.hasNext()) {
             Tree next = it.next();
@@ -160,6 +159,110 @@ public abstract class TreeScorer<T extends TreeScorer> {
             multiCollionsPoints += 100000 + (singleTaxonSet.size());
         }
         return multiCollionsPoints;
+    }
+
+    //#################### Scorer INIT ##################
+    public static TreeScorer newOverlapScorer(boolean synced){
+        return new OverlapScorer(synced);
+    }
+
+    public static TreeScorer newUniqueTaxonScorer(boolean synced){
+        return new UniqueTaxaNumberScorer(synced);
+    }
+
+    public static TreeScorer newTaxonScorer(boolean synced){
+        return new ConsensusTaxonNumberScorer(synced);
+    }
+
+    public static TreeScorer newResolutionScorer(boolean synced){
+        return new ConsensusResolutionScorer(synced);
+    }
+
+    public static TreeScorer newCollisionScorer(boolean synced){
+        return new CollisionNumberScorer(synced);
+    }
+
+
+
+    public static TreeScorer[] CompleteScorerCombo(boolean synced) {
+        return new TreeScorer[]{
+                new TreeScorer.OverlapScorer(synced),
+                new TreeScorer.CollisionPointNumberScorer(synced),
+                new TreeScorer.CollisionLostCladesNumberScorer(synced),
+                new TreeScorer.CollisionNumberScorer(synced),
+                new TreeScorer.BackboneSizeScorer(synced),
+                new TreeScorer.BackboneCladeNumberScorer(synced),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+                new TreeScorer.UniqueTaxaRateScorer(synced),
+                new TreeScorer.ConsensusBackboneCladeNumberScorer(synced),
+                new TreeScorer.ConsensusBackboneResolutionScorer(synced),
+                new TreeScorer.ConsensusBackboneSizeScorer(synced),
+                new TreeScorer.ConsensusCladeNumberScorer(synced),
+                new TreeScorer.ConsensusResolutionScorer(synced)
+        };
+    }
+
+    public static TreeScorer[] newFastScorerCombo(boolean synced){
+        return new TreeScorer[]{
+                newOverlapScorer(synced),
+                newUniqueTaxonScorer(synced),
+                newTaxonScorer(synced)
+        };
+    }
+
+    public static TreeScorer[] newGreenCombi(boolean synced) {
+        return new TreeScorer[]{
+                new TreeScorer.OverlapScorer(synced),//is automatic included
+                new TreeScorer.CollisionPointNumberScorer(synced),
+//            new CollisionLostCladesNumberScorer(),
+                new TreeScorer.CollisionNumberScorer(synced),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+                new TreeScorer.UniqueTaxaRateScorer(synced),
+//            new ConsensusBackboneCladeNumberScorer(),
+                new TreeScorer.ConsensusBackboneResolutionScorer(synced),
+//            new ConsensusBackboneSizeScorer(),
+                new TreeScorer.ConsensusCladeNumberScorer(synced),
+                new TreeScorer.ConsensusResolutionScorer(synced)
+        };
+    }
+
+
+    public static TreeScorer[] newBest4Combo(boolean synced) {
+        return new TreeScorer[]{
+//            new OverlapScorer(),//is automatic included
+                new TreeScorer.CollisionPointNumberScorer(synced),
+//            new CollisionLostCladesNumberScorer(),
+//            new CollisionNumberScorer(),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+//            new UniqueTaxaRateScorer(),
+//            new ConsensusBackboneCladeNumberScorer(),
+//            new ConsensusBackboneResolutionScorer(),
+//            new ConsensusBackboneSizeScorer(),
+                new TreeScorer.ConsensusCladeNumberScorer(synced),
+                new TreeScorer.ConsensusResolutionScorer(synced)
+        };
+    }
+
+    public static TreeScorer[] newMinimalCombo(boolean synced) {
+        return new TreeScorer[]{
+                new TreeScorer.OverlapScorer(synced),//is automatic included
+                new TreeScorer.CollisionPointNumberScorer(synced),
+//            new CollisionLostCladesNumberScorer(),
+//            new CollisionNumberScorer(),
+//            new BackboneSizeScorer(),
+//            new BackboneCladeNumberScorer(),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+//            new UniqueTaxaRateScorer(),
+//            new ConsensusBackboneCladeNumberScorer(),
+                new TreeScorer.ConsensusBackboneResolutionScorer(synced),
+//            new ConsensusBackboneSizeScorer(),
+//            new ConsensusCladeNumberScorer(),
+                new TreeScorer.ConsensusResolutionScorer(synced)
+        };
     }
 
 
@@ -436,6 +539,27 @@ public abstract class TreeScorer<T extends TreeScorer> {
             pair.calculateConsensus();
             //        return ((pair.getNumOfConsensusVertices() - pair.getNumOfConsensusTaxa()) * 100) + TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices()) ;
             return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
+        }
+    }
+
+    public static class ConsensusTaxonNumberScorer extends TreeScorer<ConsensusTaxonNumberScorer> {
+        public ConsensusTaxonNumberScorer() {
+            super();
+        }
+
+        public ConsensusTaxonNumberScorer(boolean syncedCache) {
+            super(syncedCache);
+        }
+
+        // for this score i use the resolution as a ty breaker. because i can!
+        @Override
+        public double scoreTreePair(TreePair pair) {
+            Set<String> common = calculateCommonLeafes(pair.t1, pair.t2);
+            pair.setCommonLeafes(common);
+            if (common.size() < 3)
+                return Double.NEGATIVE_INFINITY;
+
+            return getLeafLabels(pair.t1).size() + getLeafLabels(pair.t2).size() - common.size();
         }
     }
 

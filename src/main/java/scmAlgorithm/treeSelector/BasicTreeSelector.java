@@ -175,8 +175,10 @@ public abstract class BasicTreeSelector implements TreeSelector {
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
             TreePair pair = new TreePair(tree, old, scorer, newConsensusCalculatorInstance());
-            addTreePair(tree, pair);
-            addTreePair(old, pair);
+            if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                addTreePair(tree, pair);
+                addTreePair(old, pair);
+            }
         }
 
         /*if (treeToPairs.get(tree) == null || treeToPairs.get(tree).isEmpty())
@@ -186,13 +188,13 @@ public abstract class BasicTreeSelector implements TreeSelector {
 
 
     //polls treepair from data structure
-    public TreePair pollTreePair() {
+    public Tree pollTreePair() {
         TreePair tp = getMax();
         if (tp == TreePair.MIN_VALUE) {
             return null;
         } else {
             removeTreePair(tp);
-            return tp;
+            return tp.getConsensus();
         }
     }
 

@@ -5,7 +5,6 @@ import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
 import parallel.DefaultIterationCallable;
 import parallel.IterationCallableFactory;
-import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeScorer;
 import scmAlgorithm.treeSelector.TreeSelector;
 import scmAlgorithm.treeSelector.TreeSelectorFactory;
@@ -71,24 +70,34 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
      */
     @Override
     public Tree getResult() {
+        return getMergedSupertree();
+    }
+
+    public Tree getMergedSupertree() {
         if (mergedSupertree == null) {
             List<Tree> superTrees = getResults();
-            LooseConsensus cons = new LooseConsensus();
-            cons.setInput(superTrees);
-            cons.run();
-            mergedSupertree = cons.getResult();
+            if (superTrees.size() > 1) {
+                LooseConsensus cons = new LooseConsensus();
+                cons.setInput(superTrees);
+                cons.run();
+                mergedSupertree = cons.getResult();
+            }else{
+                mergedSupertree = superTrees.get(0);
+            }
         }
         return mergedSupertree;
     }
 
+
+
     @Override
-    protected List<TreePair> calculateSuperTrees() {
+    protected List<Tree> calculateSuperTrees() {
         mergedSupertree =  null;
         final int neededThreads = Math.min(threads, numOfJobs());
         if (neededThreads > 1) {
             if (executorService == null)
                 executorService = Executors.newFixedThreadPool(threads);
-            List<TreePair> superTrees = calculateParallel();
+            List<Tree> superTrees = calculateParallel();
             if (superTrees != null)
                 return superTrees;
             else
@@ -99,8 +108,8 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     //abstracts
     protected abstract int numOfJobs();
-    protected abstract List<TreePair> calculateSequencial();
-    protected abstract List<TreePair> calculateParallel();
+    protected abstract List<Tree> calculateSequencial();
+    protected abstract List<Tree> calculateParallel();
 
 
 
@@ -135,7 +144,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         }
     }
 
-    private class GSCMCallable extends DefaultIterationCallable<TreeScorer, TreePair> {
+    private class GSCMCallable extends DefaultIterationCallable<TreeScorer, Tree> {
         final TreeSelector selector;
 
         GSCMCallable(List<TreeScorer> jobs, TreeSelector selector) {
@@ -144,9 +153,9 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         }
 
         @Override
-        public TreePair doJob(TreeScorer scorer) {
+        public Tree doJob(TreeScorer scorer) {
             selector.setScorer(scorer);
-            return calculateGreedyConsensus(selector, false);
+            return calculateGreedyConsensus(true,selector);
         }
     }
 

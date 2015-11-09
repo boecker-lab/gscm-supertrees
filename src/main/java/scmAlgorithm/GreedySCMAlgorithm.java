@@ -3,7 +3,6 @@ package scmAlgorithm;
 
 import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;
@@ -19,17 +18,17 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
 
     public GreedySCMAlgorithm(TreeSelector selector) {
         super();
-        this.selector =  selector;
+        this.selector = selector;
     }
 
     public GreedySCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
         super(logger, executorService);
-        this.selector =  selector;
+        this.selector = selector;
     }
 
     public GreedySCMAlgorithm(Logger logger, TreeSelector selector) {
         super(logger);
-        this.selector =  selector;
+        this.selector = selector;
     }
 
 
@@ -43,11 +42,11 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     }
 
     @Override
-    protected List<TreePair> calculateSuperTrees() {
+    protected List<Tree> calculateSuperTrees() {
         return new ArrayList<>(Arrays.asList(calculateSuperTree()));
     }
 
-    TreePair calculateSuperTree() {
+    Tree calculateSuperTree() {
         return calculateGreedyConsensus(selector, true);
     }
 }

@@ -4,7 +4,6 @@ import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
 import parallel.ParallelUtils;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeScorer;
 import scmAlgorithm.treeSelector.TreeSelector;
 
@@ -49,9 +48,10 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
     }
 
     @Override
-    protected List<TreePair> calculateSequencial() {
+    protected List<Tree> calculateSequencial() {
         final TreeSelector selector = new GreedyTreeSelector();
-        List<TreePair> superTrees = new ArrayList<>(scorerArray.length);
+        selector.setInputTrees(inputTrees);
+        List<Tree> superTrees = new ArrayList<>(scorerArray.length);
         for (int i = 0; i < scorerArray.length; i++) {
             TreeScorer scorer = scorerArray[i];
             selector.setScorer(scorer);
@@ -61,10 +61,10 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
     }
 
     @Override
-    protected List<TreePair> calculateParallel() {
+    protected List<Tree> calculateParallel() {
         GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeSelector.getFactory(), inputTrees);
         try {
-            List<TreePair> supertrees = ParallelUtils.parallelForEachResults(executorService, factory, Arrays.asList(scorerArray));
+            List<Tree> supertrees = ParallelUtils.parallelForEachResults(executorService, factory, Arrays.asList(scorerArray));
             return supertrees;
         } catch (ExecutionException e) {
             e.printStackTrace();

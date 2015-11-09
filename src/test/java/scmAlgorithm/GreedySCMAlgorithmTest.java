@@ -1,10 +1,11 @@
 package scmAlgorithm;
 
-import epos.algo.consensus.loose.LooseConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import scmAlgorithm.treeSelector.BasicTreeSelector;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.TreeScorer;
@@ -12,13 +13,9 @@ import scmAlgorithm.treeSelector.TreeSelector;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -30,248 +27,69 @@ import static org.junit.Assert.assertNotNull;
  */
 
 
-public class GreedySCMAlgorithmTest {
-    public final static String newickInput100 = "scmAlgorithm/sm.13.sourceTrees_OptSCM-Rooting.tre";
-    public final static String newickSCM100 = "scmAlgorithm/sm.13.sourceTrees.scmTree.tre_OptRoot.tre";
-    public final static String newickInput100_NORoot = "scmAlgorithm/sm.13.sourceTrees.tre";
-    public final static String newickSCM100_NORoot = "scmAlgorithm/sm.13.sourceTrees.scmTree.tre";
+@RunWith(Parameterized.class)
+public class GreedySCMAlgorithmTest extends BasicSCMTest {
+    TreeSelector.ConsensusMethod method;
+    TreeScorer scorer;
 
-    public final static String newickInput1000 = "scmAlgorithm/sm.5.sourceTrees_OptSCM-Rooting.tre";
-    public final static String newickSCM1000 = "scmAlgorithm/sm.5.sourceTrees.scmTree.tre_OptRoot.tre";
-    public final static String newickInput1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.tre";
-    public final static String newickSCM1000_NORoot = "scmAlgorithm/sm.5.sourceTrees.scmTree.tre";
+    public GreedySCMAlgorithmTest(Tree[] inputData, Tree scmResult, TreeSelector.ConsensusMethod method, TreeScorer scorer) {
+        super(inputData, scmResult);
+        this.method = method;
+        this.scorer = scorer;
+    }
 
-    //tree constants
-/*//    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML_SCM_OPT;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-//    final static String sourceTreeLocation = Global.SM_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-    final static String sourceTreeLocation = Global.SMOG_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-    //        final static String alternateSourceTreeLocation =  Global.SM_SOURCE_TREES_RAXML_MODEL_LEAST;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-    final static String alternateSourceTreeLocation = Global.SMOG_SOURCE_TREES_RAXML;//Global.SM_SOURCE_TREES_RAXML_SCM;//
-    //        final static String scmTreeLocation = Global.SM_SCM_TREES_RAXML_OPT_ROOTED; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-//    final static String scmTreeLocation = Global.SM_SCM_TREES_RAXML; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-//    final static String scmTreeLocation = Global.SMOG_SCM_TREES_SUPER_ROOTED; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-    final static String scmTreeLocation = Global.SMOG_SCM_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-    //    final static String modelTreeLocation = Global.SM_MODEL_TREE_PATH + "sm_data." + Global.TAG_INSTANCE + ".model_tree"; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//
-    final static String modelTreeLocation = Global.SMOG_MODEL_TREES; //Global.SM_SOURCE_TREE_PATH + "RaxML/sm_data." + Global.TAG_INSTANCE + ".scmTreeRooted.tre";//*/
-
-
-    public static final TreeScorer[] fullStrictCombi = {
-            new TreeScorer.OverlapScorer(),//is automatic included
-            new TreeScorer.CollisionPointNumberScorer(),
-            new TreeScorer.CollisionLostCladesNumberScorer(),
-            new TreeScorer.CollisionNumberScorer(),
-            new TreeScorer.BackboneSizeScorer(),
-            new TreeScorer.BackboneCladeNumberScorer(),
-            new TreeScorer.UniqueTaxaNumberScorer(),
-            new TreeScorer.UniqueTaxaRateScorer(),
-            new TreeScorer.ConsensusBackboneCladeNumberScorer(),
-            new TreeScorer.ConsensusBackboneResolutionScorer(),
-            new TreeScorer.ConsensusBackboneSizeScorer(),
-            new TreeScorer.ConsensusCladeNumberScorer(),
-            new TreeScorer.ConsensusResolutionScorer()
-    };
-
-    public static final TreeScorer[] minimalCombi = {
-            new TreeScorer.OverlapScorer(),//is automatic included
-            new TreeScorer.CollisionPointNumberScorer(),
-//            new CollisionLostCladesNumberScorer(),
-//            new CollisionNumberScorer(),
-//            new BackboneSizeScorer(),
-//            new BackboneCladeNumberScorer(),
-            new TreeScorer.UniqueTaxaNumberScorer(),
-//            new UniqueTaxaRateScorer(),
-//            new ConsensusBackboneCladeNumberScorer(),
-            new TreeScorer.ConsensusBackboneResolutionScorer(),
-//            new ConsensusBackboneSizeScorer(),
-//            new ConsensusCladeNumberScorer(),
-            new TreeScorer.ConsensusResolutionScorer()
-    };
-    public static final TreeScorer[] b4 = {
-//            new OverlapScorer(),//is automatic included
-            new TreeScorer.CollisionPointNumberScorer(),
-//            new CollisionLostCladesNumberScorer(),
-//            new CollisionNumberScorer(),
-//            new BackboneSizeScorer(),
-//            new BackboneCladeNumberScorer(),
-            new TreeScorer.UniqueTaxaNumberScorer(),
-//            new UniqueTaxaRateScorer(),
-//            new ConsensusBackboneCladeNumberScorer(),
-//            new ConsensusBackboneResolutionScorer(),
-//            new ConsensusBackboneSizeScorer(),
-            new TreeScorer.ConsensusCladeNumberScorer(),
-            new TreeScorer.ConsensusResolutionScorer()
-    };
-
-    public static final TreeScorer[] greenCombi = {
-            new TreeScorer.OverlapScorer(),//is automatic included
-            new TreeScorer.CollisionPointNumberScorer(),
-//            new CollisionLostCladesNumberScorer(),
-            new TreeScorer.CollisionNumberScorer(),
-//            new BackboneSizeScorer(),
-//            new BackboneCladeNumberScorer(),
-            new TreeScorer.UniqueTaxaNumberScorer(),
-            new TreeScorer.UniqueTaxaRateScorer(),
-//            new ConsensusBackboneCladeNumberScorer(),
-            new TreeScorer.ConsensusBackboneResolutionScorer(),
-//            new ConsensusBackboneSizeScorer(),
-            new TreeScorer.ConsensusCladeNumberScorer(),
-            new TreeScorer.ConsensusResolutionScorer()
-    };
-
-
-    public static final String[] scorerNames = getScorerNames();
-    public static final String SEP = System.getProperty("line.separator");
+    @Parameterized.Parameters
+    public static List<Object[]> data() {
+        List<Object[]> paras = new LinkedList<>();
+        for (TreeScorer scorer : TreeScorer.CompleteScorerCombo(false)) {
+            for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
+                paras.addAll(Arrays.asList(
+                        new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), method, scorer},
+                        new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer}));
+            }
+        }
+        return paras;
+    }
 
     @Test
-    public void smidgenSample100() {
-        URL r = getClass().getResource("/" + newickInput100);
-        String s = r.getFile();
-        File inputFile = new File(s);
+    public void testSmidgenSamples() {
+        StringBuffer buf = new StringBuffer();
+
+        buf.append("########## Test with following Parameters [" + inputData + ", " + scmResult + ", " + method + "] ##########");
+        buf.append(SEP);
         long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector();
+        TreeSelector selector = new GreedyTreeSelector(method);
         selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
+        selector.setInputTrees(inputData);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
-        Tree scm = Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM100_NORoot).getFile()))[0];
         List<String> order = new ArrayList<>(TreeUtilsBasic.getLeafLabels(supertree.getRoot()));
         Collections.sort(order);
         TreeUtilsBasic.sortTree(supertree, order);
-        TreeUtilsBasic.sortTree(scm, order);
-        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
-        System.out.println(Newick.getStringFromTree(scm));
-        System.out.println("Strict-25: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        TreeUtilsBasic.sortTree(scmResult, order);
+        buf.append("Clades-Swenson_SCM: " + (scmResult.vertexCount() - scmResult.getNumTaxa()));
+        buf.append(SEP);
+        buf.append(Newick.getStringFromTree(scmResult));
+        buf.append(SEP);
+        buf.append("Fleisch-" + method + "-SCM: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        buf.append(SEP);
         assertNotNull(supertree);
-        assertEquals(scm.getNumTaxa(), supertree.getNumTaxa());
-        System.out.println(Newick.getStringFromTree(supertree));
+        assertEquals(scmResult.getNumTaxa(), supertree.getNumTaxa());
+        buf.append(Newick.getStringFromTree(supertree));
+        buf.append(SEP);
         int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-
+        buf.append("Clades: " + inner);
+        buf.append(SEP);
+        buf.append("########## DONE ##########");
+        buf.append(SEP);
+        buf.append(SEP);
+        buf.append(SEP);
+        System.out.println(buf.toString());
     }
 
 
-    @Test
-    public void smidgenSample100Adam() {
-        File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.ADAMS);
-        selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
-        algo.run();
-        Tree supertree = algo.getResult();
-        System.out.println("Adams-25: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-
-    }
-
-
-    @Test
-    public void smidgenSample100Loose() {
-        File inputFile = new File(getClass().getResource("/" + newickInput100).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.SEMI_STRICT);
-        selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
-        algo.run();
-        Tree supertree = algo.getResult();
-        System.out.println("Semi-Strict-25: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-
-    }
-
-
-    @Test
-    public void smidgenSample1000() {
-        File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector();
-        selector.setScorer(new TreeScorer.CollisionNumberScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
-        algo.run();
-        Tree supertree = algo.getResult();
-        Tree scm = Newick.getTreeFromFile(new File(getClass().getResource("/" + newickSCM1000_NORoot).getFile()))[0];
-        System.out.println("Clades_Real_SCM: " + (scm.vertexCount() - scm.getNumTaxa()));
-        System.out.println("Strict-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        assertEquals(scm.getNumTaxa(), supertree.getNumTaxa());
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-    }
-
-
-    @Test
-    public void smidgenSample1000Adam() {
-        File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.ADAMS);
-        selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
-        algo.run();
-        Tree supertree = algo.getResult();
-        System.out.println("Adams-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-
-    }
-
-
-    @Test
-    public void smidgenSample1000Loose() {
-        File inputFile = new File(getClass().getResource("/" + newickInput1000).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector(TreeSelector.ConsensusMethod.SEMI_STRICT);
-        selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
-        algo.run();
-        Tree supertree = algo.getResult();
-        System.out.println("Semi-Strict-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-
-    }
-
-    @Test
-    public void smidgenSample1000Loose_NORoot() {
-        File inputFile = new File(getClass().getResource("/" + newickInput1000_NORoot).getFile());
-        long t = System.currentTimeMillis();
-        Tree[] inputTrees = Newick.getTreeFromFile(inputFile);
-        TreeSelector selector = new GreedyTreeSelector();
-        selector.setScorer(new TreeScorer.OverlapScorer());
-        selector.setInputTrees(inputTrees);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
-        algo.run();
-        Tree supertree = algo.getResult();
-        System.out.println("Semi-Strict-250_Root: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        assertNotNull(supertree);
-        System.out.println(Newick.getStringFromTree(supertree));
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        System.out.println("Clades: " + inner);
-    }
-
-    @Test
+    //    @Test
     public void largeSample() throws IOException {
         Path inputFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/RaxML/smo.0.sourceTrees.tre");
         long t = System.currentTimeMillis();
@@ -378,39 +196,7 @@ public class GreedySCMAlgorithmTest {
     //############################ EVAL TESTS #################################################
 
 
-    private static String[] getScorerNames() {
-        String[] names = new String[fullStrictCombi.length];
-        for (int i = 0; i < fullStrictCombi.length; i++) {
-            names[i] = fullStrictCombi[i].toString();
-        }
-        return names;
-    }
 
-
-    private static String getMultiScorerName(int[] indices) {
-        String[] names = new String[indices.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = fullStrictCombi[indices[i]].toString();
-        }
-        return Arrays.toString(names);
-    }
-
-    private static Tree getSemiStrict(Tree[] tree, int[] indices) {
-        if (indices == null || indices.length == 0)
-            return null;
-
-        if (indices.length == 1)
-            return tree[indices[0]];
-
-        Tree[] input = new Tree[indices.length];
-        for (int i = 0; i < indices.length; i++) {
-            input[i] = tree[indices[i]];
-        }
-        LooseConsensus c = new LooseConsensus();
-        c.setInput(Arrays.asList(input));
-        c.run();
-        return c.getResult();
-    }
 
     /*    @Test
     public void createCrossTable() throws IOException {

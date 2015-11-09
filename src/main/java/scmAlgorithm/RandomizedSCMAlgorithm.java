@@ -4,7 +4,6 @@ import epos.model.tree.Tree;
 import parallel.ParallelUtils;
 import scmAlgorithm.treeSelector.GreedyTreeSelector;
 import scmAlgorithm.treeSelector.RandomizedGreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreePair;
 import scmAlgorithm.treeSelector.TreeScorer;
 
 import java.util.ArrayList;
@@ -39,7 +38,8 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
     }
 
     private int defaultIterations() {
-        return inputTrees.length * inputTrees.length;
+//        return inputTrees.length * inputTrees.length;
+        return inputTrees.length;
     }
 
     @Override
@@ -47,21 +47,21 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         return (iterations + 1) * scorerArray.length;
     }
 
-    protected List<TreePair> calculateSequencial() {
+    protected List<Tree> calculateSequencial() {
         final GreedyTreeSelector nonRandomResultSelector = new GreedyTreeSelector();
         nonRandomResultSelector.setInputTrees(inputTrees);
         final RandomizedGreedyTreeSelector randomResultSelector = new RandomizedGreedyTreeSelector();
         randomResultSelector.setInputTrees(inputTrees);
 
-        List<TreePair> superTrees = new ArrayList<>();
+        List<Tree> superTrees = new ArrayList<>();
         for (TreeScorer treeScorer : scorerArray) {
-            List<TreePair> scms = new ArrayList<>(iterations + 1);
+            List<Tree> scms = new ArrayList<>(iterations + 1);
 
             nonRandomResultSelector.setScorer(treeScorer);
-            scms.add((calculateGreedyConsensus(nonRandomResultSelector, false)));
+            scms.add((calculateGreedyConsensus(false,nonRandomResultSelector)));
             randomResultSelector.setScorer(treeScorer);
             for (int i = 0; i < iterations; i++) {
-                scms.add(calculateGreedyConsensus(randomResultSelector, false));
+                scms.add(calculateGreedyConsensus(false,randomResultSelector));
             }
             superTrees.addAll(scms);
         }
@@ -69,9 +69,9 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         return superTrees;
     }
 
-    protected List<TreePair> calculateParallel() {
-        List<TreePair> superTrees = new ArrayList<>(numOfJobs());
-        List<Future<List<TreePair>>> futurList = new LinkedList<>();
+    protected List<Tree> calculateParallel() {
+        List<Tree> superTrees = new ArrayList<>(numOfJobs());
+        List<Future<List<Tree>>> futurList = new LinkedList<>();
 
         //todo maybe bucked parallelism
         //calculate random results
@@ -79,16 +79,18 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         for (int i = 0; i < iterations; i++) {
             futurList.addAll(
                     ParallelUtils.parallelForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
+//                    ParallelUtils.parallelBucketForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
         }
 
         //calculate nonRandomResults
         GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeSelector.getFactory(), inputTrees);
         futurList.addAll(
                 ParallelUtils.parallelForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
+//                ParallelUtils.parallelBucketForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
 
         //collect results
         try {
-            for (Future<List<TreePair>> future : futurList) {
+            for (Future<List<Tree>> future : futurList) {
                 superTrees.addAll(future.get());
             }
             return superTrees;
