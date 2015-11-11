@@ -1,9 +1,9 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 
 import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package scmAlgorithm.treeSelector;
+package scm.algorithm.treeSelector;
 
 /**
  * Created by fleisch on 23.03.15.

@@ -1,12 +1,10 @@
-package scmAlgorithm.treeSelector;
+package scm.algorithm.treeSelector;
 
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
 import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * Created by fleisch on 14.10.15.

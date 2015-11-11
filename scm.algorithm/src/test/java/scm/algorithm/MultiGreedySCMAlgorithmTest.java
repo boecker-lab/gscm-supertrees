@@ -1,13 +1,12 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import scmAlgorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeScorer;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

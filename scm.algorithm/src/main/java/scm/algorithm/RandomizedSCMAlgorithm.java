@@ -1,10 +1,10 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.tree.Tree;
 import parallel.ParallelUtils;
-import scmAlgorithm.treeSelector.GreedyTreeSelector;
-import scmAlgorithm.treeSelector.RandomizedGreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.GreedyTreeSelector;
+import scm.algorithm.treeSelector.RandomizedGreedyTreeSelector;
+import scm.algorithm.treeSelector.TreeScorer;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
@@ -6,21 +6,21 @@ import epos.model.tree.treetools.TreeUtilsBasic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import scmAlgorithm.treeSelector.BasicTreeSelector;
-import scmAlgorithm.treeSelector.GreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreeScorer;
-import scmAlgorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.BasicTreeSelector;
+import scm.algorithm.treeSelector.GreedyTreeSelector;
+import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeSelector;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-//import flipCut.Global;
 
 /**
  * Created by fleisch on 16.02.15.

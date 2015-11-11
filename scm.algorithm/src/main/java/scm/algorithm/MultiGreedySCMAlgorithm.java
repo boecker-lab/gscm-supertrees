@@ -1,11 +1,11 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
 import parallel.ParallelUtils;
-import scmAlgorithm.treeSelector.GreedyTreeSelector;
-import scmAlgorithm.treeSelector.TreeScorer;
-import scmAlgorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.GreedyTreeSelector;
+import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;
 import java.util.Arrays;

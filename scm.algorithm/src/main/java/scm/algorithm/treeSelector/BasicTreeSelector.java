@@ -1,4 +1,4 @@
-package scmAlgorithm.treeSelector;
+package scm.algorithm.treeSelector;
 
 import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;

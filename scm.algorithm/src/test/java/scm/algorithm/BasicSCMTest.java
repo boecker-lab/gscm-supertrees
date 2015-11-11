@@ -1,9 +1,9 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.model.tree.Tree;
 import epos.model.tree.io.Newick;
-import scmAlgorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeScorer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -65,29 +65,29 @@ public abstract class BasicSCMTest {
 
     public static class Locations {
         public Tree[] newickInput100(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.13.sourceTrees_OptSCM-Rooting.tre").getFile());
+            return getTrees(getClass().getResource("/scm/algorithm/sm.13.sourceTrees_OptSCM-Rooting.tre").getFile());
         }
         public Tree newickSCM100(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.13.sourceTrees.scmTree.tre_OptRoot.tre").getFile())[0];
+            return getTrees(getClass().getResource("/scm/algorithm/sm.13.sourceTrees.scmTree.tre_OptRoot.tre").getFile())[0];
         }
         public Tree[] newickInput100_NORoot(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.13.sourceTrees.tre").getFile());
+            return getTrees(getClass().getResource("/scm/algorithm/sm.13.sourceTrees.tre").getFile());
         }
         public Tree newickSCM100_NORoot(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.13.sourceTrees.scmTree.tre").getFile())[0];
+            return getTrees(getClass().getResource("/scm/algorithm/sm.13.sourceTrees.scmTree.tre").getFile())[0];
         }
 
         public Tree[] newickInput1000(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.5.sourceTrees_OptSCM-Rooting.tre").getFile());
+            return getTrees(getClass().getResource("/scm/algorithm/sm.5.sourceTrees_OptSCM-Rooting.tre").getFile());
         }
         public Tree newickSCM1000(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.5.sourceTrees.scmTree.tre_OptRoot.tre").getFile())[0];
+            return getTrees(getClass().getResource("/scm/algorithm/sm.5.sourceTrees.scmTree.tre_OptRoot.tre").getFile())[0];
         }
         public Tree[] newickInput1000_NORoot(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.5.sourceTrees.tre").getFile());
+            return getTrees(getClass().getResource("/scm/algorithm/sm.5.sourceTrees.tre").getFile());
         }
         public Tree newickSCM1000_NORoot(){
-            return getTrees(getClass().getResource("/scmAlgorithm/sm.5.sourceTrees.scmTree.tre").getFile())[0];
+            return getTrees(getClass().getResource("/scm/algorithm/sm.5.sourceTrees.scmTree.tre").getFile())[0];
         }
 
 

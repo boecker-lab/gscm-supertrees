@@ -1,13 +1,6 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.tree.Tree;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by fleisch on 09.11.15.

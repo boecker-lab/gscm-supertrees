@@ -1,12 +1,11 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.model.algo.SupertreeAlgorithm;
 import epos.model.tree.Tree;
 import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
-import scmAlgorithm.treeSelector.TreeScorer;
-import scmAlgorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelector;
 import utils.CLIProgressBar;
 
 import java.util.Collections;

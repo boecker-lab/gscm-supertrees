@@ -1,13 +1,13 @@
-package scmAlgorithm;
+package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
 import parallel.DefaultIterationCallable;
 import parallel.IterationCallableFactory;
-import scmAlgorithm.treeSelector.TreeScorer;
-import scmAlgorithm.treeSelector.TreeSelector;
-import scmAlgorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeSelector;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
