@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
 
     TreeScorer[] scorerArray;
-    final static int ITERATIONS = 10;
+    final static int ITERATIONS = 4;
     public MultiGreedySCMAlgorithmTest(Tree[] inputData, Tree scmResult, TreeScorer[] scorerArray) {
         super(inputData, scmResult);
         this.scorerArray = scorerArray;
@@ -119,7 +119,7 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
 
         t = System.currentTimeMillis();
         algo = new RandomizedSCMAlgorithm(ITERATIONS,inputData, scorerArray);
-        algo.setThreads(4);
+        algo.setThreads(2);
         algo.run();
         Tree supertreeP = algo.getResult();
         buffer.append("Randomized-Parallel-" + "method" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");

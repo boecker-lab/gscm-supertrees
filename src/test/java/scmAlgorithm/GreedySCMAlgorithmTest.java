@@ -43,9 +43,8 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         List<Object[]> paras = new LinkedList<>();
         for (TreeScorer scorer : TreeScorer.CompleteScorerCombo(false)) {
             for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
-                paras.addAll(Arrays.asList(
-                        new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), method, scorer},
-                        new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer}));
+                paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), method, scorer});
+//                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});
             }
         }
         return paras;
