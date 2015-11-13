@@ -1,7 +1,7 @@
 package scm.algorithm.treeSelector;
 
-import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
+import phyloTree.model.tree.Tree;
 
 import java.util.PriorityQueue;
 

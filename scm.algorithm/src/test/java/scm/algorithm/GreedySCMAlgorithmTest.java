@@ -1,11 +1,11 @@
 package scm.algorithm;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.TreeUtilsBasic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeUtils;
 import scm.algorithm.treeSelector.BasicTreeSelector;
 import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
@@ -63,10 +63,10 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
-        List<String> order = new ArrayList<>(TreeUtilsBasic.getLeafLabels(supertree.getRoot()));
+        List<String> order = new ArrayList<>(TreeUtils.getLeafLabels(supertree.getRoot()));
         Collections.sort(order);
-        TreeUtilsBasic.sortTree(supertree, order);
-        TreeUtilsBasic.sortTree(scmResult, order);
+        TreeUtils.sortTree(supertree, order);
+        TreeUtils.sortTree(scmResult, order);
         buf.append("Clades-Swenson_SCM: " + (scmResult.vertexCount() - scmResult.getNumTaxa()));
         buf.append(SEP);
         buf.append(Newick.getStringFromTree(scmResult));
@@ -99,7 +99,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         Map<Object, Set<Tree>> finished = new HashMap<>();
         for (int i = 0; i < inputTrees.length; i++) {
             Tree tree = inputTrees[i];
-            Set<String> leafset = TreeUtilsBasic.getLeafLabels(tree.getRoot());
+            Set<String> leafset = TreeUtils.getLeafLabels(tree.getRoot());
             treesSets.put(leafset, new HashSet<>(Arrays.asList(tree)));
         }
 
@@ -146,7 +146,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         Path modelOLD =  modelFile.getParent().resolve("smo.0.modelTree_UNSUFFICIENT.tre");
         Tree model  = Newick.getTreeFromFile(modelFile.toFile())[0];
         Files.copy(modelFile,modelOLD);
-        TreeUtilsBasic.keepLeafesAndPruneTree(model, TreeUtilsBasic.getLeafesFromLabels(best, model));
+        TreeUtils.keepLeafesAndPruneTree(model, TreeUtils.getLeafesFromLabels(best, model));
         Newick.tree2File(modelFile.toFile(), model);
 
         Path modelSourceFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/ModelSourceTrees/smo.0.modelSourceTrees.tre");

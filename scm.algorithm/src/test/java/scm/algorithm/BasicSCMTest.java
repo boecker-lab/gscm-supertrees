@@ -1,8 +1,8 @@
 package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.TreeScorer;
 
 import java.io.File;

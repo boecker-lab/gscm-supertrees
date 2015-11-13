@@ -1,6 +1,7 @@
 package scm.algorithm;
 
-import epos.model.tree.Tree;
+
+import phyloTree.model.tree.Tree;
 
 /**
  * Created by fleisch on 09.11.15.

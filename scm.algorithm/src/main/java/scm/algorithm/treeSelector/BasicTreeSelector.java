@@ -1,10 +1,10 @@
 package scm.algorithm.treeSelector;
 
-import epos.model.algo.SupertreeAlgorithm;
-import epos.model.tree.Tree;
-import parallel.DefaultIterationCallable;
-import parallel.IterationCallableFactory;
-import parallel.ParallelUtils;
+import phyloTree.algorithm.SupertreeAlgorithm;
+import phyloTree.model.tree.Tree;
+import utils.parallel.DefaultIterationCallable;
+import utils.parallel.IterationCallableFactory;
+import utils.parallel.ParallelUtils;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;

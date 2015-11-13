@@ -1,8 +1,8 @@
 package scm.algorithm;
 
 
-import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
+import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.TreeSelector;
 
 import java.util.ArrayList;

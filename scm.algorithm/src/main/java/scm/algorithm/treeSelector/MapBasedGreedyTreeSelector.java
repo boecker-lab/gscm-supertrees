@@ -1,6 +1,6 @@
 package scm.algorithm.treeSelector;
 
-import epos.model.tree.Tree;
+import phyloTree.model.tree.Tree;
 
 import java.util.Collection;
 import java.util.LinkedList;

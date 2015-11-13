@@ -1,11 +1,11 @@
 package scm.algorithm.treeSelector;
 
-import epos.model.algo.SupertreeAlgorithm;
-import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import phyloTree.algorithm.SupertreeAlgorithm;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeNode;
+import phyloTree.model.tree.TreeUtils;
 
 import java.util.*;
 
@@ -125,7 +125,7 @@ class TreePair implements Comparable<TreePair> {
                 for (TreeNode sibling : node.getParent().children()) {
                     if (!sibling.equals(node)) {
                         numOfSiblings++;
-                        siblingLeaves.addAll(TreeUtilsBasic.getLeafLabels(sibling));
+                        siblingLeaves.addAll(TreeUtils.getLeafLabels(sibling));
                     }
                 }
 
@@ -161,7 +161,7 @@ class TreePair implements Comparable<TreePair> {
                 }
                 singleTaxa.add(st);
 
-                TreeUtilsBasic.pruneDegreeOneNodes(t, false, false);
+                TreeUtils.pruneDegreeOneNodes(t, false, false);
             } else {
                 for (TreeNode child : node.children()) {
                     stack.push(child);
@@ -206,7 +206,7 @@ class TreePair implements Comparable<TreePair> {
             if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
                 if (singleTaxon.numOfSiblings == 1) {
                     //todo is there a faster/more elegant way to proof that
-                    Set<String> s = new THashSet<>(TreeUtilsBasic.getLeafLabels(lca));
+                    Set<String> s = new THashSet<>(TreeUtils.getLeafLabels(lca));
                     s.retainAll(commonLeafes);
                     Set<String> s2 = new HashSet<>(singleTaxon.siblingLeaves);
                     s2.retainAll(commonLeafes);

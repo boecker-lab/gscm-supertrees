@@ -1,10 +1,10 @@
 package scm.algorithm.treeSelector;
 
-import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import epos.model.tree.treetools.TreeUtilsBasic;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeNode;
+import phyloTree.model.tree.TreeUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -162,26 +162,25 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     //#################### Scorer INIT ##################
-    public static TreeScorer newOverlapScorer(boolean synced){
+    public static TreeScorer newOverlapScorer(boolean synced) {
         return new OverlapScorer(synced);
     }
 
-    public static TreeScorer newUniqueTaxonScorer(boolean synced){
+    public static TreeScorer newUniqueTaxonScorer(boolean synced) {
         return new UniqueTaxaNumberScorer(synced);
     }
 
-    public static TreeScorer newTaxonScorer(boolean synced){
+    public static TreeScorer newTaxonScorer(boolean synced) {
         return new ConsensusTaxonNumberScorer(synced);
     }
 
-    public static TreeScorer newResolutionScorer(boolean synced){
+    public static TreeScorer newResolutionScorer(boolean synced) {
         return new ConsensusResolutionScorer(synced);
     }
 
-    public static TreeScorer newCollisionScorer(boolean synced){
+    public static TreeScorer newCollisionScorer(boolean synced) {
         return new CollisionNumberScorer(synced);
     }
-
 
 
     public static TreeScorer[] CompleteScorerCombo(boolean synced) {
@@ -202,7 +201,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         };
     }
 
-    public static TreeScorer[] newFastScorerCombo(boolean synced){
+    public static TreeScorer[] newFastScorerCombo(boolean synced) {
         return new TreeScorer[]{
                 newOverlapScorer(synced),
                 newUniqueTaxonScorer(synced),
@@ -463,7 +462,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
                 return Double.NEGATIVE_INFINITY;
 
             pair.calculateConsensus();
-            //        return ((pair.getNumOfConsensusBackboneVertices() - pair.getNumOfBackboneTaxa()) * 100) + TreeUtilsBasic.calculateTreeResolution(pair.getNumOfBackboneTaxa(), pair.getNumOfBackboneTaxa()) ;
+            //        return ((pair.getNumOfConsensusBackboneVertices() - pair.getNumOfBackboneTaxa()) * 100) + TreeUtils.calculateTreeResolution(pair.getNumOfBackboneTaxa(), pair.getNumOfBackboneTaxa()) ;
             return getNumOfConsensusBackboneVertices(pair) - getNumOfBackboneTaxa(pair);
         }
     }
@@ -488,7 +487,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
                 return Double.NEGATIVE_INFINITY;
 
             pair.calculateConsensus();
-            return TreeUtilsBasic.calculateTreeResolution(getNumOfBackboneTaxa(pair), getNumOfConsensusBackboneVertices(pair));
+            return TreeUtils.calculateTreeResolution(getNumOfBackboneTaxa(pair), getNumOfConsensusBackboneVertices(pair));
         }
     }
 
@@ -537,7 +536,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
                 return Double.NEGATIVE_INFINITY;
 
             pair.calculateConsensus();
-            //        return ((pair.getNumOfConsensusVertices() - pair.getNumOfConsensusTaxa()) * 100) + TreeUtilsBasic.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices()) ;
+            //        return ((pair.getNumOfConsensusVertices() - pair.getNumOfConsensusTaxa()) * 100) + TreeUtils.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices()) ;
             return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
         }
     }
@@ -583,7 +582,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
                 return Double.NEGATIVE_INFINITY;
 
             pair.calculateConsensus();
-            return TreeUtilsBasic.calculateTreeResolution(getNumOfConsensusTaxa(pair), getNumOfConsensusVertices(pair));
+            return TreeUtils.calculateTreeResolution(getNumOfConsensusTaxa(pair), getNumOfConsensusVertices(pair));
         }
     }
 

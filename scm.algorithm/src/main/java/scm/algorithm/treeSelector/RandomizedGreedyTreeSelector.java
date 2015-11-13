@@ -4,11 +4,11 @@ package scm.algorithm.treeSelector;
  * Created by fleisch on 23.03.15.
  */
 
-import epos.model.tree.Tree;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import phyloTree.model.tree.Tree;
 
-import java.util.*;
+import java.util.Random;
 
 
 public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{

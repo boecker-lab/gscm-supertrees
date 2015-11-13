@@ -1,12 +1,13 @@
 package scm.algorithm;
 
-import epos.model.algo.SupertreeAlgorithm;
-import epos.model.tree.Tree;
-import epos.model.tree.treetools.TreeUtilsBasic;
+
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
+import phyloTree.algorithm.SupertreeAlgorithm;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeUtils;
 import scm.algorithm.treeSelector.TreeSelector;
-import utils.CLIProgressBar;
+import utils.progressBar.CLIProgressBar;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -117,7 +118,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
         }
 
         private double caclulateTreeResolution(Tree tree) {
-            return TreeUtilsBasic.calculateTreeResolution(tree.getNumTaxa(), tree.vertexCount());
+            return TreeUtils.calculateTreeResolution(tree.getNumTaxa(), tree.vertexCount());
         }
 
         public double put(Tree tree, double resolution) {

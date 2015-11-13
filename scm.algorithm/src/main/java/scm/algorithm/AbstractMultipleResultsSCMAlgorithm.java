@@ -1,10 +1,12 @@
 package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
-import epos.model.tree.Tree;
 import org.apache.log4j.Logger;
-import parallel.DefaultIterationCallable;
-import parallel.IterationCallableFactory;
+import phyloTree.model.tree.Tree;
+
+import utils.parallel.DefaultIterationCallable;
+import utils.parallel.IterationCallableFactory;
+
 import scm.algorithm.treeSelector.TreeSelectorFactory;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;

@@ -3,8 +3,8 @@ package scm.algorithm.treeSelector;
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
-import epos.model.algo.SupertreeAlgorithm;
-import epos.model.tree.Tree;
+import phyloTree.algorithm.SupertreeAlgorithm;
+import phyloTree.model.tree.Tree;
 
 /**
  * Created by fleisch on 14.10.15.
