@@ -35,6 +35,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
 
     protected abstract List<Tree> calculateSuperTrees();
 
+    public abstract void setInput(Tree... trees);
     @Override
     public void run() {
         superTrees = calculateSuperTrees();

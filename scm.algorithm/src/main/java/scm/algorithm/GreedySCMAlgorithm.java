@@ -36,7 +36,7 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     public void setInput(List<Tree> trees) {
         setInput(trees.toArray(new Tree[trees.size()]));
     }
-
+    @Override
     public void setInput(Tree... trees) {
         selector.setInputTrees(trees);
     }

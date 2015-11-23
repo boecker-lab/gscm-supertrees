@@ -51,13 +51,12 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
     }
 
 
-
-
     @Override
     public void setInput(List<Tree> trees) {
         setInput(trees.toArray(new Tree[trees.size()]));
     }
 
+    @Override
     public void setInput(Tree... trees) {
         inputTrees = trees;
     }
@@ -68,6 +67,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     /**
      * Returns the merged Supertree, based on the supertreeList
+     *
      * @return
      */
     @Override
@@ -83,7 +83,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
                 cons.setInput(superTrees);
                 cons.run();
                 mergedSupertree = cons.getResult();
-            }else{
+            } else {
                 mergedSupertree = superTrees.get(0);
             }
         }
@@ -91,10 +91,9 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
     }
 
 
-
     @Override
     protected List<Tree> calculateSuperTrees() {
-        mergedSupertree =  null;
+        mergedSupertree = null;
         final int neededThreads = Math.min(threads, numOfJobs());
         if (neededThreads > 1) {
             if (executorService == null)
@@ -110,9 +109,10 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     //abstracts
     protected abstract int numOfJobs();
-    protected abstract List<Tree> calculateSequencial();
-    protected abstract List<Tree> calculateParallel();
 
+    protected abstract List<Tree> calculateSequencial();
+
+    protected abstract List<Tree> calculateParallel();
 
 
     //helper classes for parallel computing
@@ -121,14 +121,14 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         final Tree[] inputTrees;
         final TreeScorer scorer;
 
-        public GSCMCallableFactory(TreeSelectorFactory factory,Tree[] inputTrees) {
-            this(factory,null,inputTrees);
+        public GSCMCallableFactory(TreeSelectorFactory factory, Tree[] inputTrees) {
+            this(factory, null, inputTrees);
         }
 
         public GSCMCallableFactory(TreeSelectorFactory factory, TreeScorer scorer) {
-            this(factory,scorer,null);
+            this(factory, scorer, null);
         }
-        
+
         public GSCMCallableFactory(TreeSelectorFactory factory, TreeScorer scorer, Tree[] inputTrees) {
             this.selectorFactory = factory;
             this.inputTrees = inputTrees;
@@ -157,7 +157,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         @Override
         public Tree doJob(TreeScorer scorer) {
             selector.setScorer(scorer);
-            return calculateGreedyConsensus(true,selector);
+            return calculateGreedyConsensus(true, selector);
         }
     }
 
