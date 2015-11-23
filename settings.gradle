@@ -1,4 +1,4 @@
 rootProject.name = 'scm'
-include 'scm.algorithm'
-include 'scm.cli'
+include 'scm.algorithm' ,
+        'scm.cli'
 

@@ -39,9 +39,11 @@ project(':scm.algorithm') {
     version = '0.8-SNAPSHOT'
 
     dependencies {
-        compile 'de.unijena.bioinf:phyloTree-lib:0.9.9-SNAPSHOT'
+        compile 'de.unijena.bioinf:phyloTree.model:0.9.9-SNAPSHOT'
+        compile 'de.unijena.bioinf:phyloTree.algorithm:0.9.9-SNAPSHOT'
         compile 'de.unijena.bioinf:consensus-lib:0.9.3-SNAPSHOT'
-        compile 'de.unijena.bioinf:core-lib:0.9-SNAPSHOT'
+        compile 'de.unijena.bioinf:core-lib.algorithm:0.9-SNAPSHOT'
+        compile 'de.unijena.bioinf:core-lib.utils:0.9-SNAPSHOT'
 
         testCompile 'org.apache.commons:commons-math3:3.2'
 //        testCompile 'de.uni-jena.bioinf:project-evaluation:0.8-SNAPSHOT'
@@ -51,6 +53,12 @@ project(':scm.algorithm') {
 //command line interface stuff
 project(':scm.cli'){
     version = '0.8-SNAPSHOT'
+
+    dependencies {
+        compile project(':scm.algorithm')
+        compile 'de.unijena.bioinf:phyloTree.cli:0.9.9-SNAPSHOT'
+        compile 'de.unijena.bioinf:core-lib.cli:0.9-SNAPSHOT'
+    }
 }
 
 

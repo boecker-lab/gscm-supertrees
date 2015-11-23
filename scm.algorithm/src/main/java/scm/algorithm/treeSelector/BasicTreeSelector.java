@@ -33,30 +33,6 @@ public abstract class BasicTreeSelector implements TreeSelector {
         this(ConsensusMethod.STRICT);
     }
 
-//    public BasicTreeSelector(TreeScorer scorer, ConsensusMethod method) {
-//        this(method);
-//        this.scorer = scorer;
-//    }
-//
-//    public BasicTreeSelector(TreeScorer scorer, ConsensusMethod method, Tree... trees) {
-//        this(scorer, method);
-//        this.inputTrees = trees;
-//    }
-//
-//
-//
-//    public BasicTreeSelector(TreeScorer scorer) {
-//        this(scorer, ConsensusMethod.STRICT);
-//    }
-//
-//    public BasicTreeSelector(TreeScorer scorer, Tree... trees) {
-//        this(scorer, ConsensusMethod.STRICT, trees);
-//    }
-//
-//    public BasicTreeSelector(TreeScorer scorer, Collection<Tree> treeCollection) {
-//        this(scorer, treeCollection.toArray(new Tree[treeCollection.size()]));
-//    }
-
 
     @Override
     public void setInputTrees(Tree... inputTrees) {
