@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
+import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
 import utils.progressBar.CLIProgressBar;
 
@@ -76,6 +77,8 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
         }
         return superCandidate;
     }
+
+    public abstract void setScorer(TreeScorer scorer);
 
     @Override
     public List<Tree> getResults() {

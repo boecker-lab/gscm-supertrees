@@ -61,6 +61,12 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         inputTrees = trees;
     }
 
+
+    @Override
+    public void setScorer(TreeScorer scorer) {
+        setScorer(new TreeScorer[]{scorer});
+    }
+
     public void setScorer(TreeScorer... scorer) {
         this.scorerArray = scorer;
     }

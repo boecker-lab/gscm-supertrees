@@ -6,10 +6,7 @@ import org.junit.runners.Parameterized;
 import phyloTree.io.Newick;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
-import scm.algorithm.treeSelector.BasicTreeSelector;
-import scm.algorithm.treeSelector.GreedyTreeSelector;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +38,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     @Parameterized.Parameters
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
-        for (TreeScorer scorer : TreeScorer.CompleteScorerCombo(false)) {
+        for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
             for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), method, scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});

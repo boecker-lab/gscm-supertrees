@@ -24,8 +24,8 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
     }
 
     public RandomizedSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
-        super(trees, scorer);
-        iterations = defaultIterations();
+        this(0, trees, scorer);
+        ;
     }
 
     public RandomizedSCMAlgorithm(int numberOfIterations, TreeScorer... scorer) {
@@ -34,7 +34,11 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
     public RandomizedSCMAlgorithm(int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
         super(trees, scorer);
-        this.iterations = numberOfIterations;
+        if (numberOfIterations > 0) {
+            this.iterations = numberOfIterations;
+        }else {
+            iterations = defaultIterations();
+        }
     }
 
     private int defaultIterations() {
