@@ -37,6 +37,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     protected abstract List<Tree> calculateSuperTrees();
 
     public abstract void setInput(Tree... trees);
+
     @Override
     public void run() {
         superTrees = calculateSuperTrees();
@@ -45,33 +46,27 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     }
 
 
-    protected Tree calculateGreedyConsensus(TreeSelector selector, final boolean progress) {
-        return calculateGreedyConsensus(selector, false, progress);
+    public Tree calculateGreedyConsensus(TreeSelector selector) {
+        return calculateGreedyConsensus(selector, new CLIProgressBar());
     }
 
-    protected Tree calculateGreedyConsensus(final boolean multiRun, TreeSelector selector) {
-        return calculateGreedyConsensus(selector, multiRun, false);
+    public Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) {
+        return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT && printProgress));
     }
 
-    protected Tree calculateGreedyConsensus(TreeSelector selector){
-        return calculateGreedyConsensus(selector,false,false);
-    }
+    private Tree calculateGreedyConsensus(TreeSelector selector, final CLIProgressBar progressBar) {
 
-    private Tree calculateGreedyConsensus(TreeSelector selector, final boolean multiRun, final boolean progress) {
         Tree superCandidate = null;
         Tree pair;
 
         //progress bar stuff
-        CLIProgressBar progressBar = null;
-        if (progress)
-            progressBar = new CLIProgressBar();
         int pCount = 0;
 
-        selector.init(!multiRun);
+
+        selector.init();
         int trees = selector.getNumberOfTrees() - 1;
         while ((pair = selector.pollTreePair()) != null) {
-            if (progress)
-                progressBar.update(pCount++, trees);
+            progressBar.update(pCount++, trees);
             selector.addTree(pair);
             superCandidate = pair;
         }

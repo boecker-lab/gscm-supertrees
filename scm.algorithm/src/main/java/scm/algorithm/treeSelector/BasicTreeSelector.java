@@ -21,6 +21,8 @@ public abstract class BasicTreeSelector implements TreeSelector {
     private TreePairScoringCallableFactory factory;
     private ConsensusMethod method;
 
+    protected boolean clearScorer = true;
+
     TreeScorer scorer;
     Tree[] inputTrees;
 
@@ -202,6 +204,10 @@ public abstract class BasicTreeSelector implements TreeSelector {
 
     public void setExecutor(ExecutorService executor) {
         this.executor = executor;
+    }
+
+    public void setClearScorer(boolean clearScorer) {
+        this.clearScorer = clearScorer;
     }
 
     public void shutdown() {

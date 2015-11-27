@@ -76,6 +76,6 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     }
 
     Tree calculateSuperTree() {
-        return calculateGreedyConsensus(selector, true);
+        return calculateGreedyConsensus(selector);
     }
 }

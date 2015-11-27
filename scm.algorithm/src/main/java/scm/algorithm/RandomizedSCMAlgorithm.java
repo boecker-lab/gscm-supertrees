@@ -5,6 +5,7 @@ import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.RandomizedGreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
 import utils.parallel.ParallelUtils;
+import utils.progressBar.CLIProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,10 +63,10 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
             List<Tree> scms = new ArrayList<>(iterations + 1);
 
             nonRandomResultSelector.setScorer(treeScorer);
-            scms.add((calculateGreedyConsensus(false,nonRandomResultSelector)));
+            scms.add((calculateGreedyConsensus(nonRandomResultSelector, false)));
             randomResultSelector.setScorer(treeScorer);
             for (int i = 0; i < iterations; i++) {
-                scms.add(calculateGreedyConsensus(false,randomResultSelector));
+                scms.add(calculateGreedyConsensus(randomResultSelector,false));
             }
             superTrees.addAll(scms);
         }

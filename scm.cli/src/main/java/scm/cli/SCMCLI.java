@@ -1,6 +1,7 @@
 package scm.cli;
 
 import cli.EnumArrayOptionHandler;
+import cli.Progressbar;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionDef;
@@ -17,7 +18,7 @@ import java.io.PrintStream;
 /**
  * Created by fleisch on 20.11.15.
  */
-public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> {
+public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implements Progressbar {
 
 
     public static class ScorerTypeArrayOptionHandler extends EnumArrayOptionHandler<TreeScorers.ScorerType>{
@@ -28,7 +29,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> {
     @Option(name = "-s", aliases = {"--scorer"}, usage = "set of scores that should be used. standard scm can use only one", handler = ScorerTypeArrayOptionHandler.class)
     private  TreeScorers.ScorerType[] scorerTypes =  new TreeScorers.ScorerType[]{TreeScorers.ScorerType.UNIQUE_TAXA};
 
-    @Option(name = "-r", aliases = {"--randomized"}, usage = "Enables randomization")
+    @Option(name = "-r", aliases = {"--randomized"}, usage = "Enables randomization (standard iterations are numberOfTrees^2 per scoring)")
     private void setRandomized(boolean r){
         if (r){
             randomIterations = 0;
@@ -37,7 +38,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> {
         }
     }
 
-    @Option(name = "-R", aliases = {"--randomIterations"}, usage = "Enables randomization and specifies the number of iterations per scorer", forbids = "-r")
+    @Option(name = "-R", aliases = {"--randomIterations"}, usage = "Enables randomization and specifies the number of iterations per scoring", forbids = "-r")
     private void setRandomIterations(int iter){
         if (iter < 0){
             randomIterations = -1;
@@ -82,7 +83,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> {
     protected void printUsage(PrintStream stream) {
         stream.println("Usage:");
         stream.println(" " + name() + " [options...] INPUT_TREES_FILE");
-        stream.println("    The only required argument is the input tree file in newick format");
+        stream.println("    The only required argument is the input tree file in newick/nexus format");
         stream.println();
     }
 

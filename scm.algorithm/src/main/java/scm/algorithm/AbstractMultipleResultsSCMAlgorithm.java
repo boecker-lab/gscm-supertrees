@@ -163,7 +163,8 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         @Override
         public Tree doJob(TreeScorer scorer) {
             selector.setScorer(scorer);
-            return calculateGreedyConsensus(true, selector);
+            selector.setClearScorer(false);
+            return calculateGreedyConsensus(selector,false);
         }
     }
 

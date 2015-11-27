@@ -3,6 +3,7 @@ package scm.algorithm;
 import epos.algo.consensus.loose.LooseConsensus;
 import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeScorers;
 
 import java.util.Arrays;
 
@@ -25,7 +26,7 @@ public abstract class BasicSCMTest {
 
 
     protected static String[] getScorerNames() {
-        TreeScorer[] scorerArray = TreeScorer.CompleteScorerCombo(false);
+        TreeScorer[] scorerArray = TreeScorers.getFullScorerArray(false);
         String[] names = new String[scorerArray.length];
         for (int i = 0; i < scorerArray.length; i++) {
             names[i] = scorerArray[i].toString();
@@ -35,7 +36,7 @@ public abstract class BasicSCMTest {
 
 
     protected static String getMultiScorerName(int[] indices) {
-        TreeScorer[] scorerArray = TreeScorer.CompleteScorerCombo(false);
+        TreeScorer[] scorerArray = TreeScorers.getFullScorerArray(false);
         String[] names = new String[indices.length];
         for (int i = 0; i < names.length; i++) {
             names[i] = scorerArray[indices[i]].toString();

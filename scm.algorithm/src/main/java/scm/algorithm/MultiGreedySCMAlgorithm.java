@@ -6,6 +6,7 @@ import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
 import utils.parallel.ParallelUtils;
+import utils.progressBar.CLIProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,8 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
         for (int i = 0; i < scorerArray.length; i++) {
             TreeScorer scorer = scorerArray[i];
             selector.setScorer(scorer);
-            superTrees.add(calculateGreedyConsensus(selector, false));
+
+            superTrees.add(calculateGreedyConsensus(selector,false));
         }
         return superTrees;
     }

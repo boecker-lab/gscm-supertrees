@@ -22,13 +22,9 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
     }
 
 
+
     @Override
-    public void init(){
-        init(true);
-    }
-    // only one time called
-    @Override
-    public void init(boolean clearScorer) {
+    public void init() {
         if (clearScorer)
             clearScorer();
 

@@ -6,6 +6,7 @@ import org.junit.runners.Parameterized;
 import phyloTree.io.Newick;
 import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeScorers;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,14 +35,14 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
         List<Object[]> paras = new LinkedList<>();
 
         paras.addAll(Arrays.asList(
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorer.newOverlapScorer(true)}},
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorer.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorer.newTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), TreeScorer.newFastScorerCombo(true)},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorer.newOverlapScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorer.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorer.newTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorer.newFastScorerCombo(true)}));
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), TreeScorers.getFullScorerArray(true)},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));
 
         return paras;
 

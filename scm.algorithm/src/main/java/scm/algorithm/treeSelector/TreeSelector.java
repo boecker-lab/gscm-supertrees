@@ -11,8 +11,7 @@ import phyloTree.model.tree.Tree;
  */
 public interface TreeSelector {
     enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}
-
-    void init(boolean clearScorer);
+    void setClearScorer(boolean clearScorer);
     void init();
 
     Tree pollTreePair();

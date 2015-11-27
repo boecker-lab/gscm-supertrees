@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
  * Created by fleisch on 16.02.15.
  */
 
-
+//todo simple sample test
 @RunWith(Parameterized.class)
 public class GreedySCMAlgorithmTest extends BasicSCMTest {
     TreeSelector.ConsensusMethod method;
