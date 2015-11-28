@@ -1,18 +1,17 @@
 package scm.algorithm;
 
-import org.apache.log4j.Logger;
 import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
 import utils.parallel.ParallelUtils;
-import utils.progressBar.CLIProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 
 /**
  * Created by fleisch on 15.06.15.
@@ -57,7 +56,7 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
             TreeScorer scorer = scorerArray[i];
             selector.setScorer(scorer);
 
-            superTrees.add(calculateGreedyConsensus(selector,false));
+            superTrees.add(calculateGreedyConsensus(selector, false));
         }
         return superTrees;
     }

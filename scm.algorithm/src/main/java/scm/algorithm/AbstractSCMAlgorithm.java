@@ -2,7 +2,6 @@ package scm.algorithm;
 
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.log4j.Logger;
 import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
@@ -14,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 
 /**
  * Created by fleisch on 05.02.15.

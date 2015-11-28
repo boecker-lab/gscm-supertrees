@@ -1,7 +1,6 @@
 package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
-import org.apache.log4j.Logger;
 import phyloTree.model.tree.Tree;
 
 import utils.parallel.DefaultIterationCallable;
@@ -14,6 +13,7 @@ import scm.algorithm.treeSelector.TreeSelector;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 /**
  * Created by fleisch on 29.10.15.
