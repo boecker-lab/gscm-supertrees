@@ -7,13 +7,20 @@ import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.Setter;
 import phyloTree.SupertreeAlgortihmCLI;
+import phyloTree.model.tree.Tree;
 import scm.algorithm.AbstractSCMAlgorithm;
 import scm.algorithm.GreedySCMAlgorithm;
 import scm.algorithm.MultiGreedySCMAlgorithm;
 import scm.algorithm.RandomizedSCMAlgorithm;
 import scm.algorithm.treeSelector.TreeScorers;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by fleisch on 20.11.15.
@@ -48,10 +55,23 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
     }
     private int randomIterations = -1;
 
+    @Option(name = "-O", aliases = {"--fullOutput"}, usage = "Appends the unmerged trees of all scorers and random iterations to the output file",forbids = "-o")
+    private void setFullOutput(Path output){
+        this.output =  output;
+        appendUnmerged =  true;
+    }
+    private boolean appendUnmerged = false;
 
-    @Override
-    public void setParameters(AbstractSCMAlgorithm algorithm) {
-        super.setParameters(algorithm);
+    public void writeOutput(Tree primaryResult, List<Tree> multiTreeList) throws IOException {
+        List<Tree> results;
+        if (appendUnmerged){
+            results =  new ArrayList<>(multiTreeList.size() + 1);
+            results.add(primaryResult);
+            results.addAll(multiTreeList);
+        }else{
+            results =  Arrays.asList(primaryResult);
+        }
+        writeOutput(results);
     }
 
     public AbstractSCMAlgorithm getAlgorithmInstance(){
@@ -65,7 +85,6 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
                 //standard
                 algo =  new GreedySCMAlgorithm(TreeScorers.getScorer(isMultiThreaded(),scorerTypes[0]));
             }
-
         }else {
             //randomized
             algo =  new RandomizedSCMAlgorithm(randomIterations, TreeScorers.getScorerArray(isMultiThreaded(),scorerTypes));
@@ -86,5 +105,8 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
         stream.println("    The only required argument is the input tree file in newick/nexus format");
         stream.println();
     }
+
+
+
 
 }
