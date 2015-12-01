@@ -29,10 +29,11 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
 
 
     public static class ScorerTypeArrayOptionHandler extends EnumArrayOptionHandler<TreeScorers.ScorerType>{
-        protected ScorerTypeArrayOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super TreeScorers.ScorerType> setter) {
+        public ScorerTypeArrayOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super TreeScorers.ScorerType> setter) {
             super(parser, option, setter, TreeScorers.ScorerType.class);
         }
     }
+
     @Option(name = "-s", aliases = {"--scorer"}, usage = "set of scores that should be used. standard scm can use only one", handler = ScorerTypeArrayOptionHandler.class)
     private  TreeScorers.ScorerType[] scorerTypes =  new TreeScorers.ScorerType[]{TreeScorers.ScorerType.UNIQUE_TAXA};
 
@@ -64,7 +65,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
 
     public void writeOutput(Tree primaryResult, List<Tree> multiTreeList) throws IOException {
         List<Tree> results;
-        if (appendUnmerged){
+        if (appendUnmerged && multiTreeList.size()>1){
             results =  new ArrayList<>(multiTreeList.size() + 1);
             results.add(primaryResult);
             results.addAll(multiTreeList);
