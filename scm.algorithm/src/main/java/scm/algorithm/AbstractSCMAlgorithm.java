@@ -51,7 +51,7 @@ public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
     }
 
     public Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) {
-        return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT && printProgress));
+        return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT || !printProgress));
     }
 
     private Tree calculateGreedyConsensus(TreeSelector selector, final CLIProgressBar progressBar) {

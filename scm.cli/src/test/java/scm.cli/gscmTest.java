@@ -57,6 +57,18 @@ public class gscmTest {
         });
 
         paras.add(new Object[]{
+                new String[]{"-s",TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                out,
+                1
+        });
+
+        paras.add(new Object[]{
+                new String[]{"-B", "-s",TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                out,
+                1
+        });
+
+        paras.add(new Object[]{
                 new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
                 out,
                 1
@@ -66,6 +78,23 @@ public class gscmTest {
                 out,
                 3
         });
+        paras.add(new Object[]{
+                new String[]{"-r","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(),TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                out,
+                15
+        });
+
+        paras.add(new Object[]{
+                new String[]{"-R","10","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(),TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                out,
+                23
+        });
+
+        paras.add(new Object[]{
+                new String[]{"-B","-R","10","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(),TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                out,
+                23
+        });
         return paras;
     }
 
@@ -73,6 +102,7 @@ public class gscmTest {
     @Test
     public void testLauncher() {
         scm.main(args);
+
         assertTrue(Files.exists(resultFile));
         try {
             Tree[] trees = TreeFileUtils.parseFileToTrees(resultFile, TreeFileUtils.FileType.NEWICK);

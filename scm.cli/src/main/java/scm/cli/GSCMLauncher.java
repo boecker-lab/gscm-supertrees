@@ -2,10 +2,13 @@ package scm.cli;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.InterfaceCmdLineParser;
 import phyloTree.model.tree.Tree;
 import scm.algorithm.AbstractSCMAlgorithm;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,13 +16,14 @@ import java.util.List;
  * Created by fleisch on 24.11.15.
  */
 public class GSCMLauncher {
+//    private static Path PROPERTIES_FILE = Paths.get(GSCMLauncher.class.getResource("/application.properties").getFile());
     private static SCMCLI CLI;
 
     public static void main(String[] args) {
-        CLI = new SCMCLI();
+        CLI = new SCMCLI(SCMCLI.DEFAULT_PROPERTIES_FILE);
         double startTime = System.currentTimeMillis();
         CLI.LOGGER.info("Start calculation with following parameters: " + Arrays.toString(args));
-        final CmdLineParser parser = new CmdLineParser(CLI);
+        final CmdLineParser parser = new InterfaceCmdLineParser(CLI);
 
         try {
             // parse the arguments.
@@ -46,9 +50,20 @@ public class GSCMLauncher {
             CLI.LOGGER.info("Supertree calculation Done in: " + calcTime + "s");
 
         } catch (CmdLineException e) {
-            e.printStackTrace();
+            // if there's a problem in the command line,
+            // you'll get this exception. this will report
+            // an error message.
+            CLI.LOGGER.severe(e.getMessage());
+            System.err.println();
+            System.err.println();
+            CLI.printHelp(parser, System.out);
+
+            return;
         } catch (IOException e) {
-            e.printStackTrace();
+            CLI.LOGGER.severe(e.getMessage());
+            System.err.println();
+            System.err.println();
+            CLI.printHelp(parser, System.out);
         }
 
 

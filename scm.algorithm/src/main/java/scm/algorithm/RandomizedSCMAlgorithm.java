@@ -18,7 +18,8 @@ import java.util.concurrent.Future;
  * Created by fleisch on 24.03.15.
  */
 public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm {
-    private int iterations = 0;
+//    private int iterations = 0;
+    private int individualIterations = 0;
 
     public RandomizedSCMAlgorithm(TreeScorer... scorer) {
         this(null, scorer);
@@ -26,7 +27,6 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
     public RandomizedSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
         this(0, trees, scorer);
-        ;
     }
 
     public RandomizedSCMAlgorithm(int numberOfIterations, TreeScorer... scorer) {
@@ -35,11 +35,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
     public RandomizedSCMAlgorithm(int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
         super(trees, scorer);
-        if (numberOfIterations > 0) {
-            this.iterations = numberOfIterations;
-        }else {
-            iterations = defaultIterations();
-        }
+        individualIterations = numberOfIterations;
     }
 
     private int defaultIterations() {
@@ -49,10 +45,11 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
     @Override
     protected int numOfJobs() {
-        return (iterations + 1) * scorerArray.length;
+        return (getIterations() + 1) * scorerArray.length;
     }
 
     protected List<Tree> calculateSequencial() {
+        final int iterations = getIterations();
         final GreedyTreeSelector nonRandomResultSelector = new GreedyTreeSelector();
         nonRandomResultSelector.setInputTrees(inputTrees);
         final RandomizedGreedyTreeSelector randomResultSelector = new RandomizedGreedyTreeSelector();
@@ -75,6 +72,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
     }
 
     protected List<Tree> calculateParallel() {
+        final int iterations = getIterations();
         List<Tree> superTrees = new ArrayList<>(numOfJobs());
         List<Future<List<Tree>>> futurList = new LinkedList<>();
 
@@ -107,13 +105,15 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         return null;
     }
 
-    public void setInput(boolean defaultNumOfIterations, Tree... trees) {
-        if (defaultNumOfIterations)
-            iterations = defaultIterations();
-        setInput(trees);
+    public void setNumberOfIterations(int iterations) {
+        this.individualIterations = iterations;
     }
 
-    public void setNumberOfIterations(int iterations) {
-        this.iterations = iterations;
+    public int getIterations() {
+        if (individualIterations > 0 )
+            return individualIterations;
+        else if (inputTrees != null)
+            return defaultIterations();
+        return 0;
     }
 }

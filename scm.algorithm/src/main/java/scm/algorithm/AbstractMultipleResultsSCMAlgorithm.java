@@ -108,7 +108,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
             if (superTrees != null)
                 return superTrees;
             else
-                System.err.println("paralle execution failed! Calculating tree sequential...");
+                LOGGER.severe("parallel execution failed! Calculating tree sequential...");
         }
         return calculateSequencial();
     }
