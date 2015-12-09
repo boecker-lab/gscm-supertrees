@@ -41,8 +41,8 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
                 new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), TreeScorers.getFullScorerArray(true)},
                 new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
                 new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}}));
+//                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));
 
         return paras;
 

@@ -1,6 +1,7 @@
 package scm.algorithm;
 
 
+import org.junit.Test;
 import phyloTree.model.tree.Tree;
 
 /**
