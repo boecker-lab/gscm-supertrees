@@ -72,7 +72,6 @@ public class TreeScorers {
         return new TreeScorer[]{
                 new TreeScorer.OverlapScorer(synced),
                 new TreeScorer.CollisionPointNumberScorer(synced),
-                new TreeScorer.CollisionLostCladesNumberScorer(synced),
                 new TreeScorer.CollisionNumberScorer(synced),
                 new TreeScorer.BackboneSizeScorer(synced),
                 new TreeScorer.BackboneCladeNumberScorer(synced),
@@ -83,6 +82,20 @@ public class TreeScorers {
                 new TreeScorer.ConsensusBackboneSizeScorer(synced),
                 new TreeScorer.ConsensusCladeNumberScorer(synced),
                 new TreeScorer.ConsensusResolutionScorer(synced)
+        };
+    }
+
+    public static TreeScorer[] getNuScorerArray(boolean synced) {
+        return new TreeScorer[]{
+                new TreeScorer.OverlapScorer(synced),
+                new TreeScorer.CollisionNumberScorer(synced),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+                new TreeScorer.ConsensusCladeNumberScorer(synced),
+                new TreeScorer.ConsensusResolutionScorer(synced),
+                new TreeScorer.UniqueCladesNumberScorer(synced),
+                new TreeScorer.UniqueCladesRemainingNumberScorer(synced),
+                new TreeScorer.UniqueCladesLostNumberScorer(synced),
+                new TreeScorer.UniqueCladesRateScorer(synced)
         };
     }
 

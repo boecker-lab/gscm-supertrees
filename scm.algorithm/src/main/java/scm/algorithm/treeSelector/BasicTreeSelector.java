@@ -67,7 +67,7 @@ public abstract class BasicTreeSelector implements TreeSelector {
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
                 final TreePair pair = new TreePair(t1, t2, scorer, newConsensusCalculatorInstance(method));
-                if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                if (pair != null && !pair.isInsufficient()) {
                     addTreePair(t1, pair);
                     addTreePair(t2, pair);
                 }
@@ -137,7 +137,7 @@ public abstract class BasicTreeSelector implements TreeSelector {
         //sequential adding
         for (Future<List<TreePair>> futures : submittedJobs) {
             for (TreePair pair : futures.get()) {
-                if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+                if (pair != null && !pair.isInsufficient()) {
                     addTreePair(pair.t1, pair);
                     addTreePair(pair.t2, pair);
                 }
@@ -153,7 +153,7 @@ public abstract class BasicTreeSelector implements TreeSelector {
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
             TreePair pair = new TreePair(tree, old, scorer, newConsensusCalculatorInstance());
-            if (pair != null && pair.score > Double.NEGATIVE_INFINITY) {
+            if (pair != null && !pair.isInsufficient()) {
                 addTreePair(tree, pair);
                 addTreePair(old, pair);
             }

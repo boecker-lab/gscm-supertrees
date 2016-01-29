@@ -24,6 +24,9 @@ public abstract class BasicSCMTest {
         this.scmResult = scmResult;
     }
 
+    public BasicSCMTest() {
+        this(null,null);
+    }
 
     protected static String[] getScorerNames() {
         TreeScorer[] scorerArray = TreeScorers.getFullScorerArray(false);

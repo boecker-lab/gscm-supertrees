@@ -38,9 +38,10 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     @Parameterized.Parameters
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
-        for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
+        for (TreeScorer scorer : TreeScorers.getNuScorerArray(false)) {
             for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
-                paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), method, scorer});
+//                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
+                paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});
             }
         }
@@ -51,11 +52,11 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     public void testSmidgenSamples() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append("########## Test with following Parameters [" + inputData + ", " + scmResult + ", " + method + "] ##########");
+        buf.append("########## Test with following Parameters [" + scorer.getClass().getCanonicalName() + ", " + inputData + ", " + scmResult + ", " + method + "] ##########");
         buf.append(SEP);
         long t = System.currentTimeMillis();
         TreeSelector selector = new GreedyTreeSelector(method);
-        selector.setScorer(new TreeScorer.OverlapScorer());
+        selector.setScorer(scorer);
         selector.setInputTrees(inputData);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();

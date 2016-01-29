@@ -22,16 +22,19 @@ class TreePair implements Comparable<TreePair> {
     Tree t2pruned;
 
     public double score;
+    boolean isCollisionFree = false;
 
 
     Tree consensus = null;
+    int backboneClades =  -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
     int consensusNumOfTaxa = -1;
 
     Set<String> commonLeafes;
-    Map<Set<String>, Set<SingleTaxon>> commenInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
+    Map<Set<String>, Set<SingleTaxon>> commonInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
     private final SupertreeAlgorithm consensorator;
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
+
 
 
     //just to create min value
@@ -55,7 +58,7 @@ class TreePair implements Comparable<TreePair> {
     }
 
     TreePair calculateScore(TreeScorer scorer){
-        score = scorer.scoreTreePair(this);
+        scorer.scoreTreePair(this);
         return this;
     }
 
@@ -142,12 +145,12 @@ class TreePair implements Comparable<TreePair> {
 
                     Set<SingleTaxon> singles = commenInsertionPointTaxa.get(commonSiblingLeafes);
                     if (singles == null) {
-                        if (this.commenInsertionPointTaxa == null) {
+                        if (this.commonInsertionPointTaxa == null) {
                             singles = new THashSet<>();
                             commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
                             singles.add(st);
                         } else {
-                            singles = this.commenInsertionPointTaxa.get(commonSiblingLeafes);
+                            singles = this.commonInsertionPointTaxa.get(commonSiblingLeafes);
                             if (singles != null) {
                                 commenInsertionPointTaxa.put(commonSiblingLeafes, singles);
                                 singles.add(st);
@@ -171,7 +174,7 @@ class TreePair implements Comparable<TreePair> {
 
         //this is to do the switch between first and second tree mode
 //        first = false;
-        this.commenInsertionPointTaxa = commenInsertionPointTaxa;
+        this.commonInsertionPointTaxa = commenInsertionPointTaxa;
 
     }
 
@@ -195,7 +198,7 @@ class TreePair implements Comparable<TreePair> {
 
 
             //check ist we have to add a new inner node (removed from binary) or not (removed from polytomy)
-            Set<SingleTaxon> singles = commenInsertionPointTaxa.get(singleTaxon.commonSiblingLeaves);
+            Set<SingleTaxon> singles = commonInsertionPointTaxa.get(singleTaxon.commonSiblingLeaves);
             if (singles == null) {
                 singles = new THashSet<>(1);
                 singles.add(singleTaxon);
@@ -203,7 +206,7 @@ class TreePair implements Comparable<TreePair> {
 
 
             //build insertion point for first occurence on this path...
-            if (!singles.isEmpty()) {//if empty the taxon is already iserted before.
+            if (!singles.isEmpty()) {//if empty the taxon has already been inserted before.
                 if (singleTaxon.numOfSiblings == 1) {
                     //todo is there a faster/more elegant way to proof that
                     Set<String> s = new THashSet<>(TreeUtils.getLeafLabels(lca));
@@ -253,23 +256,28 @@ class TreePair implements Comparable<TreePair> {
         return labelToNode.size();
     }
 
-    public Tree getConsensus(/*final SupertreeAlgorithm consensorator*/) {
+    public Tree getConsensus() {
         if (consensus == null)
             calculateConsensus();
         return consensus;
     }
 
-    public void calculateConsensus(/*final SupertreeAlgorithm consensorator*/) {
+    public void calculateConsensus() {
         if (commonLeafes.size() > 2) {
             if (singleTaxa == null)
                 pruneToCommonLeafes();
             consensorator.setInput(Arrays.asList(t1pruned, t2pruned));
             consensorator.run();
             consensus = consensorator.getResult();
+            backboneClades = consensus.vertexCount() - commonLeafes.size();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
         }else{
             System.err.println("Trees have nothing in common!");
         }
+    }
+    
+    public boolean isInsufficient(){
+        return score <= Double.NEGATIVE_INFINITY;
     }
 
     @Override

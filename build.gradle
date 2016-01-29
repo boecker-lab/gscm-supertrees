@@ -57,7 +57,8 @@ project(':scm.algorithm') {
         compile 'de.unijena.bioinf:core-lib.utils:0.9-SNAPSHOT'
 
         testCompile 'org.apache.commons:commons-math3:3.2'
-//        testCompile 'de.uni-jena.bioinf:project-evaluation:0.8-SNAPSHOT'
+        testCompile files('build/libs/project-evaluation-0.8-SNAPSHOT.jar')
+        testCompile 'de.unijena.bioinf:phyloTree.utils:0.9.9-SNAPSHOT'
     }
 }
 
