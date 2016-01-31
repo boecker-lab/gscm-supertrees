@@ -10,8 +10,13 @@ public class TreeScorers {
     public enum ScorerType {
         UNIQUE_TAXA,
         OVERLAP,
+        CLADE_NUMBER,
         RESOLUTION,
-        COLLISION
+        COLLISION,
+        UNIQUE_CLADE_NUMBER,
+        UNIQUE_CLADE_RATE,
+        UNIQUE_CLADES_LOST,
+        UNIQUE_CLADES_REMAINING
     }
 
 
@@ -27,10 +32,20 @@ public class TreeScorers {
                 return newUniqueTaxonScorer(synced);
             case OVERLAP:
                 return newOverlapScorer(synced);
+            case CLADE_NUMBER:
+                return new ConsensusCladeNumberScorer(synced);
             case RESOLUTION:
                 return newResolutionScorer(synced);
             case COLLISION:
                 return newCollisionScorer(synced);
+            case UNIQUE_CLADE_NUMBER:
+                new UniqueTaxaNumberScorer(synced);
+            case UNIQUE_CLADE_RATE:
+                return new UniqueCladesRateScorer(synced);
+            case UNIQUE_CLADES_LOST:
+                return new UniqueCladesLostNumberScorer(synced);
+            case UNIQUE_CLADES_REMAINING:
+                return new UniqueCladesRemainingNumberScorer(synced);
             default:
                 return null;
         }
