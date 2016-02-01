@@ -74,4 +74,9 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
         }
         return null;
     }
+
+    @Override
+    protected String name() {
+        return getClass().getSimpleName();
+    }
 }

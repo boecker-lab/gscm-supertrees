@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

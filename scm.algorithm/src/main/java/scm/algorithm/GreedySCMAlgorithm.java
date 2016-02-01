@@ -53,7 +53,10 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
         this.selector = selector;
     }
 
-
+    @Override
+    protected String name() {
+        return getClass().getSimpleName();
+    }
 
     @Override
     public void setScorer(TreeScorer scorer) {

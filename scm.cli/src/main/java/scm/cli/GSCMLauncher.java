@@ -29,6 +29,12 @@ public class GSCMLauncher {
             // parse the arguments.
             parser.parseArgument(args);
 
+            // check for help
+            if (CLI.isHelp() || CLI.isFullHelp()) {
+                CLI.printHelp(parser);
+                System.exit(0);
+            }
+
             // configure algorithm
             AbstractSCMAlgorithm algorithm = CLI.getAlgorithmInstance();
 
@@ -48,7 +54,7 @@ public class GSCMLauncher {
 
             double calcTime = (System.currentTimeMillis() - startTime)/1000d;
             CLI.LOGGER.info("Supertree calculation Done in: " + calcTime + "s");
-
+            System.exit(0);
         } catch (CmdLineException e) {
             // if there's a problem in the command line,
             // you'll get this exception. this will report
@@ -57,16 +63,13 @@ public class GSCMLauncher {
             System.err.println();
             System.err.println();
             CLI.printHelp(parser, System.out);
-
-            return;
+            System.exit(1);
         } catch (IOException e) {
             CLI.LOGGER.severe(e.getMessage());
             System.err.println();
             System.err.println();
             CLI.printHelp(parser, System.out);
+            System.exit(1);
         }
-
-
     }
-
 }

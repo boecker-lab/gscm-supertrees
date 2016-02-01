@@ -43,6 +43,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         return inputTrees.length;
     }
 
+
     @Override
     protected int numOfJobs() {
         return (getIterations() + 1) * scorerArray.length;
@@ -115,5 +116,10 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         else if (inputTrees != null)
             return defaultIterations();
         return 0;
+    }
+
+    @Override
+    protected String name() {
+        return getClass().getSimpleName();
     }
 }

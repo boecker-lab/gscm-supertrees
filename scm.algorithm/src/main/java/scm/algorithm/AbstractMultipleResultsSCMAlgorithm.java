@@ -32,14 +32,15 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         this(null, scorer);
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(Tree[] trees) {
-        this(trees, null);
-    }
-
     public AbstractMultipleResultsSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
-        this();
+        super();
         this.inputTrees = trees;
-        this.scorerArray = scorer;
+        if (scorer != null && scorer.length > 0)
+            this.scorerArray = scorer;
+        else
+            this.scorerArray = null;
+
+
     }
 
     public AbstractMultipleResultsSCMAlgorithm(Logger logger, ExecutorService executorService) {
@@ -48,6 +49,15 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     public AbstractMultipleResultsSCMAlgorithm(Logger logger) {
         super(logger);
+    }
+
+    public AbstractMultipleResultsSCMAlgorithm(Logger logger,Tree[] trees, TreeScorer... scorer) {
+        super(logger);
+        this.inputTrees = trees;
+        if (scorer != null && scorer.length > 0)
+            this.scorerArray = scorer;
+        else
+            this.scorerArray = null;
     }
 
 

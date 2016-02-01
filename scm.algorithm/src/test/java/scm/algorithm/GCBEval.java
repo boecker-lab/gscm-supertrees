@@ -1,18 +1,33 @@
 package scm.algorithm;
 
 
+import epos.algo.consensus.loose.LooseConsensus;
+//import evalUtils.EvalUtils;
+//import flipCut.Global;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.Test;
+import phyloTree.io.Newick;
 import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeUtils;
+import phyloTree.treetools.FN_FP_RateComputer;
+import scm.algorithm.treeSelector.GreedyTreeSelector;
+import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeSelector;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by fleisch on 09.11.15.
  */
 public class GCBEval extends BasicSCMTest {
-
-
-    public GCBEval(Tree[] inputData, Tree scmResult) {
-        super(inputData, scmResult);
-    }
 
     //############################ EVAL TESTS #################################################
 
@@ -155,10 +170,10 @@ public class GCBEval extends BasicSCMTest {
         }
     }*/
 
-   /* @Test
+    /*@Test
     public void debugTest() throws IOException {
         int[] taxas = {
-//                100,
+                100,
                 500,
 //                1000
         };
@@ -170,21 +185,13 @@ public class GCBEval extends BasicSCMTest {
                 100
         };
 
-
-        Path fnFile = Paths.get("/home/qo53kab/Work/scmResults/fn.scm-rand-25-c4." + taxas[0] + ".csv");
-        Path fpFile = Paths.get("/home/qo53kab/Work/scmResults/fp.scm-rand-25-c4." + taxas[0] + ".csv");
-        ;
-        Path sfnFile = Paths.get("/home/qo53kab/Work/scmResults/sfn.scm-rand-25-c4." + taxas[0] + ".csv");
-        ;
-        Path sfpFile = Paths.get("/home/qo53kab/Work/scmResults/sfp.scm-rand-25-c4." + taxas[0] + ".csv");
-        ;
-        Path resolutionFile = Paths.get("/home/qo53kab/Work/scmResults/resolution.scm-rand-25-c4." + taxas[0] + ".csv");
-
-        List<List<Tree>> resultTrees = new ArrayList<>(4);
-        for (int i = 0; i < scaffoldFactors.length; i++) {
-            resultTrees.add(new ArrayList<>(fullStrictCombi.length));
-        }
-
+        int type = 0;
+        String[] types = {"STD","","",""};
+        Path fnFile = Paths.get("/home/qo53kab/Work/scmResults/fn.scm."  + taxas[0] + types[type] + ".csv");
+        Path fpFile = Paths.get("/home/qo53kab/Work/scmResults/fp.scm." + taxas[0] + types[type] +".csv");
+        Path sfnFile = Paths.get("/home/qo53kab/Work/scmResults/sfn.scm." + taxas[0] + types[type] +".csv");
+        Path sfpFile = Paths.get("/home/qo53kab/Work/scmResults/sfp.scm." + taxas[0] + types[type] +".csv");
+        Path resolutionFile = Paths.get("/home/qo53kab/Work/scmResults/resolution.scm." + taxas[0]  + types[type] + ".csv");
 
         Path[] files = {
                 fnFile,
@@ -196,6 +203,7 @@ public class GCBEval extends BasicSCMTest {
 
         String header = "Scorer\t20\t50\t75\t100\n";
         for (Path file : files) {
+            Files.createDirectories(file.getParent());
             Files.deleteIfExists(file);
             Files.write(file, header.getBytes(), StandardOpenOption.CREATE);
         }
@@ -226,16 +234,17 @@ public class GCBEval extends BasicSCMTest {
 //        );
 
         List<TreeScorer[]> combis = new ArrayList<>();
-//        combis.add(new TreeScorer[] {new CollisionLostCladesNumberScorer()});
-//        combis.add(new TreeScorer[] {new CollisionNumberScorer()});
-        combis.add(new TreeScorer[]{new CollisionPointNumberScorer()});
-        combis.add(new TreeScorer[]{new CollisionMultiCollisionPointScorer()});
-//        combis.add(new TreeScorer[] {new CollisionPointMultiCollissionTieBreakScorer()});
-        combis.add(new TreeScorer[]{new SubsetUnitOverlapScorer()});
-        combis.add(new TreeScorer[]{new SubsetUnitOverlapDifferenceScorer()});
-        combis.add(new TreeScorer[]{new SubsetUnitOverlapRateScorer()});
-        combis.add(new TreeScorer[]{new UniqueTaxaNumberScorer()});
-//        combis.add(new TreeScorer[] {new UniqueTaxaNumberScorer()});
+        combis.add(new TreeScorer[] {new TreeScorer.OverlapScorer()});
+        combis.add(new TreeScorer[]{new TreeScorer.UniqueTaxaNumberScorer()});
+
+//        combis.add(new TreeScorer[]{new TreeScorer.CollisionNumberScorer()});
+//        combis.add(new TreeScorer[]{new TreeScorer.ConsensusCladeNumberScorer()});
+
+//        combis.add(new TreeScorer[]{new TreeScorer.UniqueCladesNumberScorer()});
+//        combis.add(new TreeScorer[]{new TreeScorer.UniqueCladesRemainingNumberScorer()});
+//        combis.add(new TreeScorer[]{new TreeScorer.UniqueCladesLostNumberScorer()});
+//        combis.add(new TreeScorer[]{new TreeScorer.UniqueCladesRateScorer()});
+
 //        combis.add(b4);
 
 
@@ -322,14 +331,14 @@ public class GCBEval extends BasicSCMTest {
 
                     for (int instance = instanceMin; instance < currentInstanceMax; instance++) {
                         TEMPLATES.put(Global.TAG_INSTANCE, Integer.toString(instance));
-                        File scmFile = new File(EvalUtils.expandTemplate(scmTreeLocation, TEMPLATES));
-                        File modelFile = new File(EvalUtils.expandTemplate(modelTreeLocation, TEMPLATES));
+                        File scmFile = new File(EvalUtils.expandTemplate(LOCATIONS.scmTreeLocation, TEMPLATES));
+                        File modelFile = new File(EvalUtils.expandTemplate(LOCATIONS.modelTreeLocation, TEMPLATES));
 
                         if (scmFile.exists()) {
 
                             trees[scaffoldFactorIndex]++;
                             Tree swensonSCM = Newick.getTreeFromFile(scmFile)[0];
-                            File inputFile = new File(EvalUtils.expandTemplate(sourceTreeLocation, TEMPLATES));
+                            File inputFile = new File(EvalUtils.expandTemplate(LOCATIONS.sourceTreeLocation, TEMPLATES));
                             Tree[] input = Newick.getTreeFromFile(inputFile);
 
 
@@ -346,10 +355,12 @@ public class GCBEval extends BasicSCMTest {
                             System.out.println(Newick.getStringFromTree(swensonSCM));
 
 
-                            GreedySCMAlgorithm scmAlgorithm = new GreedySCMAlgorithm(new GreedyTreeSelector(scorer[0], TreeUtilsBasic.cloneTrees(input)));
+                            GreedySCMAlgorithm scmAlgorithm = new GreedySCMAlgorithm(new GreedyTreeSelector(TreeSelector.ConsensusMethod.STRICT));
 //                            MultiGreedySCMAlgorithm scmAlgorithm = new MultiGreedySCMAlgorithm(TreeUtilsBasic.cloneTrees(input), fullStrictCombi);
 //                            RandomizedSCMAlgorithm scmAlgorithm =  new RandomizedSCMAlgorithm(true,25,TreeUtilsBasic.cloneTrees(input), scorer);
 
+                            scmAlgorithm.setScorer(scorer[0]);
+                            scmAlgorithm.setInput(TreeUtils.cloneTrees(input));
                             scmAlgorithm.run();
                             List<Tree> scmTrees = scmAlgorithm.getResults();
 //                            Tree scmTree = scmAlgorithm.getMergedSupertree();
@@ -377,7 +388,7 @@ public class GCBEval extends BasicSCMTest {
 
 
 //                            Path outFile =  Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance +".standard-scmTrees.tre");
-                            Path outFile = Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance + ".randomized25-c4-scmTrees.tre");
+                            Path outFile = Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance + ".scmTrees." + types[type] + ".tre");
                             Files.createDirectories(outFile.getParent());
                             if (s == 0) {
                                 Files.deleteIfExists(outFile);
@@ -398,12 +409,12 @@ public class GCBEval extends BasicSCMTest {
                             sfn[scaffoldFactorIndex].addValue(sumOfRates[0]);
                             sfp[scaffoldFactorIndex].addValue(sumOfRates[1]);
 
-                            resolution[scaffoldFactorIndex].addValue(TreeUtilsBasic.calculateTreeResolution(scmTree.getNumTaxa(), scmTree.vertexCount()));
+                            resolution[scaffoldFactorIndex].addValue(TreeUtils.calculateTreeResolution(scmTree.getNumTaxa(), scmTree.vertexCount()));
 
-                            List<String> order = new ArrayList<>(TreeUtilsBasic.getLeafLabels(scmTree.getRoot()));
+                            List<String> order = new ArrayList<>(TreeUtils.getLeafLabels(scmTree.getRoot()));
                             Collections.sort(order);
-                            TreeUtilsBasic.sortTree(swensonSCM, order);
-                            TreeUtilsBasic.sortTree(scmTree, order);
+                            TreeUtils.sortTree(swensonSCM, order);
+                            TreeUtils.sortTree(scmTree, order);
 
                             System.out.println("FN/FP FleischSCM to Swenson: ");
                             System.out.println(Arrays.toString(swensonRates));
@@ -497,11 +508,10 @@ public class GCBEval extends BasicSCMTest {
             }
             System.out.println(" ]");
         }
-    }*/
+    }
+*/
 
-
- /*
-    @Test
+   /* @Test
     public void scmMultiEval() throws IOException {
         int[] taxas = {
 //                100,
@@ -532,7 +542,7 @@ public class GCBEval extends BasicSCMTest {
 //                new int[]{10},
 //                new int[]{11},
 //                new int[]{12},
-                new int[]{1, 6, 11, 12}
+//                new int[]{1, 6, 11, 12}
 //                new int[]{0,1,6,11,12},
 //                new int[]{0,1,6,9,12},
 //                new int[]{0,1,2,6,7,9,11,12},
@@ -577,9 +587,9 @@ public class GCBEval extends BasicSCMTest {
                     Path scmFile =  source.resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance +".standard-scmTrees.tre");
                     if (Files.exists(scmFile)) {
                         Tree[] trees =  Newick.getTreeFromFile(scmFile.toFile());
-                        File modelFile = new File(EvalUtils.expandTemplate(modelTreeLocation, TEMPLATES));
+                        File modelFile = new File(EvalUtils.expandTemplate(LOCATIONS.modelTreeLocation, TEMPLATES));
                         Tree modelTree =  Newick.getTreeFromFile(modelFile)[0];
-                        File inputFile = new File(EvalUtils.expandTemplate(sourceTreeLocation, TEMPLATES));
+                        File inputFile = new File(EvalUtils.expandTemplate(LOCATIONS.sourceTreeLocation, TEMPLATES));
                         Tree[] inputTrees =  Newick.getTreeFromFile(inputFile);
 
                         for (int i = 0; i < scorerCombos.size(); i++) {
@@ -587,7 +597,7 @@ public class GCBEval extends BasicSCMTest {
                             Tree scmTree = getSemiStrict(trees,scorerCombo);
 
                             DescriptiveStatistics[] currentComboStats =  currentScaffold[i];
-                            double[] rates = FN_FP_RateComputer.calculateRates(scmTree,modelTree,false);
+                            double[] rates = FN_FP_RateComputer.calculateRates(scmTree, modelTree, false);
                             double[] sumOfrates = FN_FP_RateComputer.calculateSumOfRates(scmTree, inputTrees);
                             if (currentComboStats[0] == null)
                                 currentComboStats[0] = new DescriptiveStatistics();
@@ -603,14 +613,14 @@ public class GCBEval extends BasicSCMTest {
                             currentComboStats[3].addValue(sumOfrates[1]);
                             if (currentComboStats[4] == null)
                                 currentComboStats[4] = new DescriptiveStatistics();
-                            currentComboStats[4].addValue(TreeUtilsBasic.calculateTreeResolution(scmTree.getNumTaxa(), scmTree.vertexCount()));
+                            currentComboStats[4].addValue(TreeUtils.calculateTreeResolution(scmTree.getNumTaxa(), scmTree.vertexCount()));
 
 
                             Path outFile =  Paths.get("/home/qo53kab/Work/scmResults/smog/").resolve(String.valueOf(taxa)).resolve(String.valueOf(scaffoldFactors[scaffoldFactorIndex])).resolve("smo." + instance +".standard-c4-scmTrees.tre");
                             if (i==0) {
                                 Files.createDirectories(outFile.getParent());
                                 Files.deleteIfExists(outFile);
-                                Files.write(outFile,(Newick.getStringFromTree(scmTree) + "\n").getBytes(),StandardOpenOption.CREATE);
+                                Files.write(outFile,(Newick.getStringFromTree(scmTree) + "\n").getBytes(), StandardOpenOption.CREATE);
                             } else {
                                 Files.write(outFile,(Newick.getStringFromTree(scmTree) + "\n").getBytes(),StandardOpenOption.APPEND);
                             }
