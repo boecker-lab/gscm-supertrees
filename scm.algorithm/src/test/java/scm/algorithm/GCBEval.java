@@ -1,28 +1,8 @@
 package scm.algorithm;
 
 
-import epos.algo.consensus.loose.LooseConsensus;
 //import evalUtils.EvalUtils;
 //import flipCut.Global;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.junit.Test;
-import phyloTree.io.Newick;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeUtils;
-import phyloTree.treetools.FN_FP_RateComputer;
-import scm.algorithm.treeSelector.GreedyTreeSelector;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelector;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by fleisch on 09.11.15.
