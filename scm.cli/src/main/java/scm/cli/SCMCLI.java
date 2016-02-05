@@ -71,7 +71,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
 
     @Option(name = "-O", aliases = {"--fullOutput"}, usage = "Appends the unmerged trees of all scorers and random iterations to the output file", forbids = "-o")
     private void setFullOutput(Path output) {
-        this.output = output;
+        setOutput(output);
         appendUnmerged = true;
     }
 
