@@ -14,7 +14,8 @@ public class TreeScorers {
         OVERLAP_ORIG,
         CLADE_NUMBER,
         RESOLUTION,
-        COLLISION,
+        COLLISION_SUBTREES,
+        COLLISION_POINT,
         UNIQUE_CLADE_NUMBER,
         UNIQUE_CLADE_RATE,
         UNIQUE_CLADES_LOST,
@@ -42,8 +43,10 @@ public class TreeScorers {
                 return new ConsensusCladeNumberScorer(synced);
             case RESOLUTION:
                 return newResolutionScorer(synced);
-            case COLLISION:
-                return newCollisionScorer(synced);
+            case COLLISION_SUBTREES:
+                return new CollisionNumberScorer(synced);
+            case COLLISION_POINT:
+                return new CollisionPointNumberScorer(synced);
             case UNIQUE_CLADE_NUMBER:
                 new UniqueTaxaNumberScorer(synced);
             case UNIQUE_CLADE_RATE:
