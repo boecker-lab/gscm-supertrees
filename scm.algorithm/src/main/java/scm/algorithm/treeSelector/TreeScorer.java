@@ -19,11 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public abstract class TreeScorer<T extends TreeScorer> {
-//    public static final boolean RELIABLE_MERGES = true;
+    //    public static final boolean RELIABLE_MERGES = true;
     final Map<Tree, THashSet<String>> treeToTaxa;
     final Set<String> taxaCache;
     public final boolean synced;
-    double max;
+    public final static boolean TIE_BREAKER = true;
+//    double max;
 
     public TreeScorer() {
         this(true);
@@ -83,12 +84,18 @@ public abstract class TreeScorer<T extends TreeScorer> {
         if (common.size() < 3)
             pair.score = Double.NEGATIVE_INFINITY;
         else {
-            pair.score = calculateScore(pair, common);//todo common not needed
+            pair.score = calculateScore(pair);
+            if (TIE_BREAKER)
+                pair.tieBreakingScore = calculateTieBreakScore(pair);
         }
         return pair.score;
     }
 
-    public abstract double calculateScore(TreePair pair, Set<String> common);
+    protected abstract double calculateScore(TreePair pair);
+
+    protected double calculateTieBreakScore(TreePair pair) {
+        return treeToTaxa.get(pair.t1).size() + treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size();
+    }
 
     public void clearCache() {
         treeToTaxa.clear();
@@ -140,7 +147,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     int getNumRemainingUniqueClades(TreePair pair) {
-        return pair.consensus.vertexCount() - pair.backboneClades - pair.commonLeafes.size();
+        return pair.consensus.vertexCount() - pair.backboneClades - pair.consensusNumOfTaxa;
     }
 
     //unchecked
@@ -198,7 +205,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         // for this score i use the resolution as a ty breaker. because i can!
         //OK
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             pair.pruneToCommonLeafes();
             return (pair.t1pruned.vertexCount() - getNumOfBackboneTaxa(pair)) + (pair.t2pruned.vertexCount() - getNumOfBackboneTaxa(pair));
@@ -220,7 +227,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         // for this score i use the resolution as a ty breaker. because i can!
         //OK
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             pair.pruneToCommonLeafes();
             return pair.t1pruned.vertexCount() + pair.t2pruned.vertexCount() - getNumOfBackboneTaxa(pair);
@@ -242,7 +249,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         //BAD
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.pruneToCommonLeafes();
@@ -264,7 +271,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         // GOOOD
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             pair.pruneToCommonLeafes();
             return (-getNumOfCollisions(pair));
         }
@@ -284,7 +291,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         //OK
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.pruneToCommonLeafes();
@@ -306,7 +313,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.calculateConsensus();
@@ -328,7 +335,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.calculateConsensus();
@@ -349,7 +356,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.calculateConsensus();
@@ -371,7 +378,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.calculateConsensus();
@@ -391,10 +398,10 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
-            return getLeafLabels(pair.t1).size() + getLeafLabels(pair.t2).size() - common.size();
+            return getLeafLabels(pair.t1).size() + getLeafLabels(pair.t2).size() - pair.commonLeafes.size();
         }
     }
 
@@ -411,7 +418,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
 
             pair.calculateConsensus();
@@ -432,9 +439,24 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             return getNumOfBackboneTaxa(pair);
+        }
+    }
+
+    public static class OverlapScorerOrig extends OverlapScorer {
+        public OverlapScorerOrig() {
+            super();
+        }
+
+        public OverlapScorerOrig(boolean syncedCache) {
+            super(syncedCache);
+        }
+
+        @Override
+        protected double calculateTieBreakScore(TreePair pair) {
+            return 0d;
         }
     }
 
@@ -452,7 +474,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             // is this a zero collision pair?
             Set<String> ts1 = treeToTaxa.get(pair.t1);
@@ -463,7 +485,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
             } else if (ts2.containsAll(ts1)) {
                 score += taxaCache.size() + ts2.size();
             }
-            score += (taxaCache.size() - (ts1.size() - common.size()) + (ts2.size() - common.size()));
+            score += (taxaCache.size() - (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size()));
             return score;
         }
 
@@ -482,7 +504,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             // is this a zero collision pair?
             Set<String> ts1 = treeToTaxa.get(pair.t1);
@@ -493,7 +515,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
             } else if (ts2.containsAll(ts1)) {
                 score += taxaCache.size() + ts2.size();
             }
-            score += (double) taxaCache.size() / (double) (ts1.size() - common.size()) + (ts2.size() - common.size());
+            score += (double) taxaCache.size() / (double) (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
             return score;
         }
 
@@ -512,7 +534,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
 
             // is this a zero collision pair?
             Set<String> ts1 = treeToTaxa.get(pair.t1);
@@ -523,8 +545,8 @@ public abstract class TreeScorer<T extends TreeScorer> {
             } else if (ts2.containsAll(ts1)) {
                 score += taxaCache.size() + ts2.size();
             }
-            score -= (ts1.size() - common.size()) + (ts2.size() - common.size());
-            score += (double) common.size() / (double) taxaCache.size();
+            score -= (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
+            score += (double) pair.commonLeafes.size() / (double) taxaCache.size();
 
             return score;
         }
@@ -544,7 +566,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             pair.pruneToCommonLeafes();
             return getNumUniqueClades(pair);
         }
@@ -564,11 +586,16 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             pair.calculateConsensus();
             double uniqueCladesBefore = getNumUniqueClades(pair);
             double uniqueCladesAfter = getNumRemainingUniqueClades(pair);
             return uniqueCladesAfter / uniqueCladesBefore;
+        }
+
+        @Override
+        protected double calculateTieBreakScore(TreePair pair) {
+            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
         }
     }
 
@@ -582,9 +609,14 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             pair.calculateConsensus();
             return getNumRemainingUniqueClades(pair);
+        }
+
+        @Override
+        protected double calculateTieBreakScore(TreePair pair) {
+            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
         }
     }
 
@@ -592,16 +624,23 @@ public abstract class TreeScorer<T extends TreeScorer> {
         public UniqueCladesLostNumberScorer() {
             super();
         }
+
         public UniqueCladesLostNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             pair.calculateConsensus();
             int uniqueCladesBefore = getNumUniqueClades(pair);
             int uniqueCladesAfter = getNumRemainingUniqueClades(pair);
+
             return (uniqueCladesAfter - uniqueCladesBefore); //should be negative... best score is 0
+        }
+
+        @Override
+        protected double calculateTieBreakScore(TreePair pair) {
+            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
         }
     }
 
@@ -620,10 +659,24 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
-            return -((treeToTaxa.get(pair.t1).size() - common.size()) + (treeToTaxa.get(pair.t2).size() - common.size()));
+        protected double calculateScore(TreePair pair) {
+            return -((treeToTaxa.get(pair.t1).size() - pair.commonLeafes.size()) + (treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size()));
+        }
+    }
+
+    public static class UniqueTaxaNumberScorerOrig extends UniqueTaxaNumberScorer {
+        public UniqueTaxaNumberScorerOrig() {
+            super();
         }
 
+        public UniqueTaxaNumberScorerOrig(boolean syncedCache) {
+            super(syncedCache);
+        }
+
+        @Override
+        protected double calculateTieBreakScore(TreePair pair) {
+            return 0d;
+        }
     }
 
 
@@ -640,10 +693,10 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
 
         @Override
-        public double calculateScore(TreePair pair, Set<String> common) {
+        protected double calculateScore(TreePair pair) {
             int tax1 = treeToTaxa.get(pair.t1).size();
             int tax2 = treeToTaxa.get(pair.t2).size();
-            return -((tax1 - common.size()) / tax1 + (tax2 - common.size()) / tax2);
+            return -((tax1 - pair.commonLeafes.size()) / tax1 + (tax2 - pair.commonLeafes.size()) / tax2);
         }
     }
 

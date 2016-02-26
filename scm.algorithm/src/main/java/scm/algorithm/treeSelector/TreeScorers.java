@@ -9,7 +9,9 @@ import static scm.algorithm.treeSelector.TreeScorer.*;
 public class TreeScorers {
     public enum ScorerType {
         UNIQUE_TAXA,
+        UNIQUE_TAXA_ORIG,
         OVERLAP,
+        OVERLAP_ORIG,
         CLADE_NUMBER,
         RESOLUTION,
         COLLISION,
@@ -30,8 +32,12 @@ public class TreeScorers {
         switch (scorer) {
             case UNIQUE_TAXA:
                 return newUniqueTaxonScorer(synced);
+            case UNIQUE_TAXA_ORIG:
+                return new UniqueTaxaNumberScorerOrig(synced) ;
             case OVERLAP:
                 return newOverlapScorer(synced);
+            case OVERLAP_ORIG:
+                return new OverlapScorerOrig(synced);
             case CLADE_NUMBER:
                 return new ConsensusCladeNumberScorer(synced);
             case RESOLUTION:
@@ -84,20 +90,11 @@ public class TreeScorers {
     }
 
     public static TreeScorer[] getFullScorerArray(boolean synced) {
-        return new TreeScorer[]{
-                new TreeScorer.OverlapScorer(synced),
-                new TreeScorer.CollisionPointNumberScorer(synced),
-                new TreeScorer.CollisionNumberScorer(synced),
-                new TreeScorer.BackboneSizeScorer(synced),
-                new TreeScorer.BackboneCladeNumberScorer(synced),
-                new TreeScorer.UniqueTaxaNumberScorer(synced),
-                new TreeScorer.UniqueTaxaRateScorer(synced),
-                new TreeScorer.ConsensusBackboneCladeNumberScorer(synced),
-                new TreeScorer.ConsensusBackboneResolutionScorer(synced),
-                new TreeScorer.ConsensusBackboneSizeScorer(synced),
-                new TreeScorer.ConsensusCladeNumberScorer(synced),
-                new TreeScorer.ConsensusResolutionScorer(synced)
-        };
+        TreeScorer[] sc = new TreeScorer[ScorerType.values().length];
+        for (int i = 0; i < sc.length; i++) {
+            sc[i] = getScorer(synced,ScorerType.values()[i]);
+        }
+        return sc;
     }
 
     public static TreeScorer[] getNuScorerArray(boolean synced) {

@@ -22,6 +22,8 @@ class TreePair implements Comparable<TreePair> {
     Tree t2pruned;
 
     public double score;
+    public double tieBreakingScore = 0d;
+
     boolean isCollisionFree = false;
 
 
@@ -282,7 +284,11 @@ class TreePair implements Comparable<TreePair> {
 
     @Override
     public int compareTo(TreePair o) {
-        return Double.compare(o.score, score); //ATTENTION --> Descending ordering
+        int comp = Double.compare(o.score, score); //ATTENTION --> Descending ordering
+        if (comp == 0){
+            comp = Double.compare(o.tieBreakingScore, tieBreakingScore);
+        }
+        return comp;
     }
 
     @Override

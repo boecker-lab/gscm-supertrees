@@ -39,7 +39,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     @Parameterized.Parameters
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
-        for (TreeScorer scorer : TreeScorers.getNuScorerArray(false)) {
+        for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
             for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
@@ -87,7 +87,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     }
 
 
-    //    @Test
+//        @Test
     public void largeSample() throws IOException {
         Path inputFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/RaxML/smo.0.sourceTrees.tre");
         long t = System.currentTimeMillis();

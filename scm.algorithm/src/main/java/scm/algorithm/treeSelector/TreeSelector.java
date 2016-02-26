@@ -1,5 +1,6 @@
 package scm.algorithm.treeSelector;
 
+import epos.algo.consensus.Consensus;
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
@@ -28,11 +29,11 @@ public interface TreeSelector {
         switch (METHOD) {
             case STRICT:
                 a = new NConsensus();
-                ((NConsensus) a).setMethod(NConsensus.METHOD_STRICT);
+                ((NConsensus) a).setThreshold(1D);
                 break;
             case MAJORITY:
                 a = new NConsensus();
-                ((NConsensus) a).setMethod(NConsensus.METHOD_MAJORITY);
+                ((NConsensus) a).setThreshold(0.5D);
                 break; // is same as strict for 2 trees...
             case SEMI_STRICT:
                 a = new LooseConsensus();

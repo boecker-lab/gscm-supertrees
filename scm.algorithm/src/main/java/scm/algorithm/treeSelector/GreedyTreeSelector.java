@@ -35,7 +35,7 @@ public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree
         //iteration in O(n)
         for (PriorityQueue<TreePair> treePairs : treeToPairs.values()) {
             TreePair max = treePairs.peek(); //get local best in O(log(n))
-            if (max.compareTo(best) < 0)
+            if (max.compareTo(best) < 0) //Attention the comparator is reverse!
                 best = max;
         }
         return best;
