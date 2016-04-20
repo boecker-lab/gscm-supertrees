@@ -4,6 +4,7 @@ import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
 import utils.parallel.ParallelUtils;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
 
     @Override
     protected List<Tree> calculateSequencial() {
-        final TreeSelector selector = new GreedyTreeSelector();
+        final TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setInputTrees(inputTrees);
         List<Tree> superTrees = new ArrayList<>(scorerArray.length);
         for (int i = 0; i < scorerArray.length; i++) {
@@ -58,21 +59,23 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
 
             superTrees.add(calculateGreedyConsensus(selector, false));
         }
+        TreeSelectorFactory.shutdown(selector);
         return superTrees;
     }
 
     @Override
     protected List<Tree> calculateParallel() {
-        GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeSelector.getFactory(), inputTrees);
+        GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeSelector.FACTORY, inputTrees);
+        List<Tree> supertrees = null;
         try {
-            List<Tree> supertrees = ParallelUtils.parallelForEachResults(executorService, factory, Arrays.asList(scorerArray));
-            return supertrees;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            supertrees = ParallelUtils.parallelForEachResults(executorService, factory, Arrays.asList(scorerArray));
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        factory.shutdownSelectors();
+        return supertrees;
+
+
     }
 
     @Override

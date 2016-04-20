@@ -13,15 +13,12 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
     M treeToPairs;
 
 
-    MapBasedGreedyTreeSelector(ConsensusMethod method) {
+    protected MapBasedGreedyTreeSelector(ConsensusMethod method) {
         super(method);
     }
-
-    MapBasedGreedyTreeSelector() {
+    protected MapBasedGreedyTreeSelector() {
         super();
     }
-
-
 
     @Override
     public void init() {

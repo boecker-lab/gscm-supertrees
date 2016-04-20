@@ -4,6 +4,7 @@ import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.RandomizedGreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
 import utils.parallel.ParallelUtils;
 import utils.progressBar.CLIProgressBar;
 
@@ -51,9 +52,9 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
     protected List<Tree> calculateSequencial() {
         final int iterations = getIterations();
-        final GreedyTreeSelector nonRandomResultSelector = new GreedyTreeSelector();
+        final GreedyTreeSelector nonRandomResultSelector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         nonRandomResultSelector.setInputTrees(inputTrees);
-        final RandomizedGreedyTreeSelector randomResultSelector = new RandomizedGreedyTreeSelector();
+        final RandomizedGreedyTreeSelector randomResultSelector = RandomizedGreedyTreeSelector.FACTORY.getNewSelectorInstance();
         randomResultSelector.setInputTrees(inputTrees);
 
         List<Tree> superTrees = new ArrayList<>();
@@ -68,7 +69,8 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
             }
             superTrees.addAll(scms);
         }
-
+        TreeSelectorFactory.shutdown(nonRandomResultSelector);
+        TreeSelectorFactory.shutdown(randomResultSelector);
         return superTrees;
     }
 
@@ -79,7 +81,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
 
         //todo maybe bucked parallelism
         //calculate random results
-        GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeSelector.getFactory(), inputTrees);
+        GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeSelector.FACTORY, inputTrees);
         for (int i = 0; i < iterations; i++) {
             futurList.addAll(
                     ParallelUtils.parallelForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
@@ -87,7 +89,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         }
 
         //calculate nonRandomResults
-        GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeSelector.getFactory(), inputTrees);
+        GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeSelector.FACTORY, inputTrees);
         futurList.addAll(
                 ParallelUtils.parallelForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
 //                ParallelUtils.parallelBucketForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
@@ -98,11 +100,11 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
                 superTrees.addAll(future.get());
             }
             return superTrees;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        nonRandomFactory.shutdownSelectors();
+        randomFactory.shutdownSelectors();
         return null;
     }
 

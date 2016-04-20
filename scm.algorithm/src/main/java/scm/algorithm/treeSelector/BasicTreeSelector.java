@@ -27,11 +27,11 @@ public abstract class BasicTreeSelector implements TreeSelector {
     Tree[] inputTrees;
 
 
-    BasicTreeSelector(ConsensusMethod method) {
+    protected BasicTreeSelector(ConsensusMethod method) {
         this.method = method;
     }
 
-    BasicTreeSelector() {
+    protected BasicTreeSelector() {
         this(ConsensusMethod.STRICT);
     }
 
@@ -210,10 +210,13 @@ public abstract class BasicTreeSelector implements TreeSelector {
         this.clearScorer = clearScorer;
     }
 
-    public void shutdown() {
+    @Override
+    public boolean shutdown() {
         if (executor != null) {
             executor.shutdown();
+            return true;
         }
+        return false;
     }
 
     @Override

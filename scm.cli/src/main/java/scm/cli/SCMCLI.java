@@ -46,8 +46,10 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
         }
     }
 
+
+
     @Option(name = "-s", aliases = {"--scorer"}, usage = "set of scores that should be used. standard scm can use only one", handler = ScorerTypeArrayOptionHandler.class)
-    private TreeScorers.ScorerType[] scorerTypes = new TreeScorers.ScorerType[]{TreeScorers.ScorerType.UNIQUE_TAXA};
+    private TreeScorers.ScorerType[] scorerTypes = new TreeScorers.ScorerType[]{TreeScorers.ScorerType.UNIQUE_CLADES_LOST};
 
     @Option(name = "-r", aliases = {"--randomized"}, usage = "Enables randomization (standard iterations are numberOfTrees^2 per scoring)")
     private void setRandomized(boolean r) {

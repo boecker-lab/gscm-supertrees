@@ -9,14 +9,12 @@ import java.util.PriorityQueue;
  * Created by fleisch on 14.10.15.
  */
 public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
-    private static final GreedyTreeSelectorFactory FACTORY = new GreedyTreeSelectorFactory();
-
-    public GreedyTreeSelector(ConsensusMethod method) {
-        super(method);
-    }
-
-    public GreedyTreeSelector() {
-    }
+    public static final TreeSelectorFactory<GreedyTreeSelector> FACTORY = () -> {
+        GreedyTreeSelector s =  new GreedyTreeSelector();
+        TreeSelectorFactory.selectors.add(s);
+        return s;
+    };
+    private GreedyTreeSelector() {}
 
     @Override
     THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {
@@ -39,17 +37,5 @@ public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree
                 best = max;
         }
         return best;
-    }
-
-
-    public static GreedyTreeSelectorFactory getFactory() {
-        return FACTORY;
-    }
-
-    private static class GreedyTreeSelectorFactory implements TreeSelectorFactory<GreedyTreeSelector>{
-        @Override
-        public GreedyTreeSelector newTreeSelectorInstance() {
-            return new GreedyTreeSelector();
-        }
     }
 }

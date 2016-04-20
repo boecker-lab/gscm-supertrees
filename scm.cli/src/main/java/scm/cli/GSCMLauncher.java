@@ -5,18 +5,23 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.InterfaceCmdLineParser;
 import phyloTree.model.tree.Tree;
 import scm.algorithm.AbstractSCMAlgorithm;
+import scm.algorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by fleisch on 24.11.15.
  */
 public class GSCMLauncher {
-//    private static Path PROPERTIES_FILE = Paths.get(GSCMLauncher.class.getResource("/application.properties").getFile());
     private static SCMCLI CLI;
 
     public static void main(String[] args) {
@@ -28,7 +33,6 @@ public class GSCMLauncher {
         try {
             // parse the arguments.
             parser.parseArgument(args);
-
             // check for help
             if (CLI.isHelp() || CLI.isFullHelp()) {
                 CLI.printHelp(parser);
@@ -46,15 +50,22 @@ public class GSCMLauncher {
             algorithm.run();
 
             //return results
-            List<Tree> supertrees =  algorithm.getResults();
-            Tree merged =  algorithm.getResult();
+            List<Tree> supertrees = algorithm.getResults();
+            Tree merged = algorithm.getResult();
+            algorithm.shutdown(); //shut executor services of algorithm down
+            TreeSelectorFactory.shutdownAll();//shut all tree selectors and their executors services down
 
             //write them to file
             CLI.writeOutput(merged, supertrees);
 
-            double calcTime = (System.currentTimeMillis() - startTime)/1000d;
+            double calcTime = (System.currentTimeMillis() - startTime) / 1000d;
             CLI.LOGGER.info("Supertree calculation Done in: " + calcTime + "s");
-            System.exit(0);
+            Path timeFile = CLI.getRuntimeFile();
+            if (timeFile != null) {
+                Files.deleteIfExists(timeFile);
+                Files.write(timeFile, ("gscm " + Double.toString(calcTime) + System.lineSeparator()).getBytes(), StandardOpenOption.CREATE_NEW);
+            }
+
         } catch (CmdLineException e) {
             // if there's a problem in the command line,
             // you'll get this exception. this will report

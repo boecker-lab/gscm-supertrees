@@ -47,5 +47,7 @@ public interface TreeSelector {
         return a;
     }
 
+    boolean shutdown();
+
 
 }

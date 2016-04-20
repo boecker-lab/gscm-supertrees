@@ -5,6 +5,7 @@ import phyloTree.model.tree.Tree;
 import scm.algorithm.treeSelector.GreedyTreeSelector;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,17 +21,17 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
 
     public GreedySCMAlgorithm() {
         super();
-        this.selector = new GreedyTreeSelector();
+        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
-        this.selector = new GreedyTreeSelector();
+        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger) {
         super(logger);
-        this.selector = new GreedyTreeSelector();
+        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(TreeScorer scorer) {
@@ -80,5 +81,11 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
 
     Tree calculateSuperTree() {
         return calculateGreedyConsensus(selector);
+    }
+
+    @Override
+    public boolean shutdown() {
+        TreeSelectorFactory.shutdown(selector);
+        return super.shutdown();
     }
 }

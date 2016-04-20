@@ -10,7 +10,9 @@ import scm.algorithm.treeSelector.TreeSelectorFactory;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -111,16 +113,19 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
     protected List<Tree> calculateSuperTrees() {
         mergedSupertree = null;
         final int neededThreads = Math.min(threads, numOfJobs());
+        List<Tree> superTrees = null;
         if (neededThreads > 1) {
             if (executorService == null)
                 executorService = Executors.newFixedThreadPool(threads);
-            List<Tree> superTrees = calculateParallel();
-            if (superTrees != null)
-                return superTrees;
-            else
+            superTrees = calculateParallel();
+            if (superTrees == null)
                 LOGGER.severe("parallel execution failed! Calculating tree sequential...");
         }
-        return calculateSequencial();
+        if (superTrees == null)
+            superTrees = calculateSequencial();
+
+//        shutdown();
+        return superTrees;
     }
 
     //abstracts
@@ -133,6 +138,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     //helper classes for parallel computing
     class GSCMCallableFactory implements IterationCallableFactory<GSCMCallable, TreeScorer> {
+        private final Set<TreeSelector> selectors = new HashSet<>();
         final TreeSelectorFactory selectorFactory;
         final Tree[] inputTrees;
         final TreeScorer scorer;
@@ -153,12 +159,18 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
         @Override
         public GSCMCallable newIterationCallable(List<TreeScorer> list) {
-            TreeSelector s = selectorFactory.newTreeSelectorInstance();
+            TreeSelector s = selectorFactory.getNewSelectorInstance();
+            selectors.add(s);
             if (scorer != null)
                 s.setScorer(scorer);
             if (inputTrees != null)
                 s.setInputTrees(inputTrees);
             return new GSCMCallable(list, s);
+        }
+
+        public void shutdownSelectors(){
+            selectors.forEach(TreeSelectorFactory::shutdown);
+            selectors.clear();
         }
     }
 
@@ -177,5 +189,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
             return calculateGreedyConsensus(selector,false);
         }
     }
+
+
 
 }

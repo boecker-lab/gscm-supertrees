@@ -56,7 +56,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         buf.append("########## Test with following Parameters [" + scorer.getClass().getCanonicalName() + ", " + inputData + ", " + scmResult + ", " + method + "] ##########");
         buf.append(SEP);
         long t = System.currentTimeMillis();
-        TreeSelector selector = new GreedyTreeSelector(method);
+        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setScorer(scorer);
         selector.setInputTrees(inputData);
         AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
@@ -176,7 +176,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
 */
 
 
-        BasicTreeSelector selector = new GreedyTreeSelector();
+        BasicTreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setScorer(new TreeScorer.ConsensusResolutionScorer());
         selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());

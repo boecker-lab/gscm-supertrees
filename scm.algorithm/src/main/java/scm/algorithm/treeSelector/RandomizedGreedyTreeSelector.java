@@ -12,7 +12,12 @@ import java.util.Random;
 
 
 public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
-    private static final RandomizedGreedyTreeSelectorFactory FACTORY = new RandomizedGreedyTreeSelectorFactory();
+    public static final TreeSelectorFactory<RandomizedGreedyTreeSelector> FACTORY =  () -> {
+        RandomizedGreedyTreeSelector s =  new RandomizedGreedyTreeSelector();
+        TreeSelectorFactory.selectors.add(s);
+        return s;
+    };
+
     private static final Random RAND = new Random();
 
     private double sumOfScores = 0d;
@@ -23,12 +28,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     private TreePair[] pairToIndex;
 
 
-    public RandomizedGreedyTreeSelector(ConsensusMethod method) {
-        super(method);
-    }
-
-    public RandomizedGreedyTreeSelector() {
-    }
+    private RandomizedGreedyTreeSelector() {}
 
     @Override
     TreePair getMax() {
@@ -135,16 +135,5 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     public void setInputTrees(Tree... inputTrees) {
         super.setInputTrees(inputTrees);
         pairs = new THashSet<>(inputTrees.length * (inputTrees.length-1)/2);
-    }
-
-    public static RandomizedGreedyTreeSelectorFactory getFactory() {
-        return FACTORY;
-    }
-
-    private static class RandomizedGreedyTreeSelectorFactory implements TreeSelectorFactory<RandomizedGreedyTreeSelector>{
-        @Override
-        public RandomizedGreedyTreeSelector newTreeSelectorInstance() {
-            return new RandomizedGreedyTreeSelector();
-        }
     }
 }
