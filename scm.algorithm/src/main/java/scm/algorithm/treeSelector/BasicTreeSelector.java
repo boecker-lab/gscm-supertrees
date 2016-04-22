@@ -121,8 +121,6 @@ public abstract class BasicTreeSelector implements TreeSelector {
 
         //parralel scoring O(n))
         scoreAndAddPairsParallel(pairsToAdd);
-        /*if (treeToPairs.get(tree).isEmpty())
-            throw new IllegalArgumentException("Input tree have insufficient Overlap to calculate a supertree");*/ //todo check overlap
         return true;
     }
 
@@ -220,7 +218,7 @@ public abstract class BasicTreeSelector implements TreeSelector {
     }
 
     @Override
-    public int getNumberOfTrees() {
+    public int getNumberOfInputTrees() {
         return inputTrees.length;
     }
 

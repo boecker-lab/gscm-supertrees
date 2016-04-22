@@ -2,10 +2,7 @@ package scm.algorithm;
 
 
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.GreedyTreeSelector;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelector;
-import scm.algorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * Created by fleisch on 10.02.15.
  */
-public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
+public class GreedySCMAlgorithm extends SCMAlgorithm {
     final TreeSelector selector;
 
     public GreedySCMAlgorithm() {
@@ -75,11 +72,11 @@ public class GreedySCMAlgorithm extends AbstractSCMAlgorithm {
     }
 
     @Override
-    protected List<Tree> calculateSuperTrees() {
+    protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
         return new ArrayList<>(Arrays.asList(calculateSuperTree()));
     }
 
-    Tree calculateSuperTree() {
+    Tree calculateSuperTree() throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector);
     }
 

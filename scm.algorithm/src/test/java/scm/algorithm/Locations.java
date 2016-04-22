@@ -41,6 +41,13 @@ public class Locations {
         return getTrees(getClass().getResource("/scm/algorithm/sm.5.sourceTrees.scmTree.tre").getFile())[0];
     }
 
+    public Tree[] newickInsufficientInput500() {
+        return getTrees(getClass().getResource("/scm/algorithm/sm.4.sourceTrees_ModelLeastTaxaDeletion-Rooting.tre").getFile());
+    }
+
+    public Tree[] insufficientInputSimple() {
+        return getTrees(getClass().getResource("/scm/algorithm/simpleInsufficient.tre").getFile());
+    }
 
     private Tree[] getTrees(String path) {
         return Newick.getTreeFromFile(new File(path));

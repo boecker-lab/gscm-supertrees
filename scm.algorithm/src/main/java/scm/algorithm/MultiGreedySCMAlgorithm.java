@@ -1,10 +1,7 @@
 package scm.algorithm;
 
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.GreedyTreeSelector;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelector;
-import scm.algorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.*;
 import utils.parallel.ParallelUtils;
 
 import java.util.ArrayList;
@@ -17,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * Created by fleisch on 15.06.15.
  */
-public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm {
+public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 
     public MultiGreedySCMAlgorithm() {
         super();
@@ -49,7 +46,7 @@ public class MultiGreedySCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm
     }
 
     @Override
-    protected List<Tree> calculateSequencial() {
+    protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setInputTrees(inputTrees);
         List<Tree> superTrees = new ArrayList<>(scorerArray.length);

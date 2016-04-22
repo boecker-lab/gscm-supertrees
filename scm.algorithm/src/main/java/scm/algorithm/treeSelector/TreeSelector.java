@@ -1,6 +1,5 @@
 package scm.algorithm.treeSelector;
 
-import epos.algo.consensus.Consensus;
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
@@ -15,11 +14,13 @@ public interface TreeSelector {
     void setClearScorer(boolean clearScorer);
     void init();
 
-    Tree pollTreePair();
+    Tree pollTreePair ();
+    int getNumberOfRemainingTrees();
+
     boolean addTree(Tree tree);
 
     void setInputTrees(Tree[] trees);
-    int getNumberOfTrees();
+    int getNumberOfInputTrees();
 
     TreeScorer getScorer();
     void setScorer(TreeScorer scorer);

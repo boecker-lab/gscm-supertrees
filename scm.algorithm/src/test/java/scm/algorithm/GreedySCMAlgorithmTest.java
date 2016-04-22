@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by fleisch on 16.02.15.
@@ -44,6 +42,8 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});
+//                paras.add(new Object[]{LOCATIONS.newickInsufficientInput500(), null, method, scorer});
+                paras.add(new Object[]{LOCATIONS.insufficientInputSimple(), null, method, scorer});
             }
         }
         return paras;
@@ -59,35 +59,41 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setScorer(scorer);
         selector.setInputTrees(inputData);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);
+        SCMAlgorithm algo = new GreedySCMAlgorithm(selector);
         algo.run();
         Tree supertree = algo.getResult();
-        List<String> order = new ArrayList<>(TreeUtils.getLeafLabels(supertree.getRoot()));
-        Collections.sort(order);
-        TreeUtils.sortTree(supertree, order);
-        TreeUtils.sortTree(scmResult, order);
-        buf.append("Clades-Swenson_SCM: " + (scmResult.vertexCount() - scmResult.getNumTaxa()));
-        buf.append(SEP);
-        buf.append(Newick.getStringFromTree(scmResult));
-        buf.append(SEP);
-        buf.append("Fleisch-" + method + "-SCM: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
-        buf.append(SEP);
-        assertNotNull(supertree);
-        assertEquals(scmResult.getNumTaxa(), supertree.getNumTaxa());
-        buf.append(Newick.getStringFromTree(supertree));
-        buf.append(SEP);
-        int inner = supertree.vertexCount() - supertree.getNumTaxa();
-        buf.append("Clades: " + inner);
-        buf.append(SEP);
-        buf.append("########## DONE ##########");
-        buf.append(SEP);
-        buf.append(SEP);
-        buf.append(SEP);
-        System.out.println(buf.toString());
+        if (scmResult != null)
+            assertNotNull(supertree);
+        else
+            assertNull(supertree);
+
+        if (supertree != null) {
+            List<String> order = new ArrayList<>(TreeUtils.getLeafLabels(supertree.getRoot()));
+            Collections.sort(order);
+            TreeUtils.sortTree(supertree, order);
+            TreeUtils.sortTree(scmResult, order);
+            buf.append("Clades-Swenson_SCM: " + (scmResult.vertexCount() - scmResult.getNumTaxa()));
+            buf.append(SEP);
+            buf.append(Newick.getStringFromTree(scmResult));
+            buf.append(SEP);
+            buf.append("Fleisch-" + method + "-SCM: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+            buf.append(SEP);
+            assertNotNull(supertree);
+            assertEquals(scmResult.getNumTaxa(), supertree.getNumTaxa());
+            buf.append(Newick.getStringFromTree(supertree));
+            buf.append(SEP);
+            int inner = supertree.vertexCount() - supertree.getNumTaxa();
+            buf.append("Clades: " + inner);
+            buf.append(SEP);
+            buf.append("########## DONE ##########");
+            buf.append(SEP);
+            buf.append(SEP);
+            buf.append(SEP);
+            System.out.println(buf.toString());
+        }
     }
 
-
-//        @Test
+    //        @Test
     public void largeSample() throws IOException {
         Path inputFile = Paths.get("/media/fleisch/wallace/home@wallace/data/simulated/SMIDGenOutgrouped/10000/0/Source_Trees/RaxML/smo.0.sourceTrees.tre");
         long t = System.currentTimeMillis();
@@ -181,7 +187,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());
         selector.setThreads(1);
-        AbstractSCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
+        SCMAlgorithm algo = new GreedySCMAlgorithm(selector);//rooting stuff
         algo.run();
         Tree supertree = algo.getResult();
         System.out.println("large example: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");

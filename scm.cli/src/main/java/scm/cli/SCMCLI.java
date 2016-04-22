@@ -9,10 +9,10 @@ import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.Setter;
 import phyloTree.SupertreeAlgortihmCLI;
 import phyloTree.model.tree.Tree;
-import scm.algorithm.AbstractSCMAlgorithm;
 import scm.algorithm.GreedySCMAlgorithm;
 import scm.algorithm.MultiGreedySCMAlgorithm;
 import scm.algorithm.RandomizedSCMAlgorithm;
+import scm.algorithm.SCMAlgorithm;
 import scm.algorithm.treeSelector.TreeScorers;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by fleisch on 20.11.15.
  */
-public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implements Multithreaded, Progressbar {
+public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multithreaded, Progressbar {
     public SCMCLI(String appHomeParent, String appHomeFolderName, String logDir, int maxLogFileSize, int logRotation) {
         super(appHomeParent, appHomeFolderName, logDir, maxLogFileSize, logRotation);
     }
@@ -91,8 +91,8 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
         writeOutput(results);
     }
 
-    public AbstractSCMAlgorithm getAlgorithmInstance() {
-        AbstractSCMAlgorithm algo = null;
+    public SCMAlgorithm getAlgorithmInstance() {
+        SCMAlgorithm algo = null;
         if (randomIterations < 0) {
             //non random
             if (scorerTypes.length > 1) {
@@ -111,7 +111,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<AbstractSCMAlgorithm> implemen
     }
 
     @Override
-    public void setParameters(AbstractSCMAlgorithm scmAlgorithm) {
+    public void setParameters(SCMAlgorithm scmAlgorithm) {
         scmAlgorithm.setThreads(getNumberOfThreads());
     }
 

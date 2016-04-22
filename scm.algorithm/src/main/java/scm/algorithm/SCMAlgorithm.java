@@ -5,6 +5,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
+import scm.algorithm.treeSelector.InsufficientOverlapException;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
 import utils.progressBar.CLIProgressBar;
@@ -18,59 +19,62 @@ import java.util.logging.Logger;
 /**
  * Created by fleisch on 05.02.15.
  */
-public abstract class AbstractSCMAlgorithm extends SupertreeAlgorithm {
+public abstract class SCMAlgorithm extends SupertreeAlgorithm {
     private List<Tree> superTrees;
     protected int threads;
 
-    public AbstractSCMAlgorithm(Logger logger, ExecutorService executorService) {
+    public SCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
     }
 
-    public AbstractSCMAlgorithm(Logger logger) {
+    public SCMAlgorithm(Logger logger) {
         super(logger);
     }
 
-    public AbstractSCMAlgorithm() {
+    public SCMAlgorithm() {
         super();
     }
 
-    protected abstract List<Tree> calculateSuperTrees();
+    protected abstract List<Tree> calculateSuperTrees() throws Exception;
 
     public abstract void setInput(Tree... trees);
 
     @Override
-    public void run() {
+    public SupertreeAlgorithm call() throws Exception {
         superTrees = calculateSuperTrees();
         TreeResolutionComparator comp = new TreeResolutionComparator();
         Collections.sort(superTrees, comp);
+        return this;
     }
 
 
-    public Tree calculateGreedyConsensus(TreeSelector selector) {
+    public Tree calculateGreedyConsensus(TreeSelector selector) throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector, new CLIProgressBar());
     }
 
-    public Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) {
+    public Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT || !printProgress));
     }
 
-    private Tree calculateGreedyConsensus(TreeSelector selector, final CLIProgressBar progressBar) {
-
+    private Tree calculateGreedyConsensus(TreeSelector selector, final CLIProgressBar progressBar) throws InsufficientOverlapException {
         Tree superCandidate = null;
         Tree pair;
 
         //progress bar stuff
         int pCount = 0;
 
-
         selector.init();
-        int trees = selector.getNumberOfTrees() - 1;
+        int trees = selector.getNumberOfInputTrees() - 1;
         while ((pair = selector.pollTreePair()) != null) {
             progressBar.update(pCount++, trees);
             selector.addTree(pair);
             superCandidate = pair;
         }
-        return superCandidate;
+        if (selector.getNumberOfRemainingTrees() > 0) {
+            throw new InsufficientOverlapException();
+        } else {
+            return superCandidate;
+        }
     }
 
     public abstract void setScorer(TreeScorer scorer);

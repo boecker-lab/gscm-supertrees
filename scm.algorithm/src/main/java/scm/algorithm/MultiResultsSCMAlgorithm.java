@@ -2,13 +2,12 @@ package scm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
 import phyloTree.model.tree.Tree;
-
-import utils.parallel.DefaultIterationCallable;
-import utils.parallel.IterationCallableFactory;
-
-import scm.algorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.InsufficientOverlapException;
 import scm.algorithm.treeSelector.TreeScorer;
 import scm.algorithm.treeSelector.TreeSelector;
+import scm.algorithm.treeSelector.TreeSelectorFactory;
+import utils.parallel.DefaultIterationCallable;
+import utils.parallel.IterationCallableFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,21 +19,21 @@ import java.util.logging.Logger;
 /**
  * Created by fleisch on 29.10.15.
  */
-public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlgorithm {
+public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
     protected Tree[] inputTrees;
     protected TreeScorer[] scorerArray = null;
 
     private Tree mergedSupertree = null;
 
-    public AbstractMultipleResultsSCMAlgorithm() {
+    public MultiResultsSCMAlgorithm() {
         super();
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(TreeScorer... scorer) {
+    public MultiResultsSCMAlgorithm(TreeScorer... scorer) {
         this(null, scorer);
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
+    public MultiResultsSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
         super();
         this.inputTrees = trees;
         if (scorer != null && scorer.length > 0)
@@ -45,15 +44,15 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(Logger logger, ExecutorService executorService) {
+    public MultiResultsSCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(Logger logger) {
+    public MultiResultsSCMAlgorithm(Logger logger) {
         super(logger);
     }
 
-    public AbstractMultipleResultsSCMAlgorithm(Logger logger,Tree[] trees, TreeScorer... scorer) {
+    public MultiResultsSCMAlgorithm(Logger logger, Tree[] trees, TreeScorer... scorer) {
         super(logger);
         this.inputTrees = trees;
         if (scorer != null && scorer.length > 0)
@@ -110,7 +109,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
 
 
     @Override
-    protected List<Tree> calculateSuperTrees() {
+    protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
         mergedSupertree = null;
         final int neededThreads = Math.min(threads, numOfJobs());
         List<Tree> superTrees = null;
@@ -131,7 +130,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
     //abstracts
     protected abstract int numOfJobs();
 
-    protected abstract List<Tree> calculateSequencial();
+    protected abstract List<Tree> calculateSequencial() throws InsufficientOverlapException;
 
     protected abstract List<Tree> calculateParallel();
 
@@ -183,7 +182,7 @@ public abstract class AbstractMultipleResultsSCMAlgorithm extends AbstractSCMAlg
         }
 
         @Override
-        public Tree doJob(TreeScorer scorer) {
+        public Tree doJob(TreeScorer scorer) throws InsufficientOverlapException {
             selector.setScorer(scorer);
             selector.setClearScorer(false);
             return calculateGreedyConsensus(selector,false);

@@ -49,10 +49,6 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
 
     private void addTreePairToRandomStructure(TreePair pair) {
         if (pairs.add(pair)) {
-            //todo if we want that
-            /*if (TreeScorer.RELIABLE_MERGES)
-                if (pair.isCollisionFree)
-                    securePairs.add(pair);*/
             sumOfScores += pair.score;
             clearCache();
         }
@@ -87,13 +83,11 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
 
     private void initRandomStructures(){
         indices = new double[pairs.size()];
-        pairToIndex = new TreePair[pairs.size()];//todo, do fany index stuff insteadd of this ugly set thinky
+        pairToIndex = new TreePair[pairs.size()];//todo, do fancy index stuff instead of this ugly set thingy
         int index = 0;
         double pre = 0d;
         for (TreePair pair : pairs) {
             pairToIndex[index] = pair;
-//            pre += pair.score / sumOfScores;
-            //todo should we get rid of negative scores?
             //this is for compatibility with negative scores
             if (sumOfScores > 0d) {
                 pre += pair.score / sumOfScores;

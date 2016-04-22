@@ -13,7 +13,7 @@ import java.util.*;
  * Created by fleisch on 10.02.15.
  */
 class TreePair implements Comparable<TreePair> {
-    public final static TreePair MIN_VALUE = new TreePair();
+    final static TreePair MIN_VALUE = new TreePair();
 
     final Tree t1;
     final Tree t2;
@@ -21,10 +21,10 @@ class TreePair implements Comparable<TreePair> {
     Tree t1pruned;
     Tree t2pruned;
 
-    public double score;
-    public double tieBreakingScore = 0d;
+    double score;
+    double tieBreakingScore = 0d;
 
-    boolean isCollisionFree = false;
+//    boolean isCollisionFree = false;
 
 
     Tree consensus = null;
@@ -68,8 +68,9 @@ class TreePair implements Comparable<TreePair> {
     public Tree getPartner(Tree t) {
         if (t.equals(t1))
             return t2;
-        else
+        else if(t.equals(t2))
             return t1;
+        return null;
     }
 
     public void setCommonLeafes(Set<String> commonLeafes) {
@@ -141,7 +142,7 @@ class TreePair implements Comparable<TreePair> {
                 }
 
                 if (numOfSiblings == 1) {
-                    Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves); //todo what todo with empty suff --> is part of subtree and not important for the collision case
+                    Set<String> commonSiblingLeafes = new THashSet<>(siblingLeaves);
                     commonSiblingLeafes.retainAll(commonLeafes);
                     st = new SingleTaxon(node, siblingLeaves, commonSiblingLeafes, numOfSiblings);
 
@@ -175,7 +176,6 @@ class TreePair implements Comparable<TreePair> {
         }
 
         //this is to do the switch between first and second tree mode
-//        first = false;
         this.commonInsertionPointTaxa = commenInsertionPointTaxa;
 
     }

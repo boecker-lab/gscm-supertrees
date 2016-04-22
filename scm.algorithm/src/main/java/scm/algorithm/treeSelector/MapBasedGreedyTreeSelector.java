@@ -21,6 +21,11 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
     }
 
     @Override
+    public int getNumberOfRemainingTrees() {
+        return treeToPairs.size();
+    }
+
+    @Override
     public void init() {
         if (clearScorer)
             clearScorer();

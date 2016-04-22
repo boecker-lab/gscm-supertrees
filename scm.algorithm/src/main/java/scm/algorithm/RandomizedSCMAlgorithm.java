@@ -1,12 +1,8 @@
 package scm.algorithm;
 
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.GreedyTreeSelector;
-import scm.algorithm.treeSelector.RandomizedGreedyTreeSelector;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelectorFactory;
+import scm.algorithm.treeSelector.*;
 import utils.parallel.ParallelUtils;
-import utils.progressBar.CLIProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +14,7 @@ import java.util.concurrent.Future;
 /**
  * Created by fleisch on 24.03.15.
  */
-public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm {
+public class RandomizedSCMAlgorithm extends MultiResultsSCMAlgorithm {
 //    private int iterations = 0;
     private int individualIterations = 0;
 
@@ -50,7 +46,7 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         return (getIterations() + 1) * scorerArray.length;
     }
 
-    protected List<Tree> calculateSequencial() {
+    protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final int iterations = getIterations();
         final GreedyTreeSelector nonRandomResultSelector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         nonRandomResultSelector.setInputTrees(inputTrees);
@@ -79,13 +75,13 @@ public class RandomizedSCMAlgorithm extends AbstractMultipleResultsSCMAlgorithm 
         List<Tree> superTrees = new ArrayList<>(numOfJobs());
         List<Future<List<Tree>>> futurList = new LinkedList<>();
 
-        //todo maybe bucked parallelism
+
         //calculate random results
         GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeSelector.FACTORY, inputTrees);
         for (int i = 0; i < iterations; i++) {
             futurList.addAll(
                     ParallelUtils.parallelForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
-//                    ParallelUtils.parallelBucketForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
+//                    ParallelUtils.parallelBucketForEach(executorService, randomFactory, Arrays.asList(scorerArray))); //maybe buckets parallelism is faster?
         }
 
         //calculate nonRandomResults

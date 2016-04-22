@@ -644,8 +644,6 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    //todo there was another scoring idea --> weigting with size or something like that
-
     /**
      * Created by fleisch on 22.06.15.
      */

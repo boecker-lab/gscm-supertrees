@@ -1,6 +1,5 @@
 package scm.cli;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -23,9 +22,10 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class gscmTest {
     public static final Path nexIn = Paths.get(gscmTest.class.getResource("/scm.cli/sm.11.sourceTrees_OptSCM-Rooting.nex").getFile());
-    public static final Path newIn =  Paths.get(gscmTest.class.getResource("/scm.cli/sm.11.sourceTrees_OptSCM-Rooting.tre").getFile());
-    public static final Path out =  newIn.getParent().resolve("outFile");
-    public static final Path time =  newIn.getParent().resolve("timeFile");
+    public static final Path newIn = Paths.get(gscmTest.class.getResource("/scm.cli/sm.11.sourceTrees_OptSCM-Rooting.tre").getFile());
+    public static final Path badIn = Paths.get(gscmTest.class.getResource("/scm/algorithm/simpleInsufficient.tre").getFile());
+    public static final Path out = newIn.getParent().resolve("outFile");
+    public static final Path time = newIn.getParent().resolve("timeFile");
     String[] args;
     Path resultFile;
     Path timeFile = null;
@@ -34,18 +34,24 @@ public class gscmTest {
 //    @Rule
 //    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
-    public gscmTest(String[] args, Path result, Path time,  int  numOfTrees) {
+    public gscmTest(String[] args, Path result, Path time, int numOfTrees) {
         this.args = args;
         this.resultFile = result;
         timeFile = time;
-        this.numOfTrees =  numOfTrees;
+        this.numOfTrees = numOfTrees;
     }
 
     @Parameterized.Parameters
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
+        /*paras.add(new Object[]{
+                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), badIn.toString()},
+                out,
+                null,
+                0
+        });*/
         paras.add(new Object[]{
-                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(),  nexIn.toString()},
+                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), nexIn.toString()},
                 out,
                 null,
                 1
@@ -57,61 +63,61 @@ public class gscmTest {
                 1
         });
         paras.add(new Object[]{
-                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), newIn.toString()},
                 out,
                 null,
                 1
         });
 
         paras.add(new Object[]{
-                new String[]{"-s", TreeScorers.ScorerType.UNIQUE_TAXA.name(), TreeScorers.ScorerType.OVERLAP.name(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                new String[]{"-s", TreeScorers.ScorerType.UNIQUE_TAXA.name(), TreeScorers.ScorerType.OVERLAP.name(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), newIn.toString()},
                 out,
                 null,
                 1
         });
 
         paras.add(new Object[]{
-                new String[]{"-s",TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                new String[]{"-s", TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), newIn.toString()},
                 out,
                 null,
                 1
         });
 
         paras.add(new Object[]{
-                new String[]{"-B", "-s",TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-o", out.toString(),  newIn.toString()},
+                new String[]{"-B", "-s", TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), newIn.toString()},
                 out,
                 null,
                 1
         });
 
         paras.add(new Object[]{
-                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-O", out.toString(), newIn.toString()},
                 out,
                 null,
                 1
         });
         paras.add(new Object[]{
-                new String[]{"-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                new String[]{"-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-O", out.toString(), newIn.toString()},
                 out,
                 null,
                 3
         });
         paras.add(new Object[]{
-                new String[]{"-r","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                new String[]{"-r", "-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-O", out.toString(), newIn.toString()},
                 out,
                 null,
                 15
         });
 
         paras.add(new Object[]{
-                new String[]{"-R","10","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                new String[]{"-R", "10", "-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-O", out.toString(), newIn.toString()},
                 out,
                 null,
                 23
         });
 
         paras.add(new Object[]{
-                new String[]{"-B","-R","10","-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(),"-O", out.toString(),  newIn.toString()},
+                new String[]{"-B", "-R", "10", "-s", TreeScorers.ScorerType.UNIQUE_TAXA.toString(), TreeScorers.ScorerType.OVERLAP.toString(), "-d", TreeFileUtils.FileType.NEWICK.toString(), "-O", out.toString(), newIn.toString()},
                 out,
                 null,
                 23
@@ -120,26 +126,33 @@ public class gscmTest {
     }
 
 
+
+    //todo, how to test system exit stuff?
     @Test
     public void testLauncher() {
         GSCMLauncher.main(args);
 
-        assertTrue(Files.exists(resultFile));
-        try {
-            Tree[] trees = TreeFileUtils.parseFileToTrees(resultFile, TreeFileUtils.FileType.NEWICK);
-            assertNotNull(trees);
-            assertEquals(numOfTrees,trees.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-            assertNull(e);
-        } finally {
-
+        if (numOfTrees > 0) {
+            assertTrue(Files.exists(resultFile));
             try {
-                Files.deleteIfExists(out);
-                Files.deleteIfExists(time);
+                Tree[] trees = TreeFileUtils.parseFileToTrees(resultFile, TreeFileUtils.FileType.NEWICK);
+                assertNotNull(trees);
+                assertEquals(numOfTrees, trees.length);
             } catch (IOException e) {
                 e.printStackTrace();
+                assertNull(e);
+            } finally {
+
+                try {
+                    Files.deleteIfExists(out);
+                    Files.deleteIfExists(time);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } else {
+            //bad tree
+            assertTrue(Files.notExists(resultFile));
         }
     }
 
