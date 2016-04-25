@@ -1,4 +1,4 @@
-rootProject.name = 'GSCM-Project'
+rootProject.name = 'gscm'
 include 'gscm-lib',
         'gscm-cli'
 

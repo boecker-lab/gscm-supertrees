@@ -1,7 +1,7 @@
-package scm.algorithm;
+package gscm.algorithm;
 
+import gscm.algorithm.treeSelector.*;
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.*;
 import utils.parallel.ParallelUtils;
 
 import java.util.ArrayList;

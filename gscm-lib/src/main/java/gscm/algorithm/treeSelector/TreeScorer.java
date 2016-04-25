@@ -1,4 +1,4 @@
-package scm.algorithm.treeSelector;
+package gscm.algorithm.treeSelector;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;

@@ -1,11 +1,11 @@
-package scm.algorithm;
+package gscm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
+import gscm.algorithm.treeSelector.TreeSelectorFactory;
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.InsufficientOverlapException;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeSelector;
-import scm.algorithm.treeSelector.TreeSelectorFactory;
+import gscm.algorithm.treeSelector.InsufficientOverlapException;
+import gscm.algorithm.treeSelector.TreeScorer;
+import gscm.algorithm.treeSelector.TreeSelector;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
 

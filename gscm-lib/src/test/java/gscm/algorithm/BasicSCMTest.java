@@ -1,9 +1,9 @@
-package scm.algorithm;
+package gscm.algorithm;
 
 import epos.algo.consensus.loose.LooseConsensus;
 import phyloTree.model.tree.Tree;
-import scm.algorithm.treeSelector.TreeScorer;
-import scm.algorithm.treeSelector.TreeScorers;
+import gscm.algorithm.treeSelector.TreeScorer;
+import gscm.algorithm.treeSelector.TreeScorers;
 
 import java.util.Arrays;
 

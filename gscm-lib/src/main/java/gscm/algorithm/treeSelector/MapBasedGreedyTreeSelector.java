@@ -1,4 +1,4 @@
-package scm.algorithm.treeSelector;
+package gscm.algorithm.treeSelector;
 
 import phyloTree.model.tree.Tree;
 

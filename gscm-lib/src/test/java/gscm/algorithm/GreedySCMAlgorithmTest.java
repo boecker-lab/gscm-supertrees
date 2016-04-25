@@ -1,12 +1,12 @@
-package scm.algorithm;
+package gscm.algorithm;
 
+import gscm.algorithm.treeSelector.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import phyloTree.io.Newick;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
-import scm.algorithm.treeSelector.*;
 
 import java.io.IOException;
 import java.nio.file.Path;

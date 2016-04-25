@@ -1,4 +1,4 @@
-package scm.algorithm.treeSelector;
+package gscm.algorithm.treeSelector;
 
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;

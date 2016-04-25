@@ -1,10 +1,8 @@
-package scm.algorithm.treeSelector;
+package gscm.algorithm.treeSelector;
 
 /**
  * Created by fleisch on 24.11.15.
  */
-
-import static scm.algorithm.treeSelector.TreeScorer.*;
 
 public class TreeScorers {
     public enum ScorerType {
@@ -34,27 +32,27 @@ public class TreeScorers {
             case UNIQUE_TAXA:
                 return newUniqueTaxonScorer(synced);
             case UNIQUE_TAXA_ORIG:
-                return new UniqueTaxaNumberScorerOrig(synced) ;
+                return new TreeScorer.UniqueTaxaNumberScorerOrig(synced) ;
             case OVERLAP:
                 return newOverlapScorer(synced);
             case OVERLAP_ORIG:
-                return new OverlapScorerOrig(synced);
+                return new TreeScorer.OverlapScorerOrig(synced);
             case CLADE_NUMBER:
-                return new ConsensusCladeNumberScorer(synced);
+                return new TreeScorer.ConsensusCladeNumberScorer(synced);
             case RESOLUTION:
                 return newResolutionScorer(synced);
             case COLLISION_SUBTREES:
-                return new CollisionNumberScorer(synced);
+                return new TreeScorer.CollisionNumberScorer(synced);
             case COLLISION_POINT:
-                return new CollisionPointNumberScorer(synced);
+                return new TreeScorer.CollisionPointNumberScorer(synced);
             case UNIQUE_CLADE_NUMBER:
-                new UniqueTaxaNumberScorer(synced);
+                new TreeScorer.UniqueTaxaNumberScorer(synced);
             case UNIQUE_CLADE_RATE:
-                return new UniqueCladesRateScorer(synced);
+                return new TreeScorer.UniqueCladesRateScorer(synced);
             case UNIQUE_CLADES_LOST:
-                return new UniqueCladesLostNumberScorer(synced);
+                return new TreeScorer.UniqueCladesLostNumberScorer(synced);
             case UNIQUE_CLADES_REMAINING:
-                return new UniqueCladesRemainingNumberScorer(synced);
+                return new TreeScorer.UniqueCladesRemainingNumberScorer(synced);
             default:
                 return null;
         }
@@ -62,23 +60,23 @@ public class TreeScorers {
 
 
     public static TreeScorer newOverlapScorer(boolean synced) {
-        return new OverlapScorer(synced);
+        return new TreeScorer.OverlapScorer(synced);
     }
 
     public static TreeScorer newUniqueTaxonScorer(boolean synced) {
-        return new UniqueTaxaNumberScorer(synced);
+        return new TreeScorer.UniqueTaxaNumberScorer(synced);
     }
 
     public static TreeScorer newTaxonScorer(boolean synced) {
-        return new ConsensusTaxonNumberScorer(synced);
+        return new TreeScorer.ConsensusTaxonNumberScorer(synced);
     }
 
     public static TreeScorer newResolutionScorer(boolean synced) {
-        return new ConsensusResolutionScorer(synced);
+        return new TreeScorer.ConsensusResolutionScorer(synced);
     }
 
     public static TreeScorer newCollisionScorer(boolean synced) {
-        return new CollisionNumberScorer(synced);
+        return new TreeScorer.CollisionNumberScorer(synced);
     }
 
 

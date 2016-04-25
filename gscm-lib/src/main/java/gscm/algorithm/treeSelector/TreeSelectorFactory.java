@@ -1,4 +1,4 @@
-package scm.algorithm.treeSelector;
+package gscm.algorithm.treeSelector;
 
 import java.util.Collections;
 import java.util.HashSet;
