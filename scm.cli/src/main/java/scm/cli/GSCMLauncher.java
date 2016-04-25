@@ -68,6 +68,7 @@ public class GSCMLauncher {
             } finally {
                 algorithm.shutdown(); //shut executor services of algorithm down
                 TreeSelectorFactory.shutdownAll();//shut all tree selectors and their executors services down
+                System.exit(0);
             }
         } catch (CmdLineException e) {
             // if there's a problem in the command line,

@@ -80,6 +80,8 @@ project(':scm.cli'){
         compile project(':scm.algorithm')
         compile 'de.unijena.bioinf:phyloTree.cli:0.9.9-SNAPSHOT'
         compile 'de.unijena.bioinf:core-lib.cli:0.9-SNAPSHOT'
+
+        testCompile 'com.github.stefanbirkner:system-rules:1.5.0'
     }
 
 

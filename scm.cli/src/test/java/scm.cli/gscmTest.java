@@ -1,6 +1,8 @@
 package scm.cli;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import phyloTree.io.TreeFileUtils;
@@ -41,15 +43,18 @@ public class gscmTest {
         this.numOfTrees = numOfTrees;
     }
 
+    @Rule
+    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
+
     @Parameterized.Parameters
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
-        /*paras.add(new Object[]{
+        paras.add(new Object[]{
                 new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), badIn.toString()},
                 out,
                 null,
                 0
-        });*/
+        });
         paras.add(new Object[]{
                 new String[]{"-d", TreeFileUtils.FileType.NEWICK.toString(), "-o", out.toString(), nexIn.toString()},
                 out,
@@ -126,13 +131,11 @@ public class gscmTest {
     }
 
 
-
-    //todo, how to test system exit stuff?
     @Test
     public void testLauncher() {
-        GSCMLauncher.main(args);
-
         if (numOfTrees > 0) {
+            exit.expectSystemExitWithStatus(0);
+            GSCMLauncher.main(args);
             assertTrue(Files.exists(resultFile));
             try {
                 Tree[] trees = TreeFileUtils.parseFileToTrees(resultFile, TreeFileUtils.FileType.NEWICK);
@@ -152,7 +155,10 @@ public class gscmTest {
             }
         } else {
             //bad tree
+            exit.expectSystemExitWithStatus(2);
+            GSCMLauncher.main(args);
             assertTrue(Files.notExists(resultFile));
+
         }
     }
 
