@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class gscmTest {
     public static final Path nexIn = Paths.get(gscmTest.class.getResource("/scm.cli/sm.11.sourceTrees_OptSCM-Rooting.nex").getFile());
     public static final Path newIn = Paths.get(gscmTest.class.getResource("/scm.cli/sm.11.sourceTrees_OptSCM-Rooting.tre").getFile());
-    public static final Path badIn = Paths.get(gscmTest.class.getResource("/scm/algorithm/simpleInsufficient.tre").getFile());
+    public static final Path badIn = Paths.get(gscmTest.class.getResource("/scm.cli/simpleInsufficient.tre").getFile());
     public static final Path out = newIn.getParent().resolve("outFile");
     public static final Path time = newIn.getParent().resolve("timeFile");
     String[] args;
