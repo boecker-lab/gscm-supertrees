@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+//        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+        classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.1'
+    }
+}
+//command line interface stuff
+apply plugin: "eu.appsatori.fatjar"
+apply plugin: 'edu.sc.seis.launch4j'
+
+version = '0.8-SNAPSHOT'
+
+dependencies {
+    compile project(':gscm-lib')
+
+    compile group: 'de.unijena.bioinf', name: 'phyloTree.cli', version: '0.9.9-SNAPSHOT', changing: true
+    compile group: 'de.unijena.bioinf', name: 'core-lib.cli', version: '0.9-SNAPSHOT', changing: true
+
+    testCompile 'com.github.stefanbirkner:system-rules:1.5.0'
+}
+
+
+
+project.ext.set("mainClassName", "scm.cli.GSCMLauncher")
+
+jar {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+fatJar {
+    classifier 'fat'
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
+}
+
+copyL4jLib.dependsOn fatJar
+fatJarPrepareFiles.dependsOn jar
+
+launch4j {
+    outfile = 'gscm.exe'
+    mainClassName = project.mainClassName
+    copyConfigurable = project.tasks.fatJar.outputs.files
+    jar = "lib/${project.tasks.fatJar.archiveName}"
+//        icon = 'icons/myApp.ico'
+}
+
+
+
+
+
+
+
+
+
+
+

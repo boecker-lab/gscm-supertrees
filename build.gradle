@@ -1,40 +1,11 @@
-buildscript {
-    /*plugins {
-        id 'edu.sc.seis.launch4j' version '1.6.1'
-    }*/
-    repositories {
-//        jcenter()
-        maven {url "https://plugins.gradle.org/m2/"}
-    }
-    dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
-        classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.1'
-//        classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.2' //todo maybe into the module
-    }
-}
-
 configurations.all {
     // check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-apply plugin: 'java'
-apply plugin: 'maven'
-
-
-
-group = 'de.unijena.bioinf'
-version = '0.8-SNAPSHOT'
-
-
-dependencies {
-    compile project(':scm.algorithm')
-    compile project(':scm.cli')
 }
 
 allprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-    apply plugin: 'edu.sc.seis.launch4j'
 
     sourceCompatibility = 1.8
 
@@ -55,75 +26,13 @@ allprojects {
     }
 }
 
-//subprojects {}
+version = '0.8-SNAPSHOT'
 
-//algorithm specific stuff
-project(':scm.algorithm') {
-    version = '0.8-SNAPSHOT'
-
-    dependencies {
-        compile group: "de.unijena.bioinf", name: "phyloTree.model", version: "0.9.9-SNAPSHOT", changing: true
-        compile group: 'de.unijena.bioinf', name:'phyloTree.algorithm', version:'0.9.9-SNAPSHOT', changing: true
-        compile group: 'de.unijena.bioinf', name:'consensus-lib', version:'0.9.3-SNAPSHOT', changing: true
-        compile group: 'de.unijena.bioinf', name:'core-lib.algorithm', version:'0.9-SNAPSHOT', changing: true
-        compile group: 'de.unijena.bioinf', name:'core-lib.utils', version:'0.9-SNAPSHOT', changing: true
-
-        testCompile 'org.apache.commons:commons-math3:3.2'
-        testCompile group: 'de.unijena.bioinf', name:'phyloTree.utils', version:'0.9.9-SNAPSHOT', changing: true
-    }
+dependencies {
+    compile project(':gscm-cli')
+    compile project(':gscm-lib')
 }
 
-//command line interface stuff
-project(':scm.cli'){
-    apply plugin: "eu.appsatori.fatjar"
-    apply plugin: 'edu.sc.seis.launch4j'
-
-    version = '0.8-SNAPSHOT'
-
-    dependencies {
-        compile project(':scm.algorithm')
-
-        compile group: 'de.unijena.bioinf', name:'phyloTree.cli', version:'0.9.9-SNAPSHOT', changing: true
-        compile group: 'de.unijena.bioinf', name:'core-lib.cli', version:'0.9-SNAPSHOT', changing: true
-
-        testCompile 'com.github.stefanbirkner:system-rules:1.5.0'
-    }
-
-
-
-    project.ext.set("mainClassName", "scm.cli.GSCMLauncher")
-
-    jar {
-        manifest {
-            attributes 'Main-Class': project.mainClassName
-        }
-    }
-
-    fatJar {
-        classifier 'fat'
-        manifest {
-            attributes 'Main-Class': project.mainClassName
-        }
-        exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
-    }
-
-    copyL4jLib.dependsOn fatJar
-    fatJarPrepareFiles.dependsOn jar
-
-    launch4j {
-        outfile = 'gscm.exe'
-        mainClassName = project.mainClassName
-        copyConfigurable = project.tasks.fatJar.outputs.files
-        jar = "lib/${project.tasks.fatJar.archiveName}"
-//        icon = 'icons/myApp.ico'
-    }
-
-//    shadowJar {
-//        mergeServiceFiles()
-//        exclude 'META-INF/*.DSA'
-//        exclude 'META-INF/*.RSA'
-//    }
-}
 
 
 
