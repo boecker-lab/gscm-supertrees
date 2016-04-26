@@ -1,8 +1,8 @@
 package evaluation;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.treetools.FN_FP_RateComputer;
 import scmAlgorithm.CalculateSupertree;
 
 import java.io.BufferedReader;
@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**

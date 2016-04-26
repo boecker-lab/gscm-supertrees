@@ -1,15 +1,16 @@
 package treeUtils;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
 import junit.framework.TestCase;
 import org.junit.Test;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class TreeEqualsTest extends TestCase {
 

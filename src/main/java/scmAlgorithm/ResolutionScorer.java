@@ -1,9 +1,8 @@
 package scmAlgorithm;
 
-import epos.model.tree.Tree;
-import epos.model.tree.treetools.TreeUtilsBasic;
+import phyloTree.model.tree.Tree;
 import treeUtils.TreeUtils;
-import scmAlgorithm.SCM;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ResolutionScorer extends Scorer{
                 System.out.println("tree contains the following leaves more than once: "+check);
             }
         }
-        double resolution = TreeUtilsBasic.calculateTreeResolution(scm.getNumTaxa(), scm.vertexCount());
+        double resolution = phyloTree.model.tree.TreeUtils.calculateTreeResolution(scm.getNumTaxa(), scm.vertexCount());
         //return normalized resolution
         return resolution / scm.getLeaves().length;
     }

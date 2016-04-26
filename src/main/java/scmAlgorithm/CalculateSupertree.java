@@ -1,8 +1,8 @@
 package scmAlgorithm;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.treetools.FN_FP_RateComputer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class CalculateSupertree {
         for (Tree x : input){
             curr.add(x);
             while (!curr.isEmpty()){
-                work = new ArrayList<>(curr);
+                work = new ArrayList<Tree>(curr);
                 for (Tree act : work){
                     if (inputtrees.contains(act)) {
                         sourcetrees.add(act);

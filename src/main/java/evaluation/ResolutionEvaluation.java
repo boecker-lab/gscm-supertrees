@@ -1,9 +1,8 @@
 package evaluation;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
-import epos.model.tree.treetools.TreeUtilsBasic;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeUtils;
 import scmAlgorithm.CalculateSupertree;
 
 import java.io.BufferedReader;
@@ -53,11 +52,11 @@ public class ResolutionEvaluation {
     //in each scaffold factor, results for resolution and overlap criterion
     public void evaluate (boolean exampledone, int notthere, int number){
         calculateSupertree("resolution");
-        resolution = TreeUtilsBasic.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
+        resolution = TreeUtils.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
         resolutionresolution += resolution;
 
         calculateSupertree("overlap");
-        resolution = TreeUtilsBasic.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
+        resolution = TreeUtils.calculateTreeResolution(supertree.getNumTaxa(), supertree.vertexCount());
         resolutionoverlap += resolution;
 
         if (exampledone){

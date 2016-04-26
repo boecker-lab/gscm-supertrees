@@ -2,21 +2,12 @@ package scmAlgorithm;
 
 
 import epos.algo.consensus.nconsensus.NConsensus;
-import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
-import epos.model.tree.treetools.TreeUtilsBasic;
-import org.apache.log4j.Level;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.*;
-import java.util.Random;
-import org.jgrapht.traverse.*;
-import treeUtils.TreeEquals;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeNode;
 import treeUtils.TreeUtils;
+
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -382,23 +373,29 @@ public class SCM {
         Tree result;
         Tree between;
         NConsensus con = new NConsensus();
-        con.getLog().setLevel(Level.OFF);
+//        con.getLog().setLevel(Level.OFF);
         if (nodesofboth.size()==0){
             System.err.println("no overlapping nodes, consensus is not possible");
             return new Tree();
         }
         //no cutting and inserting neccessary, because the trees have the same leaves
         if (nodesofboth.size() == one.getLeaves().length && nodesofboth.size() == two.getLeaves().length){
-            result = con.consesusTree(new Tree[]{one, two}, 1.0);
+            con.setInput(new Tree[]{one, two});
+            con.setThreshold(1d);
+            con.run();
+            result =  con.getResult();
         }
         else {
             Tree originalone = one.cloneTree();
             Tree originaltwo = two.cloneTree();
             one = CutTree(one, nodesofboth);
             two = CutTree(two, nodesofboth);
-            between = con.consesusTree(new Tree[]{one, two}, 1.0);
+            con.setInput(new Tree[]{one, two});
+            con.setThreshold(1d);
+            con.run();
+            between =  con.getResult();
             if (print){
-                System.out.println("Cut one "+Newick.getStringFromTree(one));
+                System.out.println("Cut one "+ Newick.getStringFromTree(one));
                 System.out.println("Cut two "+Newick.getStringFromTree(two));
                 System.out.println("Consensus "+Newick.getStringFromTree(between));
             }

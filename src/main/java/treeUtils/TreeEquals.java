@@ -1,8 +1,8 @@
 package treeUtils;
 
-import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import treeUtils.TreeUtils;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeNode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

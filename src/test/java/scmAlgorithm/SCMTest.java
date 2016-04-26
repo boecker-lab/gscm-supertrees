@@ -1,21 +1,20 @@
 package scmAlgorithm;
 
+import epos.algo.consensus.Consensus;
 import epos.algo.consensus.nconsensus.NConsensus;
-import epos.model.tree.Tree;
-import epos.model.tree.TreeNode;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.FN_FP_RateComputer;
-import junit.framework.Assert;
 import org.junit.Test;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
+import phyloTree.model.tree.TreeNode;
+import phyloTree.treetools.FN_FP_RateComputer;
 import treeUtils.TreeEquals;
-import treeUtils.TreeEqualsTest;
 import treeUtils.TreeUtils;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -170,7 +169,6 @@ public class SCMTest {
         Tree cuttree;
         Tree hanginconsensus;
         Tree consensus = new Tree();
-        NConsensus con = new NConsensus();
         //create 100 random nodes in tree
         compare = randomInsert(compare, 100);
         ArrayList<String> nodesofboth = TreeUtils.getOverLappingNodes(tree, compare);
@@ -179,7 +177,7 @@ public class SCMTest {
         cuttree = s.CutTree(tree, nodesofboth);
         cutcompare = s.CutTree(compare, nodesofboth);
 
-        consensus = con.consesusTree(new Tree[]{cuttree, cutcompare}, 1.0);
+        consensus = Consensus.getStrictConsensus(Arrays.asList(cuttree, cutcompare));
         TreeEquals equ = new TreeEquals();
         //Konsensusbaum gleich Usprungsbaum
         assertTrue(equ.getTreeEquals(tree, consensus));
@@ -210,17 +208,14 @@ public class SCMTest {
         Tree g = Newick.getTreeFromString("((d:1.0,e:1.0):1.0,(a:1.0,(c:1.0,b:1.0):1.0):1.0)");
         Tree h = Newick.getTreeFromString("(d:1.0,(a:1.0,(b:1.0,(e:1.0,c:1.0):1.0):1.0):1.0)");
 
-        NConsensus eins = new NConsensus();
-        NConsensus zwei = new NConsensus();
-        NConsensus drei = new NConsensus();
-        NConsensus vier = new NConsensus();
-        NConsensus fuenf = new NConsensus();
 
-        Tree reseins = eins.consesusTree(new Tree[]{a,b},1.0);
-        Tree reszwei = zwei.consesusTree(new Tree[]{c,d},1.0);
-        Tree resdrei = drei.consesusTree(new Tree[]{e,f},1.0);
-        Tree resvier = vier.consesusTree(new Tree[]{e,g},1.0);
-        Tree resfuenf = fuenf.consesusTree(new Tree[]{e,h},1.0);
+
+        Tree reseins = Consensus.getStrictConsensus(Arrays.asList(a,b));
+        Tree reszwei = Consensus.getStrictConsensus(Arrays.asList(c,d));
+        Tree resdrei = Consensus.getStrictConsensus(Arrays.asList(e,f));
+        Tree resvier = Consensus.getStrictConsensus(Arrays.asList(e,g));
+        Tree resfuenf = Consensus.getStrictConsensus(Arrays.asList(e,h));
+
 
         Tree expeins = Newick.getTreeFromString("((a:1.0,b:1.0):1.0,(c:1.0,d:1.0):1.0)");
         Tree expzwei = Newick.getTreeFromString("((a:1.0,b:1.0,c:1.0):1.0,d:1.0)");

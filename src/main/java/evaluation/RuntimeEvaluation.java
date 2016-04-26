@@ -1,8 +1,7 @@
 package evaluation;
 
-import epos.model.tree.Tree;
-import epos.model.tree.io.Newick;
-import epos.model.tree.treetools.TreeUtilsBasic;
+import phyloTree.io.Newick;
+import phyloTree.model.tree.Tree;
 import scmAlgorithm.CalculateSupertree;
 
 import java.io.BufferedReader;
