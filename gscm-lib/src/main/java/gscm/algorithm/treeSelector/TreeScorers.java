@@ -21,7 +21,7 @@
 package gscm.algorithm.treeSelector;
 
 /**
- * Created by fleisch on 24.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.11.15.
  */
 
 public class TreeScorers {

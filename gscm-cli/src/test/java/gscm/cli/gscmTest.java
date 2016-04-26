@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by fleisch on 01.12.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 01.12.15.
  */
 @RunWith(Parameterized.class)
 public class gscmTest {

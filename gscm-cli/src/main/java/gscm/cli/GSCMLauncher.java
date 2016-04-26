@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by fleisch on 24.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.11.15.
  */
 public class GSCMLauncher {
     private static SCMCLI CLI;

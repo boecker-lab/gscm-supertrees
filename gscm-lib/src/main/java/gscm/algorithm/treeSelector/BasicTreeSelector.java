@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Created by fleisch on 23.10.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.10.15.
  */
 public abstract class BasicTreeSelector implements TreeSelector {
     private int threads = 1;

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Created by fleisch on 06.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.11.15.
  */
 
 @RunWith(Parameterized.class)
@@ -102,7 +102,7 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
 
 
         long t = System.currentTimeMillis();
-        RandomizedSCMAlgorithm algo = new RandomizedSCMAlgorithm(ITERATIONS, inputData, scorerArray);
+        RandomizedGreedySCMAlgorithm algo = new RandomizedGreedySCMAlgorithm(ITERATIONS, inputData, scorerArray);
         algo.run();
         Tree supertree = algo.getResult();
         buffer.append("Randomized-" + "strict" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
@@ -119,7 +119,7 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
 
 
         t = System.currentTimeMillis();
-        algo = new RandomizedSCMAlgorithm(ITERATIONS, inputData, scorerArray);
+        algo = new RandomizedGreedySCMAlgorithm(ITERATIONS, inputData, scorerArray);
         algo.setThreads(2);
         algo.run();
         Tree supertreeP = algo.getResult();

@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Created by fleisch on 06.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
 public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends BasicTreeSelector {
     M treeToPairs;

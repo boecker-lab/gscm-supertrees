@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 /**
- * Created by fleisch on 10.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
  */
 public class GreedySCMAlgorithm extends SCMAlgorithm {
     final TreeSelector selector;

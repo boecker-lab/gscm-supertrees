@@ -32,25 +32,25 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * Created by fleisch on 24.03.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.03.15.
  */
-public class RandomizedSCMAlgorithm extends MultiResultsSCMAlgorithm {
+public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 //    private int iterations = 0;
     private int individualIterations = 0;
 
-    public RandomizedSCMAlgorithm(TreeScorer... scorer) {
+    public RandomizedGreedySCMAlgorithm(TreeScorer... scorer) {
         this(null, scorer);
     }
 
-    public RandomizedSCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
+    public RandomizedGreedySCMAlgorithm(Tree[] trees, TreeScorer... scorer) {
         this(0, trees, scorer);
     }
 
-    public RandomizedSCMAlgorithm(int numberOfIterations, TreeScorer... scorer) {
+    public RandomizedGreedySCMAlgorithm(int numberOfIterations, TreeScorer... scorer) {
         this(numberOfIterations, null, scorer);
     }
 
-    public RandomizedSCMAlgorithm(int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
+    public RandomizedGreedySCMAlgorithm(int numberOfIterations, Tree[] trees, TreeScorer... scorer) {
         super(trees, scorer);
         individualIterations = numberOfIterations;
     }

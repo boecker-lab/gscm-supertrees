@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by fleisch on 22.10.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.10.15.
  */
 @FunctionalInterface
 public interface TreeSelectorFactory<T extends TreeSelector> {

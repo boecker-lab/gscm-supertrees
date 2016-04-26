@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 /**
- * Created by fleisch on 29.10.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 29.10.15.
  */
 public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
     protected Tree[] inputTrees;

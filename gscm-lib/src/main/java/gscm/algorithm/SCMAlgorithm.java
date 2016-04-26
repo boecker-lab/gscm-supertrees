@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 /**
- * Created by fleisch on 05.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 05.02.15.
  */
 public abstract class SCMAlgorithm extends SupertreeAlgorithm {
     private List<Tree> superTrees;

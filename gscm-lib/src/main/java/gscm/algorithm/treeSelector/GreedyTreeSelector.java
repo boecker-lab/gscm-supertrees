@@ -26,7 +26,7 @@ import phyloTree.model.tree.Tree;
 import java.util.PriorityQueue;
 
 /**
- * Created by fleisch on 14.10.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 14.10.15.
  */
 public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
     public static final TreeSelectorFactory<GreedyTreeSelector> FACTORY = () -> {

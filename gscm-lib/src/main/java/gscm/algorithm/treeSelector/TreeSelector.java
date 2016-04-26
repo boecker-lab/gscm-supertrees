@@ -27,7 +27,7 @@ import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 
 /**
- * Created by fleisch on 14.10.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 14.10.15.
  */
 public interface TreeSelector {
     enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}

@@ -25,7 +25,7 @@ import cli.Multithreaded;
 import cli.Progressbar;
 import gscm.algorithm.GreedySCMAlgorithm;
 import gscm.algorithm.MultiGreedySCMAlgorithm;
-import gscm.algorithm.RandomizedSCMAlgorithm;
+import gscm.algorithm.RandomizedGreedySCMAlgorithm;
 import gscm.algorithm.SCMAlgorithm;
 import gscm.algorithm.treeSelector.TreeScorers;
 import org.kohsuke.args4j.CmdLineParser;
@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by fleisch on 20.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 20.11.15.
  */
 public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multithreaded, Progressbar {
     public SCMCLI(String appHomeParent, String appHomeFolderName, String logDir, int maxLogFileSize, int logRotation) {
@@ -124,7 +124,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
             }
         } else {
             //randomized
-            algo = new RandomizedSCMAlgorithm(randomIterations, TreeScorers.getScorerArray(isMultiThreaded(), scorerTypes));
+            algo = new RandomizedGreedySCMAlgorithm(randomIterations, TreeScorers.getScorerArray(isMultiThreaded(), scorerTypes));
         }
         setParameters(algo);
         return algo;

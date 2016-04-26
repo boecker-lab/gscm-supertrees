@@ -21,7 +21,7 @@
 package gscm.algorithm.treeSelector;
 
 /**
- * Created by fleisch on 23.03.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.03.15.
  */
 
 import gnu.trove.map.hash.THashMap;

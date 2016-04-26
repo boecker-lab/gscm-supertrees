@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 // TreeScores have to be positive uncluding zero
 
 /**
- * Created by fleisch on 06.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
 
 
@@ -211,7 +211,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     //#################### Scorer Implementations ##################
 
     /**
-     * Created by fleisch on 16.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
     public static class BackboneCladeNumberScorer extends TreeScorer<BackboneCladeNumberScorer> {
         public BackboneCladeNumberScorer() {
@@ -233,7 +233,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 16.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
     public static class BackboneSizeScorer extends TreeScorer<BackboneSizeScorer> {
         public BackboneSizeScorer() {
@@ -256,7 +256,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 16.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
     public static class CollisionMultiCollisionPointScorer extends TreeScorer<CollisionMultiCollisionPointScorer> {
         public CollisionMultiCollisionPointScorer() {
@@ -278,7 +278,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 15.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
     public static class CollisionNumberScorer extends TreeScorer<CollisionNumberScorer> {
         public CollisionNumberScorer() {
@@ -298,7 +298,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 15.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
     public static class CollisionPointNumberScorer extends TreeScorer<CollisionPointNumberScorer> {
         public CollisionPointNumberScorer() {
@@ -320,7 +320,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 01.04.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 01.04.15.
      */
     public static class ConsensusBackboneCladeNumberScorer extends TreeScorer<ConsensusBackboneCladeNumberScorer> {
         public ConsensusBackboneCladeNumberScorer() {
@@ -343,7 +343,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 31.03.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
     public static class ConsensusBackboneResolutionScorer extends TreeScorer<ConsensusBackboneResolutionScorer> {
         public ConsensusBackboneResolutionScorer() {
@@ -364,7 +364,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 16.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
     public static class ConsensusBackboneSizeScorer extends TreeScorer<ConsensusBackboneSizeScorer> {
         public ConsensusBackboneSizeScorer() {
@@ -385,7 +385,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 31.03.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
     public static class ConsensusCladeNumberScorer extends TreeScorer<ConsensusCladeNumberScorer> {
         public ConsensusCladeNumberScorer() {
@@ -426,7 +426,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 16.03.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.03.15.
      */
     public static class ConsensusResolutionScorer extends TreeScorer<ConsensusResolutionScorer> {
         public ConsensusResolutionScorer() {
@@ -447,7 +447,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 06.02.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
      */
     public static class OverlapScorer extends TreeScorer<OverlapScorer> {
         public OverlapScorer() {
@@ -482,7 +482,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
 
     /**
-     * Created by fleisch on 22.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
     public static class SubsetUnitOverlapDifferenceScorer extends TreeScorer<SubsetUnitOverlapDifferenceScorer> {
         public SubsetUnitOverlapDifferenceScorer() {
@@ -512,7 +512,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 22.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
     public static class SubsetUnitOverlapRateScorer extends TreeScorer<SubsetUnitOverlapRateScorer> {
         public SubsetUnitOverlapRateScorer() {
@@ -542,7 +542,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 22.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
     public static class SubsetUnitOverlapScorer extends TreeScorer<SubsetUnitOverlapScorer> {
         public SubsetUnitOverlapScorer() {
@@ -574,7 +574,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 27.01.16.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
     public static class UniqueCladesNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
         public UniqueCladesNumberScorer() {
@@ -594,7 +594,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 27.01.16.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
     public static class UniqueCladesRateScorer extends TreeScorer<UniqueTaxaNumberScorer> {
         public UniqueCladesRateScorer() {
@@ -665,7 +665,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     /**
-     * Created by fleisch on 22.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
     public static class UniqueTaxaNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
         public UniqueTaxaNumberScorer() {
@@ -699,7 +699,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
 
     /**
-     * Created by fleisch on 22.06.15.
+     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
     public static class UniqueTaxaRateScorer extends TreeScorer<UniqueTaxaRateScorer> {
         public UniqueTaxaRateScorer() {

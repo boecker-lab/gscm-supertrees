@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by fleisch on 16.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.02.15.
  */
 
 //todo simple sample test

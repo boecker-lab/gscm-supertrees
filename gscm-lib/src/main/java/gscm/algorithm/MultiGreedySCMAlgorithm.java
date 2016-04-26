@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 /**
- * Created by fleisch on 15.06.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
  */
 public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 

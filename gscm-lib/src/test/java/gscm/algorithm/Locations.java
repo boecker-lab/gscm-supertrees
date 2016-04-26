@@ -6,7 +6,7 @@ import phyloTree.model.tree.Tree;
 import java.io.File;
 
 /**
- * Created by fleisch on 13.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 13.11.15.
  */
 public class Locations {
     public Tree[] newickInput100() {

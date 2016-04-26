@@ -8,7 +8,7 @@ import phyloTree.model.tree.Tree;
 import java.util.Arrays;
 
 /**
- * Created by fleisch on 06.11.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.11.15.
  */
 public abstract class BasicSCMTest {
     public static final Locations LOCATIONS = new Locations();

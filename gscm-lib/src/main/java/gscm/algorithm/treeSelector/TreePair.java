@@ -30,7 +30,7 @@ import phyloTree.model.tree.TreeUtils;
 import java.util.*;
 
 /**
- * Created by fleisch on 10.02.15.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
  */
 class TreePair implements Comparable<TreePair> {
     final static TreePair MIN_VALUE = new TreePair();
