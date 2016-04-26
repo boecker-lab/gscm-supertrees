@@ -1,2 +1,4 @@
-rootProject.name = 'scm_Algorithm'
+rootProject.name = 'gscm'
+include 'gscm-lib',
+        'gscm-cli'
 
