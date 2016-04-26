@@ -1,5 +1,6 @@
 package gscm.cli;
 
+import gscm.algorithm.treeSelector.TreeScorers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -7,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import phyloTree.io.TreeFileUtils;
 import phyloTree.model.tree.Tree;
-import gscm.algorithm.treeSelector.TreeScorers;
 
 import java.io.IOException;
 import java.nio.file.Files;
