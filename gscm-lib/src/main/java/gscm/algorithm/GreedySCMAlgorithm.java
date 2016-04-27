@@ -119,7 +119,7 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
      * @throws InsufficientOverlapException
      */
     Tree calculateSuperTree() throws InsufficientOverlapException {
-        return calculateGreedyConsensus(selector);
+        return selector.calculateGreedyConsensus();
     }
 
     /**

@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
-public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends BasicTreeSelector {
+public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
     M treeToPairs;
 
 
@@ -59,13 +59,13 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
     }
 
     @Override
-    Collection<Tree> getRemainingTrees() {
+    protected Collection<Tree> getRemainingTrees() {
         return new LinkedList<>(treeToPairs.keySet());
     }
 
     //(O(2nlog(n))
     @Override
-    void removeTreePair(TreePair pair) {
+    protected void removeTreePair(TreePair pair) {
         Tree t1 = pair.t1; //O(1)
         Tree t2 = pair.t2; //O(1)
         removePair(t1, pair);
@@ -82,7 +82,7 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
         }
     }
 
-    void addTreePair(Tree t, TreePair p) {
+    protected void addTreePair(Tree t, TreePair p) {
         S pairs = treeToPairs.get(t);
         if (pairs == null) {
             //add new to map O(1)

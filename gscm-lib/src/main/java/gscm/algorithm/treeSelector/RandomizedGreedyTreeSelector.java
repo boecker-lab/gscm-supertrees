@@ -51,7 +51,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     private RandomizedGreedyTreeSelector() {}
 
     @Override
-    TreePair getMax() {
+    protected TreePair getMax() {
         if (treeToPairs.isEmpty())
             return TreePair.MIN_VALUE;
         return peekRandomPair();
@@ -75,7 +75,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     }
 
     @Override
-    void addTreePair(Tree t, TreePair p) {
+    protected void addTreePair(Tree t, TreePair p) {
         super.addTreePair(t,p);
         addTreePairToRandomStructure(p);
     }

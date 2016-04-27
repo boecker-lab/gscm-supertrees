@@ -44,7 +44,6 @@ class TreePair implements Comparable<TreePair> {
     double score;
     double tieBreakingScore = 0d;
 
-//    boolean isCollisionFree = false;
 
 
     Tree consensus = null;
@@ -342,4 +341,9 @@ class TreePair implements Comparable<TreePair> {
         }
 
     }
+
+
+
+
+
 }

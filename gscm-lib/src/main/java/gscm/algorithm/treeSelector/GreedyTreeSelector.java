@@ -48,7 +48,7 @@ public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree
 
     //find best pair (O(nlog(n)))
     @Override
-    TreePair getMax() {
+    protected TreePair getMax() {
         TreePair best = TreePair.MIN_VALUE;
         //iteration in O(n)
         for (PriorityQueue<TreePair> treePairs : treeToPairs.values()) {

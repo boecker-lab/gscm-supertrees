@@ -82,58 +82,6 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
         return this;
     }
 
-
-    /**
-     * Calculates a greedy strict consensus merger supertree using the given {@link gscm.algorithm.treeSelector.TreeSelector}.
-     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
-     * to not have to reimplement the workflow.
-     *
-     * This methods prints the progress to standard out
-     *
-     * @param selector specifying the tree selection strategy
-     * @return gscm supertree
-     * @throws InsufficientOverlapException
-     */
-    protected Tree calculateGreedyConsensus(TreeSelector selector) throws InsufficientOverlapException {
-        return calculateGreedyConsensus(selector, new CLIProgressBar());
-    }
-
-    /**
-     * Calculates a greedy strict consensus merger supertree using the given {@link gscm.algorithm.treeSelector.TreeSelector}.
-     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
-     * to not have to reimplement the workflow.
-     *
-     * This methods does not print progress
-     *
-     * @param selector specifying the tree selection strategy
-     * @return gscm supertree
-     * @throws InsufficientOverlapException
-     */
-    protected Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) throws InsufficientOverlapException {
-        return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT || !printProgress));
-    }
-
-    private Tree calculateGreedyConsensus(TreeSelector selector, final CLIProgressBar progressBar) throws InsufficientOverlapException {
-        Tree superCandidate = null;
-        Tree pair;
-
-        //progress bar stuff
-        int pCount = 0;
-
-        selector.init();
-        int trees = selector.getNumberOfInputTrees() - 1;
-        while ((pair = selector.pollTreePair()) != null) {
-            progressBar.update(pCount++, trees);
-            selector.addTree(pair);
-            superCandidate = pair;
-        }
-        if (selector.getNumberOfRemainingTrees() > 0) {
-            throw new InsufficientOverlapException();
-        } else {
-            return superCandidate;
-        }
-    }
-
     /**
      * Specifies the scoring function used for the calculation
      * @param scorer specifying the scoring function

@@ -95,10 +95,10 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
             List<Tree> scms = new ArrayList<>(iterations + 1);
 
             nonRandomResultSelector.setScorer(treeScorer);
-            scms.add((calculateGreedyConsensus(nonRandomResultSelector, false)));
+            scms.add((nonRandomResultSelector.calculateGreedyConsensus(false)));
             randomResultSelector.setScorer(treeScorer);
             for (int i = 0; i < iterations; i++) {
-                scms.add(calculateGreedyConsensus(randomResultSelector,false));
+                scms.add(randomResultSelector.calculateGreedyConsensus(false));
             }
             superTrees.addAll(scms);
         }

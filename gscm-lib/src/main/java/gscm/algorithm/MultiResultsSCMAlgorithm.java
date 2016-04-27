@@ -233,7 +233,7 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
         public Tree doJob(TreeScorer scorer) throws InsufficientOverlapException {
             selector.setScorer(scorer);
             selector.setClearScorer(false);
-            return calculateGreedyConsensus(selector,false);
+            return selector.calculateGreedyConsensus(false);
         }
     }
 

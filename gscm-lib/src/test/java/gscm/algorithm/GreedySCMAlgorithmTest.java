@@ -182,7 +182,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
 */
 
 
-        BasicTreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
         selector.setScorer(new TreeScorer.ConsensusResolutionScorer());
         selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());
