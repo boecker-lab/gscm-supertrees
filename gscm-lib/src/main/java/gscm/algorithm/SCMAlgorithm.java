@@ -39,6 +39,14 @@ import java.util.logging.Logger;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 05.02.15.
  */
+
+/**
+ * This class defines the basic greedy strict consensus merger algorithm.
+ * All gscm implementations inherit from this class
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public abstract class SCMAlgorithm extends SupertreeAlgorithm {
     private List<Tree> superTrees;
     protected int threads;
@@ -55,10 +63,17 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
         super();
     }
 
+    /**
+     * This is the place to implement the algorithm
+     *
+     * @return A List containing supertree(s)
+     * @throws Exception
+     */
     protected abstract List<Tree> calculateSuperTrees() throws Exception;
 
-    public abstract void setInput(Tree... trees);
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SupertreeAlgorithm call() throws Exception {
         superTrees = calculateSuperTrees();
@@ -68,11 +83,33 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
     }
 
 
-    public Tree calculateGreedyConsensus(TreeSelector selector) throws InsufficientOverlapException {
+    /**
+     * Calculates a greedy strict consensus merger supertree using the given {@link gscm.algorithm.treeSelector.TreeSelector}.
+     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
+     * to not have to reimplement the workflow.
+     *
+     * This methods prints the progress to standard out
+     *
+     * @param selector specifying the tree selection strategy
+     * @return gscm supertree
+     * @throws InsufficientOverlapException
+     */
+    protected Tree calculateGreedyConsensus(TreeSelector selector) throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector, new CLIProgressBar());
     }
 
-    public Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) throws InsufficientOverlapException {
+    /**
+     * Calculates a greedy strict consensus merger supertree using the given {@link gscm.algorithm.treeSelector.TreeSelector}.
+     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
+     * to not have to reimplement the workflow.
+     *
+     * This methods does not print progress
+     *
+     * @param selector specifying the tree selection strategy
+     * @return gscm supertree
+     * @throws InsufficientOverlapException
+     */
+    protected Tree calculateGreedyConsensus(TreeSelector selector, boolean printProgress) throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector, new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT || !printProgress));
     }
 
@@ -97,8 +134,15 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
         }
     }
 
+    /**
+     * Specifies the scoring function used for the calculation
+     * @param scorer specifying the scoring function
+     */
     public abstract void setScorer(TreeScorer scorer);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Tree> getResults() {
         if (superTrees == null || superTrees.isEmpty())
@@ -106,6 +150,9 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
         return superTrees;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tree getResult() {
         if (superTrees == null || superTrees.isEmpty())
@@ -113,12 +160,18 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
         return superTrees.get(0);
     }
 
+    /**
+     * Set the maximum number of threads the algorithm is allowed to use
+     * @param threads
+     */
     public void setThreads(int threads) {
         this.threads = threads;
     }
 
 
-    //Descending comparator
+    /**
+     * Descending Resolution comparator for trees
+     */
     protected class TreeResolutionComparator implements Comparator<Tree> {
         //caches scores of already known trees
         private TObjectDoubleHashMap<Tree> scores = new TObjectDoubleHashMap<>();

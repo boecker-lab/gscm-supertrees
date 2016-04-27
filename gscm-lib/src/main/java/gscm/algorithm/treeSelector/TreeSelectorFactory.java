@@ -27,6 +27,14 @@ import java.util.Set;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.10.15.
  */
+
+/**
+ * Functional Factory interface that can build every class
+ * that extends from {@link gscm.algorithm.treeSelector.TreeSelector}
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 @FunctionalInterface
 public interface TreeSelectorFactory<T extends TreeSelector> {
     Set<TreeSelector> selectors =  Collections.synchronizedSet(new HashSet<>());

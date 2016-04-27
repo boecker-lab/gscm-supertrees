@@ -20,6 +20,7 @@
  */
 package gscm.algorithm;
 
+import epos.algo.consensus.Consensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import gscm.algorithm.treeSelector.InsufficientOverlapException;
 import gscm.algorithm.treeSelector.TreeScorer;
@@ -38,6 +39,15 @@ import java.util.logging.Logger;
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 29.10.15.
+ */
+
+/**
+ * This class defines the basic algorithm for greedy strict
+ * consensus merger implemetations that handle multiple scorings
+ * and return multiple results. It also merges them into a single supertree
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
  */
 public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
     protected Tree[] inputTrees;
@@ -81,18 +91,17 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
             this.scorerArray = null;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setInput(List<Tree> trees) {
-        setInput(trees.toArray(new Tree[trees.size()]));
+        inputTrees = trees.toArray(new Tree[trees.size()]);
     }
 
-    @Override
-    public void setInput(Tree... trees) {
-        inputTrees = trees;
-    }
-
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setScorer(TreeScorer scorer) {
         setScorer(new TreeScorer[]{scorer});
@@ -103,23 +112,25 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
     }
 
     /**
-     * Returns the merged Supertree, based on the supertreeList
+     * Returns the merged Supertree,of all calculated supertrees
      *
-     * @return
+     * @return merged supertree
      */
     @Override
     public Tree getResult() {
         return getMergedSupertree();
     }
 
+    /**
+     * Returns the merged Supertree,of all calculated supertrees
+     *
+     * @return merged supertree
+     */
     public Tree getMergedSupertree() {
         if (mergedSupertree == null) {
             List<Tree> superTrees = getResults();
             if (superTrees.size() > 1) {
-                LooseConsensus cons = new LooseConsensus();
-                cons.setInput(superTrees);
-                cons.run();
-                mergedSupertree = cons.getResult();
+                mergedSupertree = Consensus.getLoosConsensus(superTrees);
             } else {
                 mergedSupertree = superTrees.get(0);
             }
@@ -127,7 +138,9 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
         return mergedSupertree;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
         mergedSupertree = null;
@@ -143,16 +156,31 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
         if (superTrees == null)
             superTrees = calculateSequencial();
 
-//        shutdown();
         return superTrees;
     }
 
     //abstracts
+
+    /**
+     * @return number of jobs that can be done in parallel
+     */
     protected abstract int numOfJobs();
 
+    /**
+     * Single threaded Implementation of the algorithm.
+     * If there is no single threaded Implementation call the multithreaded implementation {@link MultiResultsSCMAlgorithm#calculateParallel()}
+     *
+     * @return List of supertrees
+     */
     protected abstract List<Tree> calculateSequencial() throws InsufficientOverlapException;
 
-    protected abstract List<Tree> calculateParallel();
+    /**
+     * Multi threaded Implementation of the algorithm.
+     * If there is no multi threaded Implementation call the single threaded implementation {@link MultiResultsSCMAlgorithm#calculateSequencial()}
+     *
+     * @return List of supertrees
+     */
+    protected abstract List<Tree> calculateParallel() throws InsufficientOverlapException;
 
 
     //helper classes for parallel computing

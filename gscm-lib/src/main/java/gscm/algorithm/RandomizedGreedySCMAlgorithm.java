@@ -34,8 +34,20 @@ import java.util.concurrent.Future;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.03.15.
  */
+
+/**
+ * Randomized implementatiion of greedy strict consensus merger algorithm.
+ * It does multiple randomized iterations for a given set of scoring functions.
+ * The resulting supertrees are merged into a single supertree
+ *
+ * For every scoring function it calaculates {@linke numberOfIterations}
+ * times the randomized gscm an one optimal gscm
+ * The resulting trees are then merge into a singe supertree
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
-//    private int iterations = 0;
     private int individualIterations = 0;
 
     public RandomizedGreedySCMAlgorithm(TreeScorer... scorer) {
@@ -56,16 +68,21 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
     }
 
     private int defaultIterations() {
-//        return inputTrees.length * inputTrees.length;
         return inputTrees.length;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int numOfJobs() {
         return (getIterations() + 1) * scorerArray.length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final int iterations = getIterations();
         final GreedyTreeSelector nonRandomResultSelector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
@@ -90,6 +107,10 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         return superTrees;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected List<Tree> calculateParallel() {
         final int iterations = getIterations();
         List<Tree> superTrees = new ArrayList<>(numOfJobs());
@@ -124,10 +145,18 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         return null;
     }
 
+    /**
+     * Specifies the number of rundom iteration per run
+     * @param iterations number of random iterations
+     */
     public void setNumberOfIterations(int iterations) {
         this.individualIterations = iterations;
     }
 
+    /**
+     *
+     * @return number of random iteration
+     */
     public int getIterations() {
         if (individualIterations > 0 )
             return individualIterations;
@@ -136,6 +165,9 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String name() {
         return getClass().getSimpleName();

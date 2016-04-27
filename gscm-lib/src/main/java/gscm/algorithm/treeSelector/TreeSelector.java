@@ -29,14 +29,40 @@ import phyloTree.model.tree.Tree;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 14.10.15.
  */
+
+/**
+ * Stores treepairs and selects the next Tree pair that has to be merged respecting
+ * the given scoring function
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public interface TreeSelector {
     enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}
     void setClearScorer(boolean clearScorer);
     void init();
 
+    /**
+     * Selects the next pair of trees to Merge
+     * and returns the merged result.
+     *
+     * @return Merged Tree of the selected pair of trees
+     */
     Tree pollTreePair ();
+
+    /**
+     * Return the number of Trees have to be merged.
+     * If this method return 1 the gscm algorithm is done
+     * @return Number of tree left
+     */
     int getNumberOfRemainingTrees();
 
+    /**
+     * Method to add
+     *
+     * @param tree merged tree that has
+     * @return
+     */
     boolean addTree(Tree tree);
 
     void setInputTrees(Tree[] trees);

@@ -32,7 +32,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 /**
- * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
+ * This is a wrapper executing the {@link gscm.algorithm.GreedySCMAlgorithm}
+ * for multiple scoring functions and merges the resulting supertrees into a single supertree
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
  */
 public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 
@@ -60,11 +64,17 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         super(logger);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int numOfJobs() {
         return scorerArray.length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
@@ -80,6 +90,9 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         return superTrees;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<Tree> calculateParallel() {
         GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeSelector.FACTORY, inputTrees);
@@ -95,6 +108,9 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String name() {
         return getClass().getSimpleName();

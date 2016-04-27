@@ -33,6 +33,13 @@ import java.util.logging.Logger;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
  */
+
+/**
+ * Classical greedy strict consensus merger implementation extending {@link gscm.algorithm.SCMAlgorithm}.
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public class GreedySCMAlgorithm extends SCMAlgorithm {
     final TreeSelector selector;
 
@@ -76,30 +83,48 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
         return getClass().getSimpleName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setScorer(TreeScorer scorer) {
         this.selector.setScorer(scorer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setInput(List<Tree> trees) {
-        setInput(trees.toArray(new Tree[trees.size()]));
+        selector.setInputTrees(trees.toArray(new Tree[trees.size()]));
     }
 
-    @Override
-    public void setInput(Tree... trees) {
-        selector.setInputTrees(trees);
-    }
-
+    /**
+     * Classical  greedy strict consensus merger Implementation calculating a single supertree for a given
+     * scoring function. running time highly depends on the scoring method
+     *
+     * @return a List containing single supertree
+     * @throws InsufficientOverlapException
+     */
     @Override
     protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
         return new ArrayList<>(Arrays.asList(calculateSuperTree()));
     }
 
+    /**
+     * Classical  greedy strict consensus merger Implementation calculating a single supertree for a given
+     * scoring function. running time highly depends on the scoring method
+     *
+     * @return supertree
+     * @throws InsufficientOverlapException
+     */
     Tree calculateSuperTree() throws InsufficientOverlapException {
         return calculateGreedyConsensus(selector);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean shutdown() {
         TreeSelectorFactory.shutdown(selector);
