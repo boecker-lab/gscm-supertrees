@@ -41,8 +41,10 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
                 new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), TreeScorers.getFullScorerArray(true)},
                 new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
                 new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}}));
-//                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));
+//                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}}));
+
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));
 
         return paras;
 
@@ -60,7 +62,7 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
         MultiGreedySCMAlgorithm algo = new MultiGreedySCMAlgorithm(inputData, scorerArray);
         algo.run();
         Tree supertree = algo.getResult();
-        buffer.append("Randomized-" + "strict" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        buffer.append("Multi-" + "strict" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
         buffer.append(SEP);
         assertNotNull(supertree);
         assertEquals(scmResult.getNumTaxa(), supertree.getNumTaxa());
@@ -78,7 +80,7 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
         algo.setThreads(4);
         algo.run();
         Tree supertreeP = algo.getResult();
-        buffer.append("Randomized-Parallel-" + "method" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
+        buffer.append("Multi-Parallel-" + "method" + "-250: " + (double) (System.currentTimeMillis() - t) / 1000d + "s");
         buffer.append(SEP);
         assertEquals(scmResult.getNumTaxa(), supertreeP.getNumTaxa());
         assertNotNull(supertreeP);

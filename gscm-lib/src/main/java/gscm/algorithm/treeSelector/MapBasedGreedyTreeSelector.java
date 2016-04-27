@@ -20,6 +20,7 @@
  */
 package gscm.algorithm.treeSelector;
 
+import epos.algo.consensus.Consensus;
 import phyloTree.model.tree.Tree;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
     M treeToPairs;
 
 
-    protected MapBasedGreedyTreeSelector(ConsensusMethod method) {
+    protected MapBasedGreedyTreeSelector(Consensus.ConsensusMethod method) {
         super(method);
     }
     protected MapBasedGreedyTreeSelector() {

@@ -20,6 +20,7 @@
  */
 package gscm.algorithm.treeSelector;
 
+import epos.algo.consensus.Consensus;
 import epos.algo.consensus.adams.AdamsConsensus;
 import epos.algo.consensus.loose.LooseConsensus;
 import epos.algo.consensus.nconsensus.NConsensus;
@@ -40,12 +41,11 @@ import java.util.concurrent.Future;
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.10.15.
  */
 public abstract class TreeSelector {
-    public enum ConsensusMethod {SEMI_STRICT, STRICT, MAJORITY, ADAMS}
 
     private int threads = 1;
     private ExecutorService executor;
     private TreePairScoringCallableFactory factory;
-    private ConsensusMethod method;
+    private Consensus.ConsensusMethod method;
 
     protected boolean clearScorer = true;
 
@@ -53,12 +53,12 @@ public abstract class TreeSelector {
     Tree[] inputTrees;
 
 
-    protected TreeSelector(ConsensusMethod method) {
+    protected TreeSelector(Consensus.ConsensusMethod method) {
         this.method = method;
     }
 
     protected TreeSelector() {
-        this(ConsensusMethod.STRICT);
+        this(Consensus.ConsensusMethod.STRICT);
     }
 
 
@@ -87,7 +87,7 @@ public abstract class TreeSelector {
             Tree t1 = inputTrees[i];
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
-                final TreePair pair = new TreePair(t1, t2, scorer, newConsensusCalculatorInstance(method));
+                final TreePair pair = new TreePair(t1, t2, scorer, method);
                 if (pair != null && !pair.isInsufficient()) {
                     addTreePair(t1, pair);
                     addTreePair(t2, pair);
@@ -106,7 +106,7 @@ public abstract class TreeSelector {
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
                 pairsToAdd.add(
-                        new TreePair(t1, t2, newConsensusCalculatorInstance(method)));
+                        new TreePair(t1, t2, method));
             }
         }
         // parallel scoring --> we have to score the pairs before adding them into the SORTED data structure
@@ -137,7 +137,7 @@ public abstract class TreeSelector {
         List<TreePair> pairsToAdd = new ArrayList<>(remainingTrees.size());
         for (Tree old : remainingTrees) {
             pairsToAdd.add(
-                    new TreePair(tree, old, newConsensusCalculatorInstance()));
+                    new TreePair(tree, old, method));
         }
 
         //parralel scoring O(n))
@@ -172,15 +172,13 @@ public abstract class TreeSelector {
             return false;
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
-            TreePair pair = new TreePair(tree, old, scorer, newConsensusCalculatorInstance());
+            TreePair pair = new TreePair(tree, old, scorer, method);
             if (pair != null && !pair.isInsufficient()) {
                 addTreePair(tree, pair);
                 addTreePair(old, pair);
             }
         }
 
-        /*if (treeToPairs.get(tree) == null || treeToPairs.get(tree).isEmpty())
-            throw new IllegalArgumentException("Input tree have insufficient Overlap to calculate a supertree");*/
         return true;
     }
 
@@ -277,7 +275,7 @@ public abstract class TreeSelector {
         this.scorer = scorer;
     }
 
-    public ConsensusMethod getMethod() {
+    public Consensus.ConsensusMethod getMethod() {
         return method;
     }
 
@@ -309,11 +307,6 @@ public abstract class TreeSelector {
         return inputTrees.length;
     }
 
-    SupertreeAlgorithm newConsensusCalculatorInstance() {
-        return newConsensusCalculatorInstance(method);
-    }
-    //abstract classes
-
 
     private class TreePairScoringCallable extends DefaultIterationCallable<TreePair, TreePair> {
         protected TreePairScoringCallable(List<TreePair> jobs) {
@@ -333,29 +326,4 @@ public abstract class TreeSelector {
             return new TreePairScoringCallable(list);
         }
     }
-
-    public SupertreeAlgorithm newConsensusCalculatorInstance(final ConsensusMethod METHOD) {
-        SupertreeAlgorithm a;
-        switch (METHOD) {
-            case STRICT:
-                a = new NConsensus();
-                ((NConsensus) a).setThreshold(1D);
-                break;
-            case MAJORITY:
-                a = new NConsensus();
-                ((NConsensus) a).setThreshold(0.5D);
-                break; // is same as strict for 2 trees...
-            case SEMI_STRICT:
-                a = new LooseConsensus();
-                break;
-            case ADAMS:
-                a = new AdamsConsensus();
-                break;
-            default:
-                a = null;
-        }
-        return a;
-    }
-
-
 }

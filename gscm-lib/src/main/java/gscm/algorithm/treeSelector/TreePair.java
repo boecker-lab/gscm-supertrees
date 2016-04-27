@@ -20,14 +20,15 @@
  */
 package gscm.algorithm.treeSelector;
 
+import epos.algo.consensus.Consensus;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeNode;
 import phyloTree.model.tree.TreeUtils;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
@@ -35,50 +36,52 @@ import java.util.*;
 class TreePair implements Comparable<TreePair> {
     final static TreePair MIN_VALUE = new TreePair();
 
+    private final Consensus.ConsensusMethod consensusMethod;
+
     final Tree t1;
     final Tree t2;
 
-    Tree t1pruned;
-    Tree t2pruned;
+    private Tree t1pruned;
+    private Tree t2pruned;
+
+    int t1prunedVertexCount = Integer.MIN_VALUE;
+    int t2prunedVertexCount = Integer.MIN_VALUE;
+
 
     double score;
     double tieBreakingScore = 0d;
 
 
-
     Tree consensus = null;
-    int backboneClades =  -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
+    int backboneClades = -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
     int consensusNumOfTaxa = -1;
 
     Set<String> commonLeafes;
     Map<Set<String>, Set<SingleTaxon>> commonInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
-    private final SupertreeAlgorithm consensorator;
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
-
 
 
     //just to create min value
     private TreePair() {
         t1 = null;
         t2 = null;
-        consensorator = null;
         score = Double.NEGATIVE_INFINITY;
+        consensusMethod = null;
     }
 
-    TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final SupertreeAlgorithm consensusAlgorithm) {
-        this(t1,t2,consensusAlgorithm);
+    TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final Consensus.ConsensusMethod method) {
+        this(t1, t2, method);
         calculateScore(scorer);
     }
 
-    TreePair(final Tree t1, final Tree t2, final SupertreeAlgorithm consensusAlgorithm) {
+    TreePair(final Tree t1, final Tree t2, final Consensus.ConsensusMethod method) {
         this.t1 = t1;
         this.t2 = t2;
-        consensorator = consensusAlgorithm;
-
+        consensusMethod = method;
     }
 
-    TreePair calculateScore(TreeScorer scorer){
+    TreePair calculateScore(TreeScorer scorer) {
         scorer.scoreTreePair(this);
         return this;
     }
@@ -87,7 +90,7 @@ class TreePair implements Comparable<TreePair> {
     public Tree getPartner(Tree t) {
         if (t.equals(t1))
             return t2;
-        else if(t.equals(t2))
+        else if (t.equals(t2))
             return t1;
         return null;
     }
@@ -105,6 +108,9 @@ class TreePair implements Comparable<TreePair> {
 
         pruneLeafes(t1pruned);
         pruneLeafes(t2pruned);
+
+        t1prunedVertexCount = t1pruned.vertexCount();
+        t2prunedVertexCount = t2pruned.vertexCount();
     }
 
     // NOTE: single taxon reduction optimized for 2 trees with known common taxa
@@ -287,24 +293,25 @@ class TreePair implements Comparable<TreePair> {
         if (commonLeafes.size() > 2) {
             if (singleTaxa == null)
                 pruneToCommonLeafes();
-            consensorator.setInput(Arrays.asList(t1pruned, t2pruned));
-            consensorator.run();
-            consensus = consensorator.getResult();
+            consensus = Consensus.getConsensus(Arrays.asList(t1pruned, t2pruned), consensusMethod);
             backboneClades = consensus.vertexCount() - commonLeafes.size();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
-        }else{
-            System.err.println("Trees have nothing in common!");
+            t1pruned=null;
+            t2pruned=null;
+
+        } else {
+            Logger.getGlobal().warning("Trees have nothing in common!");
         }
     }
-    
-    public boolean isInsufficient(){
+
+    public boolean isInsufficient() {
         return score <= Double.NEGATIVE_INFINITY;
     }
 
     @Override
     public int compareTo(TreePair o) {
         int comp = Double.compare(o.score, score); //ATTENTION --> Descending ordering
-        if (comp == 0){
+        if (comp == 0) {
             comp = Double.compare(o.tieBreakingScore, tieBreakingScore);
         }
         return comp;
@@ -341,9 +348,4 @@ class TreePair implements Comparable<TreePair> {
         }
 
     }
-
-
-
-
-
 }

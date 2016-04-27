@@ -1,5 +1,6 @@
 package gscm.algorithm;
 
+import epos.algo.consensus.Consensus;
 import gscm.algorithm.treeSelector.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,10 +26,10 @@ import static org.junit.Assert.*;
 //todo simple sample test
 @RunWith(Parameterized.class)
 public class GreedySCMAlgorithmTest extends BasicSCMTest {
-    TreeSelector.ConsensusMethod method;
+    Consensus.ConsensusMethod method;
     TreeScorer scorer;
 
-    public GreedySCMAlgorithmTest(Tree[] inputData, Tree scmResult, TreeSelector.ConsensusMethod method, TreeScorer scorer) {
+    public GreedySCMAlgorithmTest(Tree[] inputData, Tree scmResult, Consensus.ConsensusMethod method, TreeScorer scorer) {
         super(inputData, scmResult);
         this.method = method;
         this.scorer = scorer;
@@ -38,7 +39,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
         for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
-            for (TreeSelector.ConsensusMethod method : TreeSelector.ConsensusMethod.values()) {
+            for (Consensus.ConsensusMethod method : Consensus.ConsensusMethod.values()) {
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});

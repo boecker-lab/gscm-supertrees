@@ -160,8 +160,8 @@ public abstract class TreeScorer<T extends TreeScorer> {
     int getNumUniqueClades(TreePair pair) {
         int t1Clades = pair.t1.vertexCount() - treeToTaxa.get(pair.t1).size();
         int t2Clades = pair.t2.vertexCount() - treeToTaxa.get(pair.t2).size();
-        int t1BackboneClades = pair.t1pruned.vertexCount() - pair.commonLeafes.size();
-        int t2BackboneClades = pair.t2pruned.vertexCount() - pair.commonLeafes.size();
+        int t1BackboneClades = pair.t1prunedVertexCount - pair.commonLeafes.size();
+        int t2BackboneClades = pair.t2prunedVertexCount - pair.commonLeafes.size();
 
         return (t1Clades - t1BackboneClades) + (t2Clades - t2BackboneClades);
     }
@@ -228,7 +228,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         protected double calculateScore(TreePair pair) {
 
             pair.pruneToCommonLeafes();
-            return (pair.t1pruned.vertexCount() - getNumOfBackboneTaxa(pair)) + (pair.t2pruned.vertexCount() - getNumOfBackboneTaxa(pair));
+            return (pair.t1prunedVertexCount - getNumOfBackboneTaxa(pair)) + (pair.t2prunedVertexCount - getNumOfBackboneTaxa(pair));
         }
     }
 
@@ -250,7 +250,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         protected double calculateScore(TreePair pair) {
 
             pair.pruneToCommonLeafes();
-            return pair.t1pruned.vertexCount() + pair.t2pruned.vertexCount() - getNumOfBackboneTaxa(pair);
+            return pair.t1prunedVertexCount + pair.t2prunedVertexCount - getNumOfBackboneTaxa(pair);
         }
 
     }
