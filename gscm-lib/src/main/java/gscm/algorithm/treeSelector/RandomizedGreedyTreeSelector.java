@@ -30,7 +30,12 @@ import phyloTree.model.tree.Tree;
 
 import java.util.Random;
 
-
+/**
+ * Randomized implementation version of a greedy tree merger
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
     public static final TreeSelectorFactory<RandomizedGreedyTreeSelector> FACTORY =  () -> {
         RandomizedGreedyTreeSelector s =  new RandomizedGreedyTreeSelector();
@@ -67,17 +72,15 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
         return new THashSet<>(size);
     }
 
-    private void addTreePairToRandomStructure(TreePair pair) {
-        if (pairs.add(pair)) {
-            sumOfScores += pair.score;
-            clearCache();
-        }
-    }
 
     @Override
-    protected void addTreePair(Tree t, TreePair p) {
-        super.addTreePair(t,p);
-        addTreePairToRandomStructure(p);
+    protected void addTreePair(TreePair p) {
+        super.addTreePair(p);
+
+        if (pairs.add(p)) {
+            sumOfScores += p.score;
+            clearCache();
+        }
     }
 
 

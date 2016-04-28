@@ -26,25 +26,26 @@ import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeNode;
 import phyloTree.model.tree.TreeUtils;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-// TreeScores have to be positive uncluding zero
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
 
-
-public abstract class TreeScorer<T extends TreeScorer> {
-    //    public static final boolean RELIABLE_MERGES = true;
+/**
+ * Basic TreeScorer template.
+ * All scoring functions have to extend this Method
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
+public abstract class TreeScorer {
     final Map<Tree, THashSet<String>> treeToTaxa;
-    final Set<String> taxaCache;
     public final boolean synced;
     public final static boolean TIE_BREAKER = true;
-//    double max;
 
     public TreeScorer() {
         this(true);
@@ -54,10 +55,8 @@ public abstract class TreeScorer<T extends TreeScorer> {
         synced = syncedCache;
         if (synced) {
             treeToTaxa = new ConcurrentHashMap<>();
-            taxaCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
         } else {
             treeToTaxa = new THashMap<>();
-            taxaCache = new THashSet<>();
         }
 
     }
@@ -98,6 +97,17 @@ public abstract class TreeScorer<T extends TreeScorer> {
         return s;
     }
 
+    /**
+     * Score the given tree pair an calculates the set of common taxa.
+     * The running time of the scoring highlly depends of the scoring function
+     * implemetation. Some scoring may already calculate the consesus merger tree.
+     * If that is the case the consensus tree is chached and not calculated a second tim
+     *
+     * Note: The given {@link gscm.algorithm.treeSelector.TreePair} gets modified.
+     *
+     * @param pair pair to score
+     * @return the modified tree pair
+     */
     public double scoreTreePair(TreePair pair) {
         Set<String> common = calculateCommonLeafes(pair);
         pair.setCommonLeafes(common);
@@ -119,18 +129,14 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
     public void clearCache() {
         treeToTaxa.clear();
-        taxaCache.clear();
     }
 
     public void clearCache(Set<Tree> keep) {
-        taxaCache.clear();
         Iterator<Tree> it = treeToTaxa.keySet().iterator();
         while (it.hasNext()) {
             Tree next = it.next();
             if (!keep.contains(next)) {
                 it.remove();
-            } else {
-                taxaCache.addAll(treeToTaxa.get(next));
             }
         }
     }
@@ -213,12 +219,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class BackboneCladeNumberScorer extends TreeScorer<BackboneCladeNumberScorer> {
-        public BackboneCladeNumberScorer() {
+    public static class BackboneCladeNumberScorer extends TreeScorer {
+        BackboneCladeNumberScorer() {
             super();
         }
 
-        public BackboneCladeNumberScorer(boolean syncedCache) {
+        BackboneCladeNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -235,12 +241,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class BackboneSizeScorer extends TreeScorer<BackboneSizeScorer> {
-        public BackboneSizeScorer() {
+    public static class BackboneSizeScorer extends TreeScorer {
+        BackboneSizeScorer() {
             super();
         }
 
-        public BackboneSizeScorer(boolean syncedCache) {
+        BackboneSizeScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -258,12 +264,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class CollisionMultiCollisionPointScorer extends TreeScorer<CollisionMultiCollisionPointScorer> {
-        public CollisionMultiCollisionPointScorer() {
+    public static class CollisionMultiCollisionPointScorer extends TreeScorer {
+        CollisionMultiCollisionPointScorer() {
             super();
         }
 
-        public CollisionMultiCollisionPointScorer(boolean syncedCache) {
+        CollisionMultiCollisionPointScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -280,12 +286,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
-    public static class CollisionNumberScorer extends TreeScorer<CollisionNumberScorer> {
-        public CollisionNumberScorer() {
+    public static class CollisionNumberScorer extends TreeScorer {
+        CollisionNumberScorer() {
             super();
         }
 
-        public CollisionNumberScorer(boolean syncedCache) {
+        CollisionNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -300,12 +306,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
-    public static class CollisionPointNumberScorer extends TreeScorer<CollisionPointNumberScorer> {
-        public CollisionPointNumberScorer() {
+    public static class CollisionPointNumberScorer extends TreeScorer {
+        CollisionPointNumberScorer() {
             super();
         }
 
-        public CollisionPointNumberScorer(boolean syncedCache) {
+        CollisionPointNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -322,12 +328,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 01.04.15.
      */
-    public static class ConsensusBackboneCladeNumberScorer extends TreeScorer<ConsensusBackboneCladeNumberScorer> {
-        public ConsensusBackboneCladeNumberScorer() {
+    public static class ConsensusBackboneCladeNumberScorer extends TreeScorer {
+        ConsensusBackboneCladeNumberScorer() {
             super();
         }
 
-        public ConsensusBackboneCladeNumberScorer(boolean syncedCache) {
+        ConsensusBackboneCladeNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -345,12 +351,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
-    public static class ConsensusBackboneResolutionScorer extends TreeScorer<ConsensusBackboneResolutionScorer> {
-        public ConsensusBackboneResolutionScorer() {
+    public static class ConsensusBackboneResolutionScorer extends TreeScorer {
+        ConsensusBackboneResolutionScorer() {
             super();
         }
 
-        public ConsensusBackboneResolutionScorer(boolean syncedCache) {
+        ConsensusBackboneResolutionScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -366,12 +372,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class ConsensusBackboneSizeScorer extends TreeScorer<ConsensusBackboneSizeScorer> {
-        public ConsensusBackboneSizeScorer() {
+    public static class ConsensusBackboneSizeScorer extends TreeScorer {
+        ConsensusBackboneSizeScorer() {
             super();
         }
 
-        public ConsensusBackboneSizeScorer(boolean syncedCache) {
+        ConsensusBackboneSizeScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -387,12 +393,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
-    public static class ConsensusCladeNumberScorer extends TreeScorer<ConsensusCladeNumberScorer> {
-        public ConsensusCladeNumberScorer() {
+    public static class ConsensusCladeNumberScorer extends TreeScorer {
+        ConsensusCladeNumberScorer() {
             super();
         }
 
-        public ConsensusCladeNumberScorer(boolean syncedCache) {
+        ConsensusCladeNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -407,12 +413,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    public static class ConsensusTaxonNumberScorer extends TreeScorer<ConsensusTaxonNumberScorer> {
-        public ConsensusTaxonNumberScorer() {
+    public static class ConsensusTaxonNumberScorer extends TreeScorer {
+        ConsensusTaxonNumberScorer() {
             super();
         }
 
-        public ConsensusTaxonNumberScorer(boolean syncedCache) {
+        ConsensusTaxonNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -428,12 +434,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.03.15.
      */
-    public static class ConsensusResolutionScorer extends TreeScorer<ConsensusResolutionScorer> {
-        public ConsensusResolutionScorer() {
+    public static class ConsensusResolutionScorer extends TreeScorer {
+        ConsensusResolutionScorer() {
             super();
         }
 
-        public ConsensusResolutionScorer(boolean syncedCache) {
+        ConsensusResolutionScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -449,12 +455,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
      */
-    public static class OverlapScorer extends TreeScorer<OverlapScorer> {
-        public OverlapScorer() {
+    public static class OverlapScorer extends TreeScorer {
+        OverlapScorer() {
             super();
         }
 
-        public OverlapScorer(boolean syncedCache) {
+        OverlapScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -466,11 +472,11 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     public static class OverlapScorerOrig extends OverlapScorer {
-        public OverlapScorerOrig() {
+        OverlapScorerOrig() {
             super();
         }
 
-        public OverlapScorerOrig(boolean syncedCache) {
+        OverlapScorerOrig(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -482,106 +488,14 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
 
     /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapDifferenceScorer extends TreeScorer<SubsetUnitOverlapDifferenceScorer> {
-        public SubsetUnitOverlapDifferenceScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapDifferenceScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score += (taxaCache.size() - (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size()));
-            return score;
-        }
-
-    }
-
-    /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapRateScorer extends TreeScorer<SubsetUnitOverlapRateScorer> {
-        public SubsetUnitOverlapRateScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapRateScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score += (double) taxaCache.size() / (double) (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
-            return score;
-        }
-
-    }
-
-    /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapScorer extends TreeScorer<SubsetUnitOverlapScorer> {
-        public SubsetUnitOverlapScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score -= (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
-            score += (double) pair.commonLeafes.size() / (double) taxaCache.size();
-
-            return score;
-        }
-
-    }
-
-    /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
-    public static class UniqueCladesNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueCladesNumberScorer() {
+    public static class UniqueCladesNumberScorer extends TreeScorer {
+        UniqueCladesNumberScorer() {
             super();
         }
 
-        public UniqueCladesNumberScorer(boolean syncedCache) {
+        UniqueCladesNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -596,12 +510,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
-    public static class UniqueCladesRateScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueCladesRateScorer() {
+    public static class UniqueCladesRateScorer extends TreeScorer {
+        UniqueCladesRateScorer() {
             super();
         }
 
-        public UniqueCladesRateScorer(boolean syncedCache) {
+        UniqueCladesRateScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -619,12 +533,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    public static class UniqueCladesRemainingNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueCladesRemainingNumberScorer() {
+    public static class UniqueCladesRemainingNumberScorer extends TreeScorer {
+        UniqueCladesRemainingNumberScorer() {
             super();
         }
 
-        public UniqueCladesRemainingNumberScorer(boolean syncedCache) {
+        UniqueCladesRemainingNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -640,12 +554,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    public static class UniqueCladesLostNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueCladesLostNumberScorer() {
+    public static class UniqueCladesLostNumberScorer extends TreeScorer {
+        UniqueCladesLostNumberScorer() {
             super();
         }
 
-        public UniqueCladesLostNumberScorer(boolean syncedCache) {
+        UniqueCladesLostNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -667,12 +581,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
-    public static class UniqueTaxaNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueTaxaNumberScorer() {
+    public static class UniqueTaxaNumberScorer extends TreeScorer {
+        UniqueTaxaNumberScorer() {
             super();
         }
 
-        public UniqueTaxaNumberScorer(boolean syncedCache) {
+        UniqueTaxaNumberScorer(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -683,11 +597,11 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     public static class UniqueTaxaNumberScorerOrig extends UniqueTaxaNumberScorer {
-        public UniqueTaxaNumberScorerOrig() {
+        UniqueTaxaNumberScorerOrig() {
             super();
         }
 
-        public UniqueTaxaNumberScorerOrig(boolean syncedCache) {
+        UniqueTaxaNumberScorerOrig(boolean syncedCache) {
             super(syncedCache);
         }
 
@@ -701,12 +615,12 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
-    public static class UniqueTaxaRateScorer extends TreeScorer<UniqueTaxaRateScorer> {
-        public UniqueTaxaRateScorer() {
+    public static class UniqueTaxaRateScorer extends TreeScorer {
+        UniqueTaxaRateScorer() {
             super();
         }
 
-        public UniqueTaxaRateScorer(boolean syncedCache) {
+        UniqueTaxaRateScorer(boolean syncedCache) {
             super(syncedCache);
         }
 

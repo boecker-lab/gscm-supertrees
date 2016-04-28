@@ -23,6 +23,11 @@ package gscm.algorithm.treeSelector;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.04.16.
  */
+
+/**
+ * Exception which is thrown if the input data has insufficient overlap for a supertree calculation
+ */
+//todo move to the phyloTree algorithm library
 public class InsufficientOverlapException extends Exception {
     private static String message =  "Input trees have insufficient taxon overlap for supertree reconstruction!";
 

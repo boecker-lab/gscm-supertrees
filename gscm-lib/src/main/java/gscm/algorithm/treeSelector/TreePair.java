@@ -33,6 +33,16 @@ import java.util.logging.Logger;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
  */
+
+/**
+ * This class stores a Pair of trees and their scores
+ * I does the pairwise merging (strict consensus merger) step
+ * and caches the consensus tree and other interim result
+ * depending on the given scoring function
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 class TreePair implements Comparable<TreePair> {
     final static TreePair MIN_VALUE = new TreePair();
 
@@ -87,7 +97,7 @@ class TreePair implements Comparable<TreePair> {
     }
 
     //unchecked
-    public Tree getPartner(Tree t) {
+    Tree getPartner(Tree t) {
         if (t.equals(t1))
             return t2;
         else if (t.equals(t2))
@@ -95,12 +105,12 @@ class TreePair implements Comparable<TreePair> {
         return null;
     }
 
-    public void setCommonLeafes(Set<String> commonLeafes) {
+    void setCommonLeafes(Set<String> commonLeafes) {
         this.commonLeafes = commonLeafes;
     }
 
     //uncheked and uncached
-    public void pruneToCommonLeafes() {
+    void pruneToCommonLeafes() {
         singleTaxa = new ArrayList<>(t1.vertexCount() + t2.vertexCount()); // is an upper bound for the list --> no resizing
 
         t1pruned = t1.cloneTree();
@@ -283,13 +293,13 @@ class TreePair implements Comparable<TreePair> {
         return labelToNode.size();
     }
 
-    public Tree getConsensus() {
+    Tree getConsensus() {
         if (consensus == null)
             calculateConsensus();
         return consensus;
     }
 
-    public void calculateConsensus() {
+    void calculateConsensus() {
         if (commonLeafes.size() > 2) {
             if (singleTaxa == null)
                 pruneToCommonLeafes();
@@ -304,7 +314,7 @@ class TreePair implements Comparable<TreePair> {
         }
     }
 
-    public boolean isInsufficient() {
+    boolean isInsufficient() {
         return score <= Double.NEGATIVE_INFINITY;
     }
 
@@ -332,18 +342,18 @@ class TreePair implements Comparable<TreePair> {
         final Set<String> commonSiblingLeaves;
         final int numOfSiblings;
 
-        public SingleTaxon(TreeNode insertionPoint, Set<String> siblingLeaves, Set<String> commonSiblingLeaves, int numOfSiblings) {
+        private SingleTaxon(TreeNode insertionPoint, Set<String> siblingLeaves, Set<String> commonSiblingLeaves, int numOfSiblings) {
             this.insertionPoint = insertionPoint;
             this.siblingLeaves = siblingLeaves;
             this.numOfSiblings = numOfSiblings;
             this.commonSiblingLeaves = commonSiblingLeaves;
         }
 
-        public boolean isLeaf() {
+        private boolean isLeaf() {
             return insertionPoint.isLeaf();
         }
 
-        public boolean isSubtree() {
+        private boolean isSubtree() {
             return insertionPoint.isInnerNode();
         }
 

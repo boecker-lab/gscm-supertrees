@@ -40,6 +40,14 @@ import java.util.concurrent.Future;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.10.15.
  */
+
+/**
+ * Base Method for greedy tree merger algorithms
+ * all tree merger implementation should extend this Method
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public abstract class TreeSelector {
 
     private int threads = 1;
@@ -72,9 +80,7 @@ public abstract class TreeSelector {
         if (threads > 1) {
             try {
                 createPairsParallel();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         } else {
@@ -88,9 +94,8 @@ public abstract class TreeSelector {
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
                 final TreePair pair = new TreePair(t1, t2, scorer, method);
-                if (pair != null && !pair.isInsufficient()) {
-                    addTreePair(t1, pair);
-                    addTreePair(t2, pair);
+                if (!pair.isInsufficient()) {
+                    addTreePair(pair);
                 }
             }
         }
@@ -121,9 +126,7 @@ public abstract class TreeSelector {
             } else {
                 return addTreeSequencial(tree);
             }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return false;
@@ -158,8 +161,7 @@ public abstract class TreeSelector {
         for (Future<List<TreePair>> futures : submittedJobs) {
             for (TreePair pair : futures.get()) {
                 if (pair != null && !pair.isInsufficient()) {
-                    addTreePair(pair.t1, pair);
-                    addTreePair(pair.t2, pair);
+                    addTreePair(pair);
                 }
             }
         }
@@ -174,8 +176,7 @@ public abstract class TreeSelector {
         for (Tree old : remainingTrees) {
             TreePair pair = new TreePair(tree, old, scorer, method);
             if (pair != null && !pair.isInsufficient()) {
-                addTreePair(tree, pair);
-                addTreePair(old, pair);
+                addTreePair(pair);
             }
         }
 
@@ -194,11 +195,10 @@ public abstract class TreeSelector {
         }
     }
 
-//todo proof comments
     /**
      * Calculates a greedy strict consensus merger supertree using the given scoring.
-     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
-     * to not have to reimplement the workflow.
+     * This should be used by all classes extending {@link gscm.algorithm.treeSelector.TreeSelector}
+     * to not have to reimplement the general workflow.
      *
      * This methods prints the progress to standard out
      *
@@ -210,11 +210,11 @@ public abstract class TreeSelector {
     }
 
     /**
-     * Calculates a greedy strict consensus merger supertree using the given {@link gscm.algorithm.treeSelector.TreeSelector}.
-     * This should be used by all classes extending {@link gscm.algorithm.SCMAlgorithm}
-     * to not have to reimplement the workflow.
+     * Calculates a greedy strict consensus merger supertree using the given scoring.
+     * This should be used by all classes extending {@link gscm.algorithm.treeSelector.TreeSelector}
+     * to not have to reimplement the general workflow.
      *
-     * This methods does not print progress
+     *This methods does not print progress
      *
      * @return gscm supertree
      * @throws InsufficientOverlapException
@@ -252,45 +252,97 @@ public abstract class TreeSelector {
     protected abstract void init();
 
     /**
-     * Return the number of Trees have to be merged.
+     * Returns the number of Trees have to be merged.
      * If this method return 1 the gscm algorithm is done
      *
      * @return Number of tree left
      */
     protected abstract int getNumberOfRemainingTrees();
 
+    /**
+     * Adds a tree pair to the data structure
+     *
+     * @param t tree for wich the p should be added
+     * @param p pair to add into data structure
+     */
     protected abstract void addTreePair(Tree t, TreePair p);
+    protected void addTreePair(TreePair p){
+        addTreePair(p.t1,p);
+        addTreePair(p.t2,p);
+    }
 
+    /**
+     * remove merged treepair from data structure
+     *
+     * @param pair pair to remove from data structure
+     */
     protected abstract void removeTreePair(TreePair pair);
 
+    /**
+     * Returns the trees that are left and can be merged
+     *
+     * @return  remaining trees
+     */
     protected abstract Collection<Tree> getRemainingTrees();
 
+    /**
+     * Returns the {@link TreePair} with the highest score
+     *
+     * @return  {@link TreePair} with highest score
+     */
     protected abstract TreePair getMax();
 
+    /**
+     *
+     * @return the given Scorer
+     */
     public TreeScorer getScorer() {
         return scorer;
     }
-
+    /**
+     *
+     * @param scorer scorer to score {@link TreePair}s
+     */
     public void setScorer(TreeScorer scorer) {
         this.scorer = scorer;
     }
 
+    /**
+     *
+     * @return Consensus algorithm to merge the {@link TreePair}s
+     */
     public Consensus.ConsensusMethod getMethod() {
         return method;
     }
 
+    /**
+     *
+     * @param threads number of thread that may be used
+     */
     public void setThreads(int threads) {
         this.threads = threads;
     }
 
+    /**
+     *
+     * @param executor ExecutorService for multi threaded computation
+     */
     public void setExecutor(ExecutorService executor) {
         this.executor = executor;
     }
 
+    /**
+     * Specifies if Scorer cache has to be cleared after computation
+     * @param clearScorer
+     */
     public void setClearScorer(boolean clearScorer) {
         this.clearScorer = clearScorer;
     }
 
+    /**
+     * shut all executor services down
+     * @return true if executer service exists
+     */
     public boolean shutdown() {
         if (executor != null) {
             executor.shutdown();
@@ -299,10 +351,17 @@ public abstract class TreeSelector {
         return false;
     }
 
+    /**
+     * Sets the input trees to merge
+     * @param inputTrees trees to merge
+     */
     public void setInputTrees(Tree... inputTrees) {
         this.inputTrees = inputTrees;
     }
 
+    /**
+     * @return number of trees to merge
+     */
     public int getNumberOfInputTrees() {
         return inputTrees.length;
     }

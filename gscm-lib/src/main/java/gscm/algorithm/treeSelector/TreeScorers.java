@@ -24,6 +24,9 @@ package gscm.algorithm.treeSelector;
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.11.15.
  */
 
+/**
+ * Factory mehtod to get access to all implemented scoring functions by name
+ */
 public class TreeScorers {
     public enum ScorerType {
         UNIQUE_TAXA,

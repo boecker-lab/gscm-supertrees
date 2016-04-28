@@ -30,6 +30,17 @@ import java.util.Map;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
+
+/**
+ * Template for greedy tree merger algorithms
+ * that provides a map based data structure
+ *
+ * @param <M> Map implementation for the main data structure
+ * @param <S> Collection to store the treePairs for the corresponding tree
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
     M treeToPairs;
 
@@ -83,6 +94,7 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
         }
     }
 
+    @Override
     protected void addTreePair(Tree t, TreePair p) {
         S pairs = treeToPairs.get(t);
         if (pairs == null) {
@@ -92,7 +104,6 @@ public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S exten
         }
         pairs.add(p);
     }
-
     void removePair(Tree t, TreePair p) {
         treeToPairs.get(t).remove(p);
     }

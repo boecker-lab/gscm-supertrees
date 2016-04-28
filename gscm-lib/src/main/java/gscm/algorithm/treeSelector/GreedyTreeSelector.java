@@ -28,6 +28,13 @@ import java.util.PriorityQueue;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 14.10.15.
  */
+
+/**
+ * Simple Greedy Strict consensus merger implementation
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
+ */
 public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
     public static final TreeSelectorFactory<GreedyTreeSelector> FACTORY = () -> {
         GreedyTreeSelector s =  new GreedyTreeSelector();
