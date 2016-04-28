@@ -12,10 +12,7 @@ import phyloTree.model.tree.TreeUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -39,12 +36,14 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
     public static List<Object[]> data() {
         List<Object[]> paras = new LinkedList<>();
         for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
+//        for (TreeScorer scorer : new TreeScorer[]{TreeScorers.getScorer(TreeScorers.ScorerType.UNIQUE_CLADES_REMAINING)}) {
+//        for (TreeScorer scorer : new TreeScorer[]{TreeScorers.getScorer(TreeScorers.ScorerType.UNIQUE_TAXA)}) {
             for (Consensus.ConsensusMethod method : Consensus.ConsensusMethod.values()) {
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInsufficientInput500(), null, method, scorer});
-                paras.add(new Object[]{LOCATIONS.insufficientInputSimple(), null, method, scorer});
+//                paras.add(new Object[]{LOCATIONS.insufficientInputSimple(), null, method, scorer});
             }
         }
         return paras;
@@ -57,10 +56,11 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         buf.append("########## Test with following Parameters [" + scorer.getClass().getCanonicalName() + ", " + inputData + ", " + scmResult + ", " + method + "] ##########");
         buf.append(SEP);
         long t = System.currentTimeMillis();
-        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
-        selector.setScorer(scorer);
-        selector.setInputTrees(inputData);
-        SCMAlgorithm algo = new GreedySCMAlgorithm(selector);
+//        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+//        selector.setScorer(scorer);
+//        selector.setInputTrees(inputData);
+        SCMAlgorithm algo = new GreedySCMAlgorithm(scorer);
+        algo.setInput(Arrays.asList(inputData));
         algo.run();
         Tree supertree = algo.getResult();
         if (scmResult != null)

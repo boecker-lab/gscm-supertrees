@@ -28,13 +28,14 @@ import java.util.PriorityQueue;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 14.10.15.
  */
-public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+public class GreedyTreeSelector<T extends TreeScorer> extends MapBasedGreedyTreeSelector<T,THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
     public static final TreeSelectorFactory<GreedyTreeSelector> FACTORY = () -> {
         GreedyTreeSelector s =  new GreedyTreeSelector();
         TreeSelectorFactory.selectors.add(s);
         return s;
     };
     private GreedyTreeSelector() {}
+
 
     @Override
     THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {

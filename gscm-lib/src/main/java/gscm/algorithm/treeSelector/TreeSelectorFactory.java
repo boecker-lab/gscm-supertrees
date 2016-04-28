@@ -37,7 +37,7 @@ import java.util.Set;
  */
 @FunctionalInterface
 public interface TreeSelectorFactory<T extends TreeSelector> {
-    Set<TreeSelector> selectors =  Collections.synchronizedSet(new HashSet<>());
+    static Set<TreeSelector> selectors =  Collections.synchronizedSet(new HashSet<>());
 
     T getNewSelectorInstance();
 

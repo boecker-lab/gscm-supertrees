@@ -21,10 +21,6 @@
 package gscm.algorithm.treeSelector;
 
 import epos.algo.consensus.Consensus;
-import epos.algo.consensus.adams.AdamsConsensus;
-import epos.algo.consensus.loose.LooseConsensus;
-import epos.algo.consensus.nconsensus.NConsensus;
-import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
@@ -40,16 +36,16 @@ import java.util.concurrent.Future;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.10.15.
  */
-public abstract class TreeSelector {
+public abstract class TreeSelector<S extends TreeScorer> {
 
     private int threads = 1;
     private ExecutorService executor;
-    private TreePairScoringCallableFactory factory;
+    private IterationCallableFactory<TreePairInitCallable, TreePair> factory;
     private Consensus.ConsensusMethod method;
 
     protected boolean clearScorer = true;
 
-    TreeScorer scorer;
+    S scorer;
     Tree[] inputTrees;
 
 
@@ -87,7 +83,7 @@ public abstract class TreeSelector {
             Tree t1 = inputTrees[i];
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
-                final TreePair pair = new TreePair(t1, t2, scorer, method);
+                final TreePair pair = initTreePair(new TreePair(t1, t2,method));
                 if (pair != null && !pair.isInsufficient()) {
                     addTreePair(t1, pair);
                     addTreePair(t2, pair);
@@ -111,6 +107,10 @@ public abstract class TreeSelector {
         }
         // parallel scoring --> we have to score the pairs before adding them into the SORTED data structure
         scoreAndAddPairsParallel(pairsToAdd);
+    }
+
+    protected TreePair initTreePair(TreePair pair) {
+        return pair.calculateScore(scorer);
     }
 
     // adds tree and its paires to the data structure (O(2nlog(n)))
@@ -151,7 +151,7 @@ public abstract class TreeSelector {
         if (executor == null)
             executor = Executors.newFixedThreadPool(threads);
         if (factory == null)
-            factory = new TreePairScoringCallableFactory();
+            factory = TreePairInitCallable::new;
         List<Future<List<TreePair>>> submittedJobs = ParallelUtils.parallelBucketForEach(executor, factory, pairsToAdd, threads);
 
         //sequential adding
@@ -172,7 +172,7 @@ public abstract class TreeSelector {
             return false;
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
-            TreePair pair = new TreePair(tree, old, scorer, method);
+            TreePair pair = initTreePair(new TreePair(tree, old,method));
             if (pair != null && !pair.isInsufficient()) {
                 addTreePair(tree, pair);
                 addTreePair(old, pair);
@@ -260,6 +260,7 @@ public abstract class TreeSelector {
     protected abstract int getNumberOfRemainingTrees();
 
     protected abstract void addTreePair(Tree t, TreePair p);
+//    protected abstract TreePair initTreePair(TreePair pair);
 
     protected abstract void removeTreePair(TreePair pair);
 
@@ -267,11 +268,11 @@ public abstract class TreeSelector {
 
     protected abstract TreePair getMax();
 
-    public TreeScorer getScorer() {
+    public S getScorer() {
         return scorer;
     }
 
-    public void setScorer(TreeScorer scorer) {
+    public void setScorer(S scorer) {
         this.scorer = scorer;
     }
 
@@ -308,22 +309,15 @@ public abstract class TreeSelector {
     }
 
 
-    private class TreePairScoringCallable extends DefaultIterationCallable<TreePair, TreePair> {
-        protected TreePairScoringCallable(List<TreePair> jobs) {
+    private class TreePairInitCallable extends DefaultIterationCallable<TreePair, TreePair> {
+        protected TreePairInitCallable(List<TreePair> jobs) {
             super(jobs);
         }
 
         @Override
         public TreePair doJob(TreePair pair) {
-            return pair.calculateScore(scorer);
+            return initTreePair(pair);
         }
 
-    }
-
-    private class TreePairScoringCallableFactory implements IterationCallableFactory<TreePairScoringCallable, TreePair> {
-        @Override
-        public TreePairScoringCallable newIterationCallable(List<TreePair> list) {
-            return new TreePairScoringCallable(list);
-        }
     }
 }

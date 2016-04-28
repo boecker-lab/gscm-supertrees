@@ -43,24 +43,35 @@ import java.util.logging.Logger;
 public class GreedySCMAlgorithm extends SCMAlgorithm {
     final TreeSelector selector;
 
-    public GreedySCMAlgorithm() {
+/*    public GreedySCMAlgorithm() {
         super();
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+//        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = UpperBoundGreedyTreeSelector.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+//        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = UpperBoundGreedyTreeSelector.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger) {
         super(logger);
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
-    }
+//        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = UpperBoundGreedyTreeSelector.FACTORY.getNewSelectorInstance();
+    }*/
 
     public GreedySCMAlgorithm(TreeScorer scorer) {
-        this();
-        this.selector.setScorer(scorer);
+        if (scorer instanceof TreeScorerUpperBound) {
+            this.selector = UpperBoundGreedyTreeSelector.FACTORY.getNewSelectorInstance();
+            this.selector.setScorer(scorer);
+        }else{
+            this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+            this.selector.setScorer(scorer);
+        }
+
+        /*this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector.setScorer(scorer);*/
     }
 
     public GreedySCMAlgorithm(TreeSelector selector) {

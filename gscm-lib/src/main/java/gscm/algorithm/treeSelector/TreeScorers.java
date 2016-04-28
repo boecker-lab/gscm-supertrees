@@ -72,7 +72,7 @@ public class TreeScorers {
             case UNIQUE_CLADES_LOST:
                 return new TreeScorer.UniqueCladesLostNumberScorer(synced);
             case UNIQUE_CLADES_REMAINING:
-                return new TreeScorer.UniqueCladesRemainingNumberScorer(synced);
+                return new TreeScorerUpperBound.UniqueCladesRemainingNumberScorer(synced);
             default:
                 return null;
         }
@@ -126,7 +126,7 @@ public class TreeScorers {
                 new TreeScorer.ConsensusCladeNumberScorer(synced),
                 new TreeScorer.ConsensusResolutionScorer(synced),
                 new TreeScorer.UniqueCladesNumberScorer(synced),
-                new TreeScorer.UniqueCladesRemainingNumberScorer(synced),
+                new TreeScorerUpperBound.UniqueCladesRemainingNumberScorer(synced),
                 new TreeScorer.UniqueCladesLostNumberScorer(synced),
                 new TreeScorer.UniqueCladesRateScorer(synced)
         };

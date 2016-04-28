@@ -26,25 +26,20 @@ import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeNode;
 import phyloTree.model.tree.TreeUtils;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-// TreeScores have to be positive uncluding zero
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
 
 
-public abstract class TreeScorer<T extends TreeScorer> {
-    //    public static final boolean RELIABLE_MERGES = true;
+public abstract class TreeScorer {
     final Map<Tree, THashSet<String>> treeToTaxa;
-    final Set<String> taxaCache;
     public final boolean synced;
     public final static boolean TIE_BREAKER = true;
-//    double max;
 
     public TreeScorer() {
         this(true);
@@ -54,15 +49,15 @@ public abstract class TreeScorer<T extends TreeScorer> {
         synced = syncedCache;
         if (synced) {
             treeToTaxa = new ConcurrentHashMap<>();
-            taxaCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
         } else {
             treeToTaxa = new THashMap<>();
-            taxaCache = new THashSet<>();
         }
-
     }
 
-    THashSet<String> calculateCommonLeafes(TreePair pair) {
+    int calculateAndAddCommonLeafes(TreePair pair) {
+        if (pair.commonLeafes != null)
+            return pair.commonLeafes.size();
+
         THashSet<String> ts1 = treeToTaxa.get(pair.t1);
         THashSet<String> ts2 = treeToTaxa.get(pair.t2);
         if (ts1 == null) {
@@ -77,7 +72,9 @@ public abstract class TreeScorer<T extends TreeScorer> {
         tcommon.addAll(ts1);
         tcommon.retainAll(ts2);
 
-        return tcommon;
+        pair.setCommonLeafes(tcommon);
+
+        return tcommon.size();
     }
 
 
@@ -99,16 +96,13 @@ public abstract class TreeScorer<T extends TreeScorer> {
     }
 
     public double scoreTreePair(TreePair pair) {
-        Set<String> common = calculateCommonLeafes(pair);
-        pair.setCommonLeafes(common);
-        if (common.size() < 3)
-            pair.score = Double.NEGATIVE_INFINITY;
-        else {
-            pair.score = calculateScore(pair);
+        double score = Double.NEGATIVE_INFINITY;
+        if (calculateAndAddCommonLeafes(pair) > 2) {
+            score = calculateScore(pair);
             if (TIE_BREAKER)
                 pair.tieBreakingScore = calculateTieBreakScore(pair);
         }
-        return pair.score;
+        return score;
     }
 
     protected abstract double calculateScore(TreePair pair);
@@ -119,18 +113,14 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
     public void clearCache() {
         treeToTaxa.clear();
-        taxaCache.clear();
     }
 
     public void clearCache(Set<Tree> keep) {
-        taxaCache.clear();
         Iterator<Tree> it = treeToTaxa.keySet().iterator();
         while (it.hasNext()) {
             Tree next = it.next();
             if (!keep.contains(next)) {
                 it.remove();
-            } else {
-                taxaCache.addAll(treeToTaxa.get(next));
             }
         }
     }
@@ -208,12 +198,16 @@ public abstract class TreeScorer<T extends TreeScorer> {
         return multiCollionsPoints;
     }
 
+    int getNumberOfUniqueTaxa(TreePair pair){
+        return ((treeToTaxa.get(pair.t1).size() - pair.commonLeafes.size()) + (treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size()));
+    }
+
     //#################### Scorer Implementations ##################
 
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class BackboneCladeNumberScorer extends TreeScorer<BackboneCladeNumberScorer> {
+    public static class BackboneCladeNumberScorer extends TreeScorer {
         public BackboneCladeNumberScorer() {
             super();
         }
@@ -235,7 +229,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class BackboneSizeScorer extends TreeScorer<BackboneSizeScorer> {
+    public static class BackboneSizeScorer extends TreeScorer {
         public BackboneSizeScorer() {
             super();
         }
@@ -258,7 +252,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class CollisionMultiCollisionPointScorer extends TreeScorer<CollisionMultiCollisionPointScorer> {
+    public static class CollisionMultiCollisionPointScorer extends TreeScorer {
         public CollisionMultiCollisionPointScorer() {
             super();
         }
@@ -280,7 +274,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
-    public static class CollisionNumberScorer extends TreeScorer<CollisionNumberScorer> {
+    public static class CollisionNumberScorer extends TreeScorer {
         public CollisionNumberScorer() {
             super();
         }
@@ -300,7 +294,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 15.06.15.
      */
-    public static class CollisionPointNumberScorer extends TreeScorer<CollisionPointNumberScorer> {
+    public static class CollisionPointNumberScorer extends TreeScorer {
         public CollisionPointNumberScorer() {
             super();
         }
@@ -322,7 +316,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 01.04.15.
      */
-    public static class ConsensusBackboneCladeNumberScorer extends TreeScorer<ConsensusBackboneCladeNumberScorer> {
+    public static class ConsensusBackboneCladeNumberScorer extends TreeScorer {
         public ConsensusBackboneCladeNumberScorer() {
             super();
         }
@@ -345,7 +339,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
-    public static class ConsensusBackboneResolutionScorer extends TreeScorer<ConsensusBackboneResolutionScorer> {
+    public static class ConsensusBackboneResolutionScorer extends TreeScorer {
         public ConsensusBackboneResolutionScorer() {
             super();
         }
@@ -366,7 +360,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.06.15.
      */
-    public static class ConsensusBackboneSizeScorer extends TreeScorer<ConsensusBackboneSizeScorer> {
+    public static class ConsensusBackboneSizeScorer extends TreeScorer {
         public ConsensusBackboneSizeScorer() {
             super();
         }
@@ -387,7 +381,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 31.03.15.
      */
-    public static class ConsensusCladeNumberScorer extends TreeScorer<ConsensusCladeNumberScorer> {
+    public static class ConsensusCladeNumberScorer extends TreeScorer {
         public ConsensusCladeNumberScorer() {
             super();
         }
@@ -407,7 +401,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    public static class ConsensusTaxonNumberScorer extends TreeScorer<ConsensusTaxonNumberScorer> {
+    public static class ConsensusTaxonNumberScorer extends TreeScorer {
         public ConsensusTaxonNumberScorer() {
             super();
         }
@@ -428,7 +422,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.03.15.
      */
-    public static class ConsensusResolutionScorer extends TreeScorer<ConsensusResolutionScorer> {
+    public static class ConsensusResolutionScorer extends TreeScorer {
         public ConsensusResolutionScorer() {
             super();
         }
@@ -449,7 +443,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
      */
-    public static class OverlapScorer extends TreeScorer<OverlapScorer> {
+    public static class OverlapScorer extends TreeScorer {
         public OverlapScorer() {
             super();
         }
@@ -480,103 +474,10 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-
-    /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapDifferenceScorer extends TreeScorer<SubsetUnitOverlapDifferenceScorer> {
-        public SubsetUnitOverlapDifferenceScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapDifferenceScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score += (taxaCache.size() - (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size()));
-            return score;
-        }
-
-    }
-
-    /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapRateScorer extends TreeScorer<SubsetUnitOverlapRateScorer> {
-        public SubsetUnitOverlapRateScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapRateScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score += (double) taxaCache.size() / (double) (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
-            return score;
-        }
-
-    }
-
-    /**
-     * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
-     */
-    public static class SubsetUnitOverlapScorer extends TreeScorer<SubsetUnitOverlapScorer> {
-        public SubsetUnitOverlapScorer() {
-            super();
-        }
-
-        public SubsetUnitOverlapScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-
-            // is this a zero collision pair?
-            Set<String> ts1 = treeToTaxa.get(pair.t1);
-            Set<String> ts2 = treeToTaxa.get(pair.t2);
-            double score = taxaCache.size();
-            if (ts1.containsAll(ts2)) {
-                score += taxaCache.size() + ts1.size();//todo better would be the number of all taxa...
-            } else if (ts2.containsAll(ts1)) {
-                score += taxaCache.size() + ts2.size();
-            }
-            score -= (ts1.size() - pair.commonLeafes.size()) + (ts2.size() - pair.commonLeafes.size());
-            score += (double) pair.commonLeafes.size() / (double) taxaCache.size();
-
-            return score;
-        }
-
-    }
-
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
-    public static class UniqueCladesNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
+    public static class UniqueCladesNumberScorer extends TreeScorer {
         public UniqueCladesNumberScorer() {
             super();
         }
@@ -596,7 +497,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 27.01.16.
      */
-    public static class UniqueCladesRateScorer extends TreeScorer<UniqueTaxaNumberScorer> {
+    public static class UniqueCladesRateScorer extends TreeScorer {
         public UniqueCladesRateScorer() {
             super();
         }
@@ -619,28 +520,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
-    public static class UniqueCladesRemainingNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
-        public UniqueCladesRemainingNumberScorer() {
-            super();
-        }
-
-        public UniqueCladesRemainingNumberScorer(boolean syncedCache) {
-            super(syncedCache);
-        }
-
-        @Override
-        protected double calculateScore(TreePair pair) {
-            pair.calculateConsensus();
-            return getNumRemainingUniqueClades(pair);
-        }
-
-        @Override
-        protected double calculateTieBreakScore(TreePair pair) {
-            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
-        }
-    }
-
-    public static class UniqueCladesLostNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
+    public static class UniqueCladesLostNumberScorer extends TreeScorer {
         public UniqueCladesLostNumberScorer() {
             super();
         }
@@ -664,10 +544,11 @@ public abstract class TreeScorer<T extends TreeScorer> {
         }
     }
 
+
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
-    public static class UniqueTaxaNumberScorer extends TreeScorer<UniqueTaxaNumberScorer> {
+    public static class UniqueTaxaNumberScorer extends TreeScorer {
         public UniqueTaxaNumberScorer() {
             super();
         }
@@ -678,7 +559,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
 
         @Override
         protected double calculateScore(TreePair pair) {
-            return -((treeToTaxa.get(pair.t1).size() - pair.commonLeafes.size()) + (treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size()));
+            return - getNumberOfUniqueTaxa(pair);
         }
     }
 
@@ -701,7 +582,7 @@ public abstract class TreeScorer<T extends TreeScorer> {
     /**
      * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.06.15.
      */
-    public static class UniqueTaxaRateScorer extends TreeScorer<UniqueTaxaRateScorer> {
+    public static class UniqueTaxaRateScorer extends TreeScorer {
         public UniqueTaxaRateScorer() {
             super();
         }

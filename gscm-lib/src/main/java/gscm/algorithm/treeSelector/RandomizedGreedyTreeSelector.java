@@ -31,7 +31,7 @@ import phyloTree.model.tree.Tree;
 import java.util.Random;
 
 
-public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
+public class RandomizedGreedyTreeSelector<T extends TreeScorer> extends MapBasedGreedyTreeSelector<T,THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
     public static final TreeSelectorFactory<RandomizedGreedyTreeSelector> FACTORY =  () -> {
         RandomizedGreedyTreeSelector s =  new RandomizedGreedyTreeSelector();
         TreeSelectorFactory.selectors.add(s);
@@ -69,7 +69,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
 
     private void addTreePairToRandomStructure(TreePair pair) {
         if (pairs.add(pair)) {
-            sumOfScores += pair.score;
+            sumOfScores += pair.getScore();
             clearCache();
         }
     }
@@ -80,7 +80,6 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
         addTreePairToRandomStructure(p);
     }
 
-
     @Override
     void removePair(Tree tree,TreePair pair) {
         super.removePair(tree, pair);
@@ -89,7 +88,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
 
     private void removePairFromRandomStructure(TreePair pair) {
         if (pairs.remove(pair)) {
-            sumOfScores -= pair.score;
+            sumOfScores -= pair.getScore();
             clearCache();
         }
     }
@@ -110,9 +109,9 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
             pairToIndex[index] = pair;
             //this is for compatibility with negative scores
             if (sumOfScores > 0d) {
-                pre += pair.score / sumOfScores;
+                pre += pair.getScore() / sumOfScores;
             }else {
-                pre += 1d - (pair.score / sumOfScores);
+                pre += 1d - (pair.getScore() / sumOfScores);
             }
             indices[index] = pre;
             index++;

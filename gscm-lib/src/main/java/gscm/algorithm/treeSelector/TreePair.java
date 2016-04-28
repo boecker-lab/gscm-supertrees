@@ -48,7 +48,8 @@ class TreePair implements Comparable<TreePair> {
     int t2prunedVertexCount = Integer.MIN_VALUE;
 
 
-    double score;
+    double score = Double.NaN;
+    double upperBound = Double.NaN;
     double tieBreakingScore = 0d;
 
 
@@ -56,7 +57,7 @@ class TreePair implements Comparable<TreePair> {
     int backboneClades = -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
     int consensusNumOfTaxa = -1;
 
-    Set<String> commonLeafes;
+    Set<String> commonLeafes = null;
     Map<Set<String>, Set<SingleTaxon>> commonInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
@@ -67,12 +68,8 @@ class TreePair implements Comparable<TreePair> {
         t1 = null;
         t2 = null;
         score = Double.NEGATIVE_INFINITY;
+        upperBound = Double.NEGATIVE_INFINITY;
         consensusMethod = null;
-    }
-
-    TreePair(final Tree t1, final Tree t2, TreeScorer scorer, final Consensus.ConsensusMethod method) {
-        this(t1, t2, method);
-        calculateScore(scorer);
     }
 
     TreePair(final Tree t1, final Tree t2, final Consensus.ConsensusMethod method) {
@@ -82,9 +79,27 @@ class TreePair implements Comparable<TreePair> {
     }
 
     TreePair calculateScore(TreeScorer scorer) {
-        scorer.scoreTreePair(this);
+        score = scorer.scoreTreePair(this);
         return this;
     }
+
+    TreePair calculateUpperBound(TreeScorerUpperBound scorer) {
+        scorer.scoreUpperBoundTreePair(this);
+        return this;
+    }
+
+    public boolean isScored(){
+        return !Double.isNaN(score);
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public double getUpperBound() {
+        return upperBound;
+    }
+
 
     //unchecked
     public Tree getPartner(Tree t) {
@@ -305,7 +320,7 @@ class TreePair implements Comparable<TreePair> {
     }
 
     public boolean isInsufficient() {
-        return score <= Double.NEGATIVE_INFINITY;
+        return Double.NEGATIVE_INFINITY == score;
     }
 
     @Override

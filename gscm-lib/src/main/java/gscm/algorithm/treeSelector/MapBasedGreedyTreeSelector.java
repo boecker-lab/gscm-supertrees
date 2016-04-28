@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
  */
-public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
+public abstract class MapBasedGreedyTreeSelector<T extends TreeScorer, M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector<T> {
     M treeToPairs;
 
 
