@@ -1,7 +1,7 @@
 package gscm.algorithm;
 
-import gscm.algorithm.treeSelector.TreeScorer;
-import gscm.algorithm.treeSelector.TreeScorers;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeScorers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

@@ -18,7 +18,7 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 import epos.algo.consensus.Consensus;
 import phyloTree.model.tree.Tree;
@@ -41,14 +41,14 @@ import java.util.Map;
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
  * @since version 1.0
  */
-public abstract class MapBasedGreedyTreeSelector<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeSelector {
+public abstract class MapBasedGreedyTreeMerger<M extends Map<Tree, S>, S extends Collection<TreePair>> extends TreeMerger {
     M treeToPairs;
 
 
-    protected MapBasedGreedyTreeSelector(Consensus.ConsensusMethod method) {
+    protected MapBasedGreedyTreeMerger(Consensus.ConsensusMethod method) {
         super(method);
     }
-    protected MapBasedGreedyTreeSelector() {
+    protected MapBasedGreedyTreeMerger() {
         super();
     }
 

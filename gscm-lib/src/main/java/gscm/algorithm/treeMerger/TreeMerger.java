@@ -18,13 +18,10 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 import epos.algo.consensus.Consensus;
-import epos.algo.consensus.adams.AdamsConsensus;
-import epos.algo.consensus.loose.LooseConsensus;
-import epos.algo.consensus.nconsensus.NConsensus;
-import phyloTree.algorithm.SupertreeAlgorithm;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
@@ -48,7 +45,7 @@ import java.util.concurrent.Future;
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
  * @since version 1.0
  */
-public abstract class TreeSelector {
+public abstract class TreeMerger {
 
     private int threads = 1;
     private ExecutorService executor;
@@ -61,11 +58,11 @@ public abstract class TreeSelector {
     Tree[] inputTrees;
 
 
-    protected TreeSelector(Consensus.ConsensusMethod method) {
+    protected TreeMerger(Consensus.ConsensusMethod method) {
         this.method = method;
     }
 
-    protected TreeSelector() {
+    protected TreeMerger() {
         this(Consensus.ConsensusMethod.STRICT);
     }
 
@@ -197,7 +194,7 @@ public abstract class TreeSelector {
 
     /**
      * Calculates a greedy strict consensus merger supertree using the given scoring.
-     * This should be used by all classes extending {@link gscm.algorithm.treeSelector.TreeSelector}
+     * This should be used by all classes extending {@link TreeMerger}
      * to not have to reimplement the general workflow.
      *
      * This methods prints the progress to standard out
@@ -211,7 +208,7 @@ public abstract class TreeSelector {
 
     /**
      * Calculates a greedy strict consensus merger supertree using the given scoring.
-     * This should be used by all classes extending {@link gscm.algorithm.treeSelector.TreeSelector}
+     * This should be used by all classes extending {@link TreeMerger}
      * to not have to reimplement the general workflow.
      *
      *This methods does not print progress

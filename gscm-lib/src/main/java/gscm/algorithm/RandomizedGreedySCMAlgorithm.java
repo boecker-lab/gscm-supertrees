@@ -20,7 +20,11 @@
  */
 package gscm.algorithm;
 
-import gscm.algorithm.treeSelector.*;
+import gscm.algorithm.treeMerger.GreedyTreeMerger;
+import gscm.algorithm.treeMerger.RandomizedGreedyTreeMerger;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeMergerFactory;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 import utils.parallel.ParallelUtils;
 
@@ -36,12 +40,12 @@ import java.util.concurrent.Future;
  */
 
 /**
- * Randomized implementatiion of greedy strict consensus merger algorithm.
+ * Randomized implementation of greedy strict consensus merger algorithm.
  * It does multiple randomized iterations for a given set of scoring functions.
  * The resulting supertrees are merged into a single supertree
  *
- * For every scoring function it calaculates {@linke numberOfIterations}
- * times the randomized gscm an one optimal gscm
+ * For every scoring function it calculates {@link gscm.algorithm.RandomizedGreedySCMAlgorithm#individualIterations}
+ * times the randomized gscm and one optimal gscm
  * The resulting trees are then merge into a singe supertree
  *
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
@@ -85,9 +89,9 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
     @Override
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final int iterations = getIterations();
-        final GreedyTreeSelector nonRandomResultSelector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        final GreedyTreeMerger nonRandomResultSelector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
         nonRandomResultSelector.setInputTrees(inputTrees);
-        final RandomizedGreedyTreeSelector randomResultSelector = RandomizedGreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        final RandomizedGreedyTreeMerger randomResultSelector = RandomizedGreedyTreeMerger.FACTORY.getNewSelectorInstance();
         randomResultSelector.setInputTrees(inputTrees);
 
         List<Tree> superTrees = new ArrayList<>();
@@ -102,8 +106,8 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
             }
             superTrees.addAll(scms);
         }
-        TreeSelectorFactory.shutdown(nonRandomResultSelector);
-        TreeSelectorFactory.shutdown(randomResultSelector);
+        TreeMergerFactory.shutdown(nonRandomResultSelector);
+        TreeMergerFactory.shutdown(randomResultSelector);
         return superTrees;
     }
 
@@ -118,7 +122,7 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
 
 
         //calculate random results
-        GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeSelector.FACTORY, inputTrees);
+        GSCMCallableFactory randomFactory = new GSCMCallableFactory(RandomizedGreedyTreeMerger.FACTORY, inputTrees);
         for (int i = 0; i < iterations; i++) {
             futurList.addAll(
                     ParallelUtils.parallelForEach(executorService, randomFactory, Arrays.asList(scorerArray)));
@@ -126,7 +130,7 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         }
 
         //calculate nonRandomResults
-        GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeSelector.FACTORY, inputTrees);
+        GSCMCallableFactory nonRandomFactory = new GSCMCallableFactory(GreedyTreeMerger.FACTORY, inputTrees);
         futurList.addAll(
                 ParallelUtils.parallelForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));
 //                ParallelUtils.parallelBucketForEach(executorService, nonRandomFactory, Arrays.asList(scorerArray)));

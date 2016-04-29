@@ -1,6 +1,6 @@
 package gscm.cli;
 
-import gscm.algorithm.treeSelector.TreeScorers;
+import gscm.algorithm.treeMerger.TreeScorers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;

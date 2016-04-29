@@ -18,7 +18,7 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 import epos.algo.consensus.Consensus;
 import gnu.trove.map.hash.THashMap;
@@ -245,7 +245,7 @@ class TreePair implements Comparable<TreePair> {
             //build insertion point for first occurence on this path...
             if (!singles.isEmpty()) {//if empty the taxon has already been inserted before.
                 if (singleTaxon.numOfSiblings == 1) {
-                    //todo is there a faster/more elegant way to proof that
+                    //todo is there a faster/more elegant way to proof that?
                     Set<String> s = new THashSet<>(TreeUtils.getLeafLabels(lca));
                     s.retainAll(commonLeafes);
                     Set<String> s2 = new HashSet<>(singleTaxon.siblingLeaves);

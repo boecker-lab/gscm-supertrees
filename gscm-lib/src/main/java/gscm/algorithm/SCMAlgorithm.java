@@ -22,13 +22,10 @@ package gscm.algorithm;
 
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gscm.algorithm.treeSelector.InsufficientOverlapException;
-import gscm.algorithm.treeSelector.TreeScorer;
-import gscm.algorithm.treeSelector.TreeSelector;
+import gscm.algorithm.treeMerger.TreeScorer;
 import phyloTree.algorithm.SupertreeAlgorithm;
 import phyloTree.model.tree.Tree;
 import phyloTree.model.tree.TreeUtils;
-import utils.progressBar.CLIProgressBar;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -110,7 +107,7 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
 
     /**
      * Set the maximum number of threads the algorithm is allowed to use
-     * @param threads
+     * @param threads maximal number of threads the algorithm may use
      */
     public void setThreads(int threads) {
         this.threads = threads;

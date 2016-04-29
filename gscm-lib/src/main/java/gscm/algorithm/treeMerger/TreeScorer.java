@@ -18,7 +18,7 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -103,7 +103,7 @@ public abstract class TreeScorer {
      * implemetation. Some scoring may already calculate the consesus merger tree.
      * If that is the case the consensus tree is chached and not calculated a second tim
      *
-     * Note: The given {@link gscm.algorithm.treeSelector.TreePair} gets modified.
+     * Note: The given {@link gscm.algorithm.treeMerger.TreePair} gets modified.
      *
      * @param pair pair to score
      * @return the modified tree pair

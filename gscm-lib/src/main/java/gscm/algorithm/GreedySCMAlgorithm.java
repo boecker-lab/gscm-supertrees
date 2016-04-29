@@ -21,7 +21,11 @@
 package gscm.algorithm;
 
 
-import gscm.algorithm.treeSelector.*;
+import gscm.algorithm.treeMerger.GreedyTreeMerger;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeMerger;
+import gscm.algorithm.treeMerger.TreeMergerFactory;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 
 import java.util.ArrayList;
@@ -41,21 +45,21 @@ import java.util.logging.Logger;
  * @since version 1.0
  */
 public class GreedySCMAlgorithm extends SCMAlgorithm {
-    final TreeSelector selector;
+    final TreeMerger selector;
 
     public GreedySCMAlgorithm() {
         super();
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger, ExecutorService executorService) {
         super(logger, executorService);
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(Logger logger) {
         super(logger);
-        this.selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        this.selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
     }
 
     public GreedySCMAlgorithm(TreeScorer scorer) {
@@ -63,17 +67,17 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
         this.selector.setScorer(scorer);
     }
 
-    public GreedySCMAlgorithm(TreeSelector selector) {
+    public GreedySCMAlgorithm(TreeMerger selector) {
         super();
         this.selector = selector;
     }
 
-    public GreedySCMAlgorithm(Logger logger, ExecutorService executorService, TreeSelector selector) {
+    public GreedySCMAlgorithm(Logger logger, ExecutorService executorService, TreeMerger selector) {
         super(logger, executorService);
         this.selector = selector;
     }
 
-    public GreedySCMAlgorithm(Logger logger, TreeSelector selector) {
+    public GreedySCMAlgorithm(Logger logger, TreeMerger selector) {
         super(logger);
         this.selector = selector;
     }
@@ -127,7 +131,7 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
      */
     @Override
     public boolean shutdown() {
-        TreeSelectorFactory.shutdown(selector);
+        TreeMergerFactory.shutdown(selector);
         return super.shutdown();
     }
 }

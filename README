@@ -212,7 +212,7 @@ public class RandomizedSCMAlgorithm
 Scorer Implemetations:
 ----------------------
 
-The class gscm.algorithm.treeSelector.TreeScorers is a factory class 
+The class gscm.algorithm.treeMerger.TreeScorers is a factory class
 that provides recommended scorers and scorer combinations:
 
   UNIQUE_TAXA,

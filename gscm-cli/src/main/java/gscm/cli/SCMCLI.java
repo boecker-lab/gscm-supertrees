@@ -27,7 +27,7 @@ import gscm.algorithm.GreedySCMAlgorithm;
 import gscm.algorithm.MultiGreedySCMAlgorithm;
 import gscm.algorithm.RandomizedGreedySCMAlgorithm;
 import gscm.algorithm.SCMAlgorithm;
-import gscm.algorithm.treeSelector.TreeScorers;
+import gscm.algorithm.treeMerger.TreeScorers;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionDef;

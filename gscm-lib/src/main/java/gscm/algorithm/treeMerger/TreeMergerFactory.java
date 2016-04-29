@@ -18,32 +18,38 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.04.16.
+ * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 22.10.15.
  */
 
 /**
- * Exception which is thrown if the input data has insufficient overlap for a supertree calculation
+ * Functional Factory interface that can build every class
+ * that extends from {@link TreeMerger}
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
  */
-//todo move to the phyloTree algorithm library
-public class InsufficientOverlapException extends Exception {
-    private static String message =  "Input trees have insufficient taxon overlap for supertree reconstruction!";
+@FunctionalInterface
+public interface TreeMergerFactory<T extends TreeMerger> {
+    Set<TreeMerger> selectors =  Collections.synchronizedSet(new HashSet<>());
 
-    public InsufficientOverlapException() {
-        super(message);
+    T getNewSelectorInstance();
+
+    static void shutdown(TreeMerger... toRemove){
+        for (TreeMerger selector : toRemove) {
+            selector.shutdown();
+            selectors.remove(selector);
+        }
     }
 
-    public InsufficientOverlapException(String s) {
-        super(s);
-    }
-
-    public InsufficientOverlapException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public InsufficientOverlapException(Throwable cause) {
-        super(message,cause);
+    static void shutdownAll(){
+        selectors.forEach(TreeMerger::shutdown);
+        selectors.clear();
     }
 }

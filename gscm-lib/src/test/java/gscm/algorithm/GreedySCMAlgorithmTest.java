@@ -1,7 +1,10 @@
 package gscm.algorithm;
 
 import epos.algo.consensus.Consensus;
-import gscm.algorithm.treeSelector.*;
+import gscm.algorithm.treeMerger.GreedyTreeMerger;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeScorers;
+import gscm.algorithm.treeMerger.TreeMerger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -23,7 +26,6 @@ import static org.junit.Assert.*;
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 16.02.15.
  */
 
-//todo simple sample test
 @RunWith(Parameterized.class)
 public class GreedySCMAlgorithmTest extends BasicSCMTest {
     Consensus.ConsensusMethod method;
@@ -40,7 +42,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         List<Object[]> paras = new LinkedList<>();
         for (TreeScorer scorer : TreeScorers.getFullScorerArray(false)) {
             for (Consensus.ConsensusMethod method : Consensus.ConsensusMethod.values()) {
-//                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),TreeSelector.ConsensusMethod.STRICT , scorer});
+//                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(),Consensus.ConsensusMethod.STRICT , scorer});
                 paras.add(new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(),method , scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), method, scorer});
 //                paras.add(new Object[]{LOCATIONS.newickInsufficientInput500(), null, method, scorer});
@@ -57,7 +59,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
         buf.append("########## Test with following Parameters [" + scorer.getClass().getCanonicalName() + ", " + inputData + ", " + scmResult + ", " + method + "] ##########");
         buf.append(SEP);
         long t = System.currentTimeMillis();
-        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
         selector.setScorer(scorer);
         selector.setInputTrees(inputData);
         SCMAlgorithm algo = new GreedySCMAlgorithm(selector);
@@ -183,8 +185,8 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
 */
 
 
-        TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
-        selector.setScorer(new TreeScorer.ConsensusResolutionScorer());
+        TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
+        selector.setScorer(TreeScorers.newCollisionScorer(false));
         selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());
         selector.setThreads(1);

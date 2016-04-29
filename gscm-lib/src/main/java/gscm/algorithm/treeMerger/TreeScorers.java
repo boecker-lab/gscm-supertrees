@@ -18,14 +18,17 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 24.11.15.
  */
 
 /**
- * Factory mehtod to get access to all implemented scoring functions by name
+ * Factory method to get access to all implemented scoring functions by name
+ *
+ * @author Markus Fleischauer (markus.fleischauer@gmail.com)
+ * @since version 1.0
  */
 public class TreeScorers {
     public enum ScorerType {

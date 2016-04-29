@@ -18,7 +18,7 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 import gnu.trove.map.hash.THashMap;
 import phyloTree.model.tree.Tree;
@@ -35,13 +35,13 @@ import java.util.PriorityQueue;
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
  * @since version 1.0
  */
-public class GreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
-    public static final TreeSelectorFactory<GreedyTreeSelector> FACTORY = () -> {
-        GreedyTreeSelector s =  new GreedyTreeSelector();
-        TreeSelectorFactory.selectors.add(s);
+public class GreedyTreeMerger extends MapBasedGreedyTreeMerger<THashMap<Tree, PriorityQueue<TreePair>>, PriorityQueue<TreePair>> {
+    public static final TreeMergerFactory<GreedyTreeMerger> FACTORY = () -> {
+        GreedyTreeMerger s =  new GreedyTreeMerger();
+        TreeMergerFactory.selectors.add(s);
         return s;
     };
-    private GreedyTreeSelector() {}
+    private GreedyTreeMerger() {}
 
     @Override
     THashMap<Tree, PriorityQueue<TreePair>> getTreeToPairsInstance(int size) {

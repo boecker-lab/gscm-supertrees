@@ -20,7 +20,11 @@
  */
 package gscm.algorithm;
 
-import gscm.algorithm.treeSelector.*;
+import gscm.algorithm.treeMerger.GreedyTreeMerger;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeMerger;
+import gscm.algorithm.treeMerger.TreeMergerFactory;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 import utils.parallel.ParallelUtils;
 
@@ -77,7 +81,7 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
      */
     @Override
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
-        final TreeSelector selector = GreedyTreeSelector.FACTORY.getNewSelectorInstance();
+        final TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
         selector.setInputTrees(inputTrees);
         List<Tree> superTrees = new ArrayList<>(scorerArray.length);
         for (int i = 0; i < scorerArray.length; i++) {
@@ -85,7 +89,7 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
             selector.setScorer(scorer);
             superTrees.add(selector.calculateGreedyConsensus(false));
         }
-        TreeSelectorFactory.shutdown(selector);
+        TreeMergerFactory.shutdown(selector);
         return superTrees;
     }
 
@@ -94,7 +98,7 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
      */
     @Override
     protected List<Tree> calculateParallel() {
-        GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeSelector.FACTORY, inputTrees);
+        GSCMCallableFactory factory = new GSCMCallableFactory(GreedyTreeMerger.FACTORY, inputTrees);
         List<Tree> supertrees = null;
         try {
             supertrees = ParallelUtils.parallelForEachResults(executorService, factory, Arrays.asList(scorerArray));

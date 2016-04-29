@@ -21,11 +21,11 @@
 package gscm.cli;
 
 import gscm.algorithm.SCMAlgorithm;
-import gscm.algorithm.treeSelector.InsufficientOverlapException;
-import gscm.algorithm.treeSelector.TreeSelectorFactory;
+import gscm.algorithm.treeMerger.TreeMergerFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.InterfaceCmdLineParser;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ public class GSCMLauncher {
                 System.exit(2);
             } finally {
                 algorithm.shutdown(); //shut executor services of algorithm down
-                TreeSelectorFactory.shutdownAll();//shut all tree selectors and their executors services down
+                TreeMergerFactory.shutdownAll();//shut all tree selectors and their executors services down
                 System.exit(0);
             }
         } catch (CmdLineException e) {

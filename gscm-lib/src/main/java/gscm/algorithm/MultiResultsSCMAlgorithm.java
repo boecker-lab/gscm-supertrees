@@ -21,11 +21,10 @@
 package gscm.algorithm;
 
 import epos.algo.consensus.Consensus;
-import epos.algo.consensus.loose.LooseConsensus;
-import gscm.algorithm.treeSelector.InsufficientOverlapException;
-import gscm.algorithm.treeSelector.TreeScorer;
-import gscm.algorithm.treeSelector.TreeSelector;
-import gscm.algorithm.treeSelector.TreeSelectorFactory;
+import gscm.algorithm.treeMerger.TreeScorer;
+import gscm.algorithm.treeMerger.TreeMerger;
+import gscm.algorithm.treeMerger.TreeMergerFactory;
+import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
@@ -43,7 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * This class defines the basic algorithm for greedy strict
- * consensus merger implemetations that handle multiple scorings
+ * consensus merger implementations that handle multiple scoring functions
  * and return multiple results. It also merges them into a single supertree
  *
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
@@ -185,20 +184,20 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
 
     //helper classes for parallel computing
     class GSCMCallableFactory implements IterationCallableFactory<GSCMCallable, TreeScorer> {
-        private final Set<TreeSelector> selectors = new HashSet<>();
-        final TreeSelectorFactory selectorFactory;
+        private final Set<TreeMerger> selectors = new HashSet<>();
+        final TreeMergerFactory selectorFactory;
         final Tree[] inputTrees;
         final TreeScorer scorer;
 
-        public GSCMCallableFactory(TreeSelectorFactory factory, Tree[] inputTrees) {
+        public GSCMCallableFactory(TreeMergerFactory factory, Tree[] inputTrees) {
             this(factory, null, inputTrees);
         }
 
-        public GSCMCallableFactory(TreeSelectorFactory factory, TreeScorer scorer) {
+        public GSCMCallableFactory(TreeMergerFactory factory, TreeScorer scorer) {
             this(factory, scorer, null);
         }
 
-        public GSCMCallableFactory(TreeSelectorFactory factory, TreeScorer scorer, Tree[] inputTrees) {
+        public GSCMCallableFactory(TreeMergerFactory factory, TreeScorer scorer, Tree[] inputTrees) {
             this.selectorFactory = factory;
             this.inputTrees = inputTrees;
             this.scorer = scorer;
@@ -206,7 +205,7 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
 
         @Override
         public GSCMCallable newIterationCallable(List<TreeScorer> list) {
-            TreeSelector s = selectorFactory.getNewSelectorInstance();
+            TreeMerger s = selectorFactory.getNewSelectorInstance();
             selectors.add(s);
             if (scorer != null)
                 s.setScorer(scorer);
@@ -216,15 +215,15 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
         }
 
         public void shutdownSelectors(){
-            selectors.forEach(TreeSelectorFactory::shutdown);
+            selectors.forEach(TreeMergerFactory::shutdown);
             selectors.clear();
         }
     }
 
     private class GSCMCallable extends DefaultIterationCallable<TreeScorer, Tree> {
-        final TreeSelector selector;
+        final TreeMerger selector;
 
-        GSCMCallable(List<TreeScorer> jobs, TreeSelector selector) {
+        GSCMCallable(List<TreeScorer> jobs, TreeMerger selector) {
             super(jobs);
             this.selector = selector;
         }

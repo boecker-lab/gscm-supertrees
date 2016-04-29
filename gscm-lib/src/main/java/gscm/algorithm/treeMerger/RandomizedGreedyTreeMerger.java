@@ -18,7 +18,7 @@
  * along with GSCM-Project.  If not, see <http://www.gnu.org/licenses/>;.
  *
  */
-package gscm.algorithm.treeSelector;
+package gscm.algorithm.treeMerger;
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 23.03.15.
@@ -36,10 +36,10 @@ import java.util.Random;
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)
  * @since version 1.0
  */
-public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>>{
-    public static final TreeSelectorFactory<RandomizedGreedyTreeSelector> FACTORY =  () -> {
-        RandomizedGreedyTreeSelector s =  new RandomizedGreedyTreeSelector();
-        TreeSelectorFactory.selectors.add(s);
+public class RandomizedGreedyTreeMerger extends MapBasedGreedyTreeMerger<THashMap<Tree, THashSet<TreePair>>, THashSet<TreePair>> {
+    public static final TreeMergerFactory<RandomizedGreedyTreeMerger> FACTORY =  () -> {
+        RandomizedGreedyTreeMerger s =  new RandomizedGreedyTreeMerger();
+        TreeMergerFactory.selectors.add(s);
         return s;
     };
 
@@ -53,7 +53,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
     private TreePair[] pairToIndex;
 
 
-    private RandomizedGreedyTreeSelector() {}
+    private RandomizedGreedyTreeMerger() {}
 
     @Override
     protected TreePair getMax() {
@@ -106,7 +106,7 @@ public class RandomizedGreedyTreeSelector extends MapBasedGreedyTreeSelector<THa
 
     private void initRandomStructures(){
         indices = new double[pairs.size()];
-        pairToIndex = new TreePair[pairs.size()];//todo, do fancy index stuff instead of this ugly set thingy
+        pairToIndex = new TreePair[pairs.size()]; //todo, use index instead of this ugly set thingy
         int index = 0;
         double pre = 0d;
         for (TreePair pair : pairs) {
