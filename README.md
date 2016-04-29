@@ -1,6 +1,6 @@
 
 Introduction
-~~~~~~~~~~~~
+============
 
 The GSCM Project is a *java* library and command line tool providing the 
 greedy strict consensus merger supertree algorithm for rooted input trees.
@@ -10,7 +10,7 @@ For more detailed information about the algorithm see the Literature.
 
 
 Literature
-==========
+----------
 
       * **Collecting reliable clades using Greedy Strict Consensus Merger.
         ** Markus Fleischauer and Sebastian Böcker 
@@ -20,10 +20,10 @@ Literature
 
 
 Installation
-************
+============
 
 Windows
-=======
+-------
 
 The gscm.exe should hopefully work out of
 the box. To execute GSCM from every location you have to add the
@@ -31,17 +31,17 @@ location of the gscm.exe to your PATH environment variable.
 
 
 Linux and MacOSX
-================
+----------------
 
 To execute GSCM from every location you have to add the location of
 the gscm executable to your PATH variable. Open the file "~/.bashrc"
 in an editor and add the following line (replacing the placeholder
 path):
 
-   export PATH=$PATH:/path/to/gscm
+   export PATH-$PATH:/path/to/gscm
 
 Jar (any OS)
-================
+----------------
 
 Alternatively, you can run the gscm.jar jar file using java with the
 command:
@@ -53,10 +53,10 @@ the available commands and options.
 
 
 Using GSCM command line tool
-*********************************
+============================
 
 Supported Filtypes
-==================
+------------------
 
 The GSCM command line tool handles trees in NEWICK and NEXUS format.
 For an outomatic file format detection use the common file extension
@@ -65,10 +65,10 @@ Per default the output tree format equals the input format. To specify a differe
 output format you can use the option "--outFileType" ("-d"). 
 
 Supported Commands
-******************
+==================
 
 Usage:
-======
+------
 
 gscm [options...] INPUT_TREES_FILE
 
@@ -76,7 +76,7 @@ INPUT_TREES_FILE                       : Path of the file containing the input
                                          data
 
 General options:
-================
+----------------
  
  -H (--HELP)                            : Full usage message including
                                           nonofficial Options (default: false)
@@ -116,7 +116,7 @@ General options:
 
 
 GSCM Java Library
-*****************
+=================
 
 You can integrate the GSCM library in your java project, either by
 using Maven [1] or by including the jar file directly. The latter is
@@ -125,7 +125,7 @@ external libraries.
 
 
 Maven Integration
-=================
+-----------------
 
 Add the following repository to your pom file:
 
@@ -158,7 +158,7 @@ Whole project containing the algorithm (gscm-lib) and the command line interface
 
 
 Main API
-========
+--------
 
 The main class in the GSCM library is **de.unijena.bioinf.gscm.algorithm.SCMAlgorithm*. 
 It specifies the main API of all provided algorithm implementation. To run a algorithm
@@ -166,8 +166,8 @@ just have to specify scorer(s) and input trees.
 
 There are currently 3 implemetations of **de.unijena.bioinf.gscm.algorithm.GSCMAlgorithm*:
 
-Algorithm Implemetations:
--------------------------
+###### Algorithm Implemetations:
+
 public class GreedySCMAlgorithm
 
    This class provides the basic greedy strict consensus merger algorithm.
@@ -209,8 +209,8 @@ public class RandomizedSCMAlgorithm
           The combined supertree
 
 
-Scorer Implemetations:
-----------------------
+###### Scorer Implemetations:
+
 
 The class gscm.algorithm.treeMerger.TreeScorers is a factory class
 that provides recommended scorers and scorer combinations:
@@ -239,7 +239,7 @@ The in Fleischauer et al. presented scorings are:
 
 
 Changelog
-*********
+=========
 
 1.0.0
    * release version
