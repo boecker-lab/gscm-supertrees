@@ -12,11 +12,11 @@ For more detailed information about the algorithm see the Literature.
 Literature
 ----------
 
-      * **Collecting reliable clades using Greedy Strict Consensus Merger.
-        ** Markus Fleischauer and Sebastian Böcker 
-        *Proc. of German Conference on Bioinformatics (GCB 2015), 
-        volume 3 of PeerJ PrePrints, pages e1595. 
-        PeerJ Inc. San Francisco, USA, 2015.*
+      * Markus Fleischauer and Sebastian Böcker,
+        **Collecting reliable clades using Greedy Strict Consensus Merger.**
+        *Proc. of German Conference on Bioinformatics (GCB 2015),
+        volume 3 of PeerJ PrePrints*, pages e1595.
+        PeerJ Inc. San Francisco, USA, 2015. *
 
 
 Installation
