@@ -166,7 +166,7 @@ just have to specify scorer(s) and input trees.
 
 There are currently 3 implemetations of **de.unijena.bioinf.gscm.algorithm.GSCMAlgorithm*:
 
-#### Algorithm Implemetations:
+### Algorithm Implemetations:
 
 public class GreedySCMAlgorithm
 
@@ -209,7 +209,7 @@ public class RandomizedSCMAlgorithm
           The combined supertree
 
 
-#### Scorer Implemetations:
+### Scorer Implemetations:
 
 
 The class gscm.algorithm.treeMerger.TreeScorers is a factory class
