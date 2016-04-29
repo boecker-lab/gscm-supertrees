@@ -119,7 +119,7 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
      */
     protected class TreeResolutionComparator implements Comparator<Tree> {
         //caches scores of already known trees
-        private TObjectDoubleHashMap<Tree> scores = new TObjectDoubleHashMap<>();
+        private final TObjectDoubleHashMap<Tree> scores = new TObjectDoubleHashMap<>();
 
         @Override
         public int compare(Tree o1, Tree o2) {

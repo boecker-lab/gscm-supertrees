@@ -64,7 +64,7 @@ public class RandomizedGreedyTreeMerger extends MapBasedGreedyTreeMerger<THashMa
 
     @Override
     THashMap<Tree, THashSet<TreePair>> getTreeToPairsInstance(int size) {
-        return new THashMap<Tree, THashSet<TreePair>>(size);
+        return new THashMap<>(size);
     }
 
     @Override

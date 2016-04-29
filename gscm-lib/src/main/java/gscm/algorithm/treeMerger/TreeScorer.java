@@ -106,9 +106,8 @@ public abstract class TreeScorer {
      * Note: The given {@link gscm.algorithm.treeMerger.TreePair} gets modified.
      *
      * @param pair pair to score
-     * @return the modified tree pair
      */
-    public double scoreTreePair(TreePair pair) {
+    public void scoreTreePair(TreePair pair) {
         Set<String> common = calculateCommonLeafes(pair);
         pair.setCommonLeafes(common);
         if (common.size() < 3)
@@ -118,7 +117,6 @@ public abstract class TreeScorer {
             if (TIE_BREAKER)
                 pair.tieBreakingScore = calculateTieBreakScore(pair);
         }
-        return pair.score;
     }
 
     protected abstract double calculateScore(TreePair pair);

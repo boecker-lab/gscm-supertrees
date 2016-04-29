@@ -56,17 +56,17 @@ public class TreeScorers {
     public static TreeScorer getScorer(boolean synced, ScorerType scorer) {
         switch (scorer) {
             case UNIQUE_TAXA:
-                return newUniqueTaxonScorer(synced);
+                return new TreeScorer.ConsensusCladeNumberScorer(synced);
             case UNIQUE_TAXA_ORIG:
                 return new TreeScorer.UniqueTaxaNumberScorerOrig(synced) ;
             case OVERLAP:
-                return newOverlapScorer(synced);
+                return new TreeScorer.OverlapScorer(synced);
             case OVERLAP_ORIG:
                 return new TreeScorer.OverlapScorerOrig(synced);
             case CLADE_NUMBER:
                 return new TreeScorer.ConsensusCladeNumberScorer(synced);
             case RESOLUTION:
-                return newResolutionScorer(synced);
+                return new TreeScorer.ConsensusResolutionScorer(synced);
             case COLLISION_SUBTREES:
                 return new TreeScorer.CollisionNumberScorer(synced);
             case COLLISION_POINT:
@@ -82,27 +82,6 @@ public class TreeScorers {
             default:
                 return null;
         }
-    }
-
-
-    public static TreeScorer newOverlapScorer(boolean synced) {
-        return new TreeScorer.OverlapScorer(synced);
-    }
-
-    public static TreeScorer newUniqueTaxonScorer(boolean synced) {
-        return new TreeScorer.UniqueTaxaNumberScorer(synced);
-    }
-
-    public static TreeScorer newTaxonScorer(boolean synced) {
-        return new TreeScorer.ConsensusTaxonNumberScorer(synced);
-    }
-
-    public static TreeScorer newResolutionScorer(boolean synced) {
-        return new TreeScorer.ConsensusResolutionScorer(synced);
-    }
-
-    public static TreeScorer newCollisionScorer(boolean synced) {
-        return new TreeScorer.CollisionNumberScorer(synced);
     }
 
 
@@ -140,9 +119,9 @@ public class TreeScorers {
 
     public static TreeScorer[] newFastScorerArray(boolean synced) {
         return new TreeScorer[]{
-                newOverlapScorer(synced),
-                newUniqueTaxonScorer(synced),
-                newTaxonScorer(synced)
+                new TreeScorer.OverlapScorer(synced),
+                new TreeScorer.UniqueTaxaNumberScorer(synced),
+                new TreeScorer.ConsensusTaxonNumberScorer(synced)
         };
     }
 

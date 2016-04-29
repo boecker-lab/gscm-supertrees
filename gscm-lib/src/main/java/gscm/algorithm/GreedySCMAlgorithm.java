@@ -22,14 +22,13 @@ package gscm.algorithm;
 
 
 import gscm.algorithm.treeMerger.GreedyTreeMerger;
-import gscm.algorithm.treeMerger.TreeScorer;
 import gscm.algorithm.treeMerger.TreeMerger;
 import gscm.algorithm.treeMerger.TreeMergerFactory;
+import gscm.algorithm.treeMerger.TreeScorer;
 import phyloTree.algorithm.exceptions.InsufficientOverlapException;
 import phyloTree.model.tree.Tree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
@@ -45,7 +44,7 @@ import java.util.logging.Logger;
  * @since version 1.0
  */
 public class GreedySCMAlgorithm extends SCMAlgorithm {
-    final TreeMerger selector;
+    private final TreeMerger selector;
 
     public GreedySCMAlgorithm() {
         super();
@@ -112,7 +111,9 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
      */
     @Override
     protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
-        return new ArrayList<>(Arrays.asList(calculateSuperTree()));
+        List<Tree> l = new ArrayList<>(1);
+        l.add(calculateSuperTree());
+        return l;
     }
 
     /**

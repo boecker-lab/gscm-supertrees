@@ -134,7 +134,6 @@ public class gscmTest {
     @Test
     public void testLauncher() {
         if (numOfTrees > 0) {
-            exit.expectSystemExitWithStatus(0);
             GSCMLauncher.main(args);
             assertTrue(Files.exists(resultFile));
             try {

@@ -198,7 +198,7 @@ class TreePair implements Comparable<TreePair> {
                         singles.add(st);
                     }
                 } else {
-                    st = new SingleTaxon(node, siblingLeaves, new THashSet<String>(), numOfSiblings);
+                    st = new SingleTaxon(node, siblingLeaves, new THashSet<>(), numOfSiblings);
                 }
                 singleTaxa.add(st);
 

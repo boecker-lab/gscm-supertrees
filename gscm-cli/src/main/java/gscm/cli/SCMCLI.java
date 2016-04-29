@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
 
     static {
         initName("gscm");
-        DEFAULT_PROPERTIES.setProperty("APP_HOME_PARENT",System.getProperty("user.home"));
+        DEFAULT_PROPERTIES.setProperty("APP_HOME_PARENT", System.getProperty("user.home"));
     }
 
     public static class ScorerTypeArrayOptionHandler extends EnumArrayOptionHandler<TreeScorers.ScorerType> {
@@ -65,7 +65,6 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
             super(parser, option, setter, TreeScorers.ScorerType.class);
         }
     }
-
 
 
     @Option(name = "-s", aliases = {"--scorer"}, usage = "set of scores that should be used. standard scm can use only one", handler = ScorerTypeArrayOptionHandler.class)
@@ -106,13 +105,13 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
             results.add(primaryResult);
             results.addAll(multiTreeList);
         } else {
-            results = Arrays.asList(primaryResult);
+            results = Collections.singletonList(primaryResult);
         }
         writeOutput(results);
     }
 
     public SCMAlgorithm getAlgorithmInstance() {
-        SCMAlgorithm algo = null;
+        SCMAlgorithm algo;
         if (randomIterations < 0) {
             //non random
             if (scorerTypes.length > 1) {
@@ -155,7 +154,6 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
         stream.println("    The only required argument is the input tree file in newick/nexus format");
         stream.println();
     }
-
 
 
 }

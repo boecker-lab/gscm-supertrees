@@ -172,7 +172,7 @@ public abstract class TreeMerger {
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
             TreePair pair = new TreePair(tree, old, scorer, method);
-            if (pair != null && !pair.isInsufficient()) {
+            if (!pair.isInsufficient()) {
                 addTreePair(pair);
             }
         }
@@ -330,7 +330,7 @@ public abstract class TreeMerger {
 
     /**
      * Specifies if Scorer cache has to be cleared after computation
-     * @param clearScorer
+     * @param clearScorer set true if Scorer cache has to be cleared
      */
     public void setClearScorer(boolean clearScorer) {
         this.clearScorer = clearScorer;

@@ -84,8 +84,7 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
         final TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
         selector.setInputTrees(inputTrees);
         List<Tree> superTrees = new ArrayList<>(scorerArray.length);
-        for (int i = 0; i < scorerArray.length; i++) {
-            TreeScorer scorer = scorerArray[i];
+        for (TreeScorer scorer : scorerArray) {
             selector.setScorer(scorer);
             superTrees.add(selector.calculateGreedyConsensus(false));
         }
