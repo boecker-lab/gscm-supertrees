@@ -64,7 +64,7 @@ public abstract class SCMAlgorithm extends SupertreeAlgorithm {
      * This is the place to implement the algorithm
      *
      * @return A List containing supertree(s)
-     * @throws Exception
+     * @throws Exception if the algorithm fails for some reason
      */
     protected abstract List<Tree> calculateSuperTrees() throws Exception;
 

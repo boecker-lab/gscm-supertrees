@@ -12,7 +12,7 @@ buildscript {
 apply plugin: "eu.appsatori.fatjar"
 apply plugin: 'edu.sc.seis.launch4j'
 
-version = '0.8-SNAPSHOT'
+version = '1.0'
 
 dependencies {
     compile project(':gscm-lib')

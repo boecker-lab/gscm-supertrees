@@ -186,7 +186,7 @@ public class GreedySCMAlgorithmTest extends BasicSCMTest {
 
 
         TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
-        selector.setScorer(TreeScorers.newCollisionScorer(false));
+        selector.setScorer(TreeScorers.getScorer(false, TreeScorers.ScorerType.COLLISION_SUBTREES));
         selector.setInputTrees(inputTrees);
 //        selector.setThreads(Runtime.getRuntime().availableProcessors());
         selector.setThreads(1);

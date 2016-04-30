@@ -1,4 +1,4 @@
-version = '0.8-SNAPSHOT'
+version = '1.0'
 
 dependencies {
     compile group: "de.unijena.bioinf", name: "phyloTree.model", version: "0.9.9-SNAPSHOT", changing: true

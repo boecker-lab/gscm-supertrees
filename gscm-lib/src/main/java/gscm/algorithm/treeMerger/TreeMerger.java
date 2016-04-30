@@ -200,7 +200,7 @@ public abstract class TreeMerger {
      * This methods prints the progress to standard out
      *
      * @return gscm supertree
-     * @throws InsufficientOverlapException
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     public Tree calculateGreedyConsensus() throws InsufficientOverlapException {
         return calculateGreedyConsensus(new CLIProgressBar());
@@ -213,8 +213,9 @@ public abstract class TreeMerger {
      *
      *This methods does not print progress
      *
+     * @param  printProgress disables printing the progress to system out
      * @return gscm supertree
-     * @throws InsufficientOverlapException
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     public Tree calculateGreedyConsensus(boolean printProgress) throws InsufficientOverlapException {
         return calculateGreedyConsensus(new CLIProgressBar(CLIProgressBar.DISABLE_PER_DEFAULT || !printProgress));
@@ -223,6 +224,7 @@ public abstract class TreeMerger {
 
     /**
      * @return Merged supertree
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     private Tree calculateGreedyConsensus(final CLIProgressBar progressBar) throws InsufficientOverlapException {
         Tree superCandidate = null;

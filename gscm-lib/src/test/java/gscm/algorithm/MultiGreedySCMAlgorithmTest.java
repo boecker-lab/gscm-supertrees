@@ -35,13 +35,13 @@ public class MultiGreedySCMAlgorithmTest extends BasicSCMTest {
         List<Object[]> paras = new LinkedList<>();
 
         paras.addAll(Arrays.asList(
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.OVERLAP)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.UNIQUE_TAXA)}},
+                new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.UNIQUE_CLADES_LOST)}},
                 new Object[]{LOCATIONS.newickInput100(), LOCATIONS.newickSCM100_NORoot(), TreeScorers.getFullScorerArray(true)},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newOverlapScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newUniqueTaxonScorer(true)}},
-                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}}));
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.OVERLAP)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.UNIQUE_TAXA)}},
+                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.getScorer(true, TreeScorers.ScorerType.UNIQUE_CLADES_LOST)}}));
 
 //                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), new TreeScorer[]{TreeScorers.newTaxonScorer(true)}},
 //                new Object[]{LOCATIONS.newickInput1000(), LOCATIONS.newickSCM1000_NORoot(), TreeScorers.getFullScorerArray(true)}));

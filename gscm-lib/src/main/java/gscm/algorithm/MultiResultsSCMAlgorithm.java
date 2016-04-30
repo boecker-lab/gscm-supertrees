@@ -170,6 +170,7 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
      * If there is no single threaded Implementation call the multithreaded implementation {@link MultiResultsSCMAlgorithm#calculateParallel()}
      *
      * @return List of supertrees
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     protected abstract List<Tree> calculateSequencial() throws InsufficientOverlapException;
 
@@ -178,6 +179,7 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
      * If there is no multi threaded Implementation call the single threaded implementation {@link MultiResultsSCMAlgorithm#calculateSequencial()}
      *
      * @return List of supertrees
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     protected abstract List<Tree> calculateParallel() throws InsufficientOverlapException;
 

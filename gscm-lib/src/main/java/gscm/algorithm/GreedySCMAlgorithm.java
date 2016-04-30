@@ -107,7 +107,7 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
      * scoring function. running time highly depends on the scoring method
      *
      * @return a List containing single supertree
-     * @throws InsufficientOverlapException
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     @Override
     protected List<Tree> calculateSuperTrees() throws InsufficientOverlapException {
@@ -121,7 +121,7 @@ public class GreedySCMAlgorithm extends SCMAlgorithm {
      * scoring function. running time highly depends on the scoring method
      *
      * @return supertree
-     * @throws InsufficientOverlapException
+     * @throws InsufficientOverlapException thrown if overlap of input trees is insufficient for supertree calculation
      */
     Tree calculateSuperTree() throws InsufficientOverlapException {
         return selector.calculateGreedyConsensus();
