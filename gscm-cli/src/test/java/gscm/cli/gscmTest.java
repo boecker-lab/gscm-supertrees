@@ -33,8 +33,6 @@ public class gscmTest {
     Path timeFile = null;
     private int numOfTrees;
 
-//    @Rule
-//    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
     public gscmTest(String[] args, Path result, Path time, int numOfTrees) {
         this.args = args;
