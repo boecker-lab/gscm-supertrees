@@ -158,7 +158,7 @@ Whole project containing the algorithm (gscm-lib) and the command line interface
 Main API
 --------
 
-The main class in the GSCM library is **de.unijena.bioinf.gscm.algorithm.SCMAlgorithm*. 
+The main class in the GSCM library is **de.unijena.bioinf.SCMAlgorithm*.
 It specifies the main API of all provided algorithm implementation. To run a algorithm
 just have to specify scorer(s) and input trees. 
 
@@ -210,7 +210,7 @@ public class RandomizedSCMAlgorithm
 ### Scorer Implemetations:
 
 
-The class gscm.algorithm.treeMerger.TreeScorers is a factory class
+The class TreeScorers is a factory class
 that provides recommended scorers and scorer combinations:
 
   UNIQUE_TAXA,
