@@ -1,9 +1,10 @@
 package gscm.algorithm;
 
-import epos.algo.consensus.loose.LooseConsensus;
 import gscm.algorithm.treeMerger.TreeScorer;
 import gscm.algorithm.treeMerger.TreeScorers;
-import phyloTree.model.tree.Tree;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.algorithm.consensus.loose.LooseConsensus;
+import phylo.tree.model.tree.Tree;
 
 import java.util.Arrays;
 
@@ -58,9 +59,6 @@ public abstract class BasicSCMTest {
         for (int i = 0; i < indices.length; i++) {
             input[i] = tree[indices[i]];
         }
-        LooseConsensus c = new LooseConsensus();
-        c.setInput(Arrays.asList(input));
-        c.run();
-        return c.getResult();
+        return Consensus.getLoosConsensus(Arrays.asList(input));
     }
 }

@@ -17,8 +17,8 @@ version = '1.0'
 dependencies {
     compile project(':gscm-lib')
 
-    compile group: 'de.unijena.bioinf', name: 'phyloTree.cli', version: '0.9.9-SNAPSHOT', changing: true
-    compile group: 'de.unijena.bioinf', name: 'core-lib.cli', version: '0.9-SNAPSHOT', changing: true
+    compile group: 'de.unijena.bioinf', name: 'phyloTree-lib.cli', version: '0.9.9', changing: false
+    compile group: 'de.unijena.bioinf', name: 'core-lib.cli', version: '0.9', changing: false
 
     testCompile 'com.github.stefanbirkner:system-rules:1.5.0'
 }

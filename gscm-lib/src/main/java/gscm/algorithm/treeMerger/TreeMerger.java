@@ -20,13 +20,13 @@
  */
 package gscm.algorithm.treeMerger;
 
-import epos.algo.consensus.Consensus;
-import phyloTree.algorithm.exceptions.InsufficientOverlapException;
-import phyloTree.model.tree.Tree;
-import utils.parallel.DefaultIterationCallable;
-import utils.parallel.IterationCallableFactory;
-import utils.parallel.ParallelUtils;
-import utils.progressBar.CLIProgressBar;
+import core.utils.parallel.DefaultIterationCallable;
+import core.utils.parallel.IterationCallableFactory;
+import core.utils.parallel.ParallelUtils;
+import core.utils.progressBar.CLIProgressBar;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
+import phylo.tree.model.tree.Tree;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;

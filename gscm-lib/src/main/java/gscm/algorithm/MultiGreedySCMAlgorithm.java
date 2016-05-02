@@ -20,13 +20,13 @@
  */
 package gscm.algorithm;
 
+import core.utils.parallel.ParallelUtils;
 import gscm.algorithm.treeMerger.GreedyTreeMerger;
 import gscm.algorithm.treeMerger.TreeScorer;
 import gscm.algorithm.treeMerger.TreeMerger;
 import gscm.algorithm.treeMerger.TreeMergerFactory;
-import phyloTree.algorithm.exceptions.InsufficientOverlapException;
-import phyloTree.model.tree.Tree;
-import utils.parallel.ParallelUtils;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
+import phylo.tree.model.tree.Tree;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -25,8 +25,8 @@ import gscm.algorithm.treeMerger.GreedyTreeMerger;
 import gscm.algorithm.treeMerger.TreeMerger;
 import gscm.algorithm.treeMerger.TreeMergerFactory;
 import gscm.algorithm.treeMerger.TreeScorer;
-import phyloTree.algorithm.exceptions.InsufficientOverlapException;
-import phyloTree.model.tree.Tree;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
+import phylo.tree.model.tree.Tree;
 
 import java.util.ArrayList;
 import java.util.List;

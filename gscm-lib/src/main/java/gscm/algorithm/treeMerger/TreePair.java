@@ -20,12 +20,12 @@
  */
 package gscm.algorithm.treeMerger;
 
-import epos.algo.consensus.Consensus;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeNode;
-import phyloTree.model.tree.TreeUtils;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.model.tree.Tree;
+import phylo.tree.model.tree.TreeNode;
+import phylo.tree.model.tree.TreeUtils;
 
 import java.util.*;
 import java.util.logging.Logger;

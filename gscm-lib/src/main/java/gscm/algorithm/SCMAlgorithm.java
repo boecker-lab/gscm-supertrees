@@ -23,9 +23,9 @@ package gscm.algorithm;
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import gscm.algorithm.treeMerger.TreeScorer;
-import phyloTree.algorithm.SupertreeAlgorithm;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeUtils;
+import phylo.tree.algorithm.SupertreeAlgorithm;
+import phylo.tree.model.tree.Tree;
+import phylo.tree.model.tree.TreeUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
