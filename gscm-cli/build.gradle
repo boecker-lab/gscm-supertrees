@@ -52,7 +52,7 @@ launch4j {
     mainClassName = project.mainClassName
     copyConfigurable = project.tasks.fatJar.outputs.files
     jar = "lib/${project.tasks.fatJar.archiveName}"
-    icon = project.projectDir.toPath().resolve('src/main/resources/dist/icon.ico')
+//    icon = project.projectDir.toPath().resolve('src/main/resources/dist/icon.ico')
 }
 
 apply plugin: 'distribution'
