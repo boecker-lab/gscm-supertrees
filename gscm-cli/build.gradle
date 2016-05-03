@@ -96,7 +96,7 @@ distributions {
 }
 
 task distribute {}
-distribute.dependsOn 'linuxDistZip', 'winDistZip', 'jarDistZip'
+distribute.dependsOn 'linuxDistZip', /*'winDistZip',*/ 'jarDistZip'
 
 
 linuxDistZip.doLast {
