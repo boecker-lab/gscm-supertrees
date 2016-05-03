@@ -51,6 +51,12 @@ launch4j {
 //        icon = 'icons/myApp.ico'
 }
 
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives fatJar
+}
+
 
 
 
