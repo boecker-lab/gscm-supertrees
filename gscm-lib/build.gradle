@@ -4,7 +4,7 @@ dependencies {
     compile group: "de.unijena.bioinf", name: "phyloTree-lib.model", version: "0.9.9", changing: false
     compile group: 'de.unijena.bioinf', name:'phyloTree-lib.algorithm', version:'0.9.9', changing: false
     compile group: 'de.unijena.bioinf', name:'phyloTree-lib.consensus', version:'0.9.9', changing: false
-//    compile group: 'de.unijena.bioinf', name:'consensus-lib', version:'0.9.3-SNAPSHOT', changing: true
+
     compile group: 'de.unijena.bioinf', name:'core-lib.algorithm', version:'0.9', changing: false
     compile group: 'de.unijena.bioinf', name:'core-lib.utils', version:'0.9', changing: false
 
