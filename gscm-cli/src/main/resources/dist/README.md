@@ -1,5 +1,3 @@
-Greedy Strict Consensus Merger
-==============================
 The GSCM Project is a *java* library and command line tool providing the
 greedy strict consensus merger supertree algorithm for rooted input trees.
 It provides several scoring functions to determine in which oder the input trees get merged. 
