@@ -121,7 +121,7 @@ GSCM Java Library
 
 You can integrate the GSCM library in your java project, either by
 using Maven [1] or by including the jar file directly. The latter is
-not recommendet, as the GSCM jar contains also dependencies to other
+not recommended, as the GSCM jar contains also dependencies to other
 external libraries.
 
 
@@ -147,7 +147,7 @@ Library containing all algorithms
    <dependency>
      <groupId>de.unijena.bioinf</groupId>
      <artifactId>gscm-lib</artifactId>
-     <version>1.0.0</version>
+     <version>1.0</version>
    </dependency>
 ```
 Whole project containing the algorithm (gscm-lib) and the command line interface (gscm-cli)
@@ -155,7 +155,7 @@ Whole project containing the algorithm (gscm-lib) and the command line interface
    <dependency>
      <groupId>de.unijena.bioinf</groupId>
      <artifactId>gscm</artifactId>
-     <version>1.0.0</version>
+     <version>1.0</version>
    </dependency>
 ```
 
@@ -245,5 +245,5 @@ The in Fleischauer et al. presented scorings are:
 Changelog
 =========
 
-1.0.0
+1.0
    * release version
