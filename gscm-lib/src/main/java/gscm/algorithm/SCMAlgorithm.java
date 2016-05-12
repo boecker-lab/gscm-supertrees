@@ -22,13 +22,10 @@ package gscm.algorithm;
 
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gscm.algorithm.treeSelector.InsufficientOverlapException;
 import gscm.algorithm.treeSelector.TreeScorer;
-import gscm.algorithm.treeSelector.TreeSelector;
-import phyloTree.algorithm.SupertreeAlgorithm;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeUtils;
-import utils.progressBar.CLIProgressBar;
+import phylo.tree.algorithm.SupertreeAlgorithm;
+import phylo.tree.model.Tree;
+import phylo.tree.model.TreeUtils;
 
 import java.util.Collections;
 import java.util.Comparator;

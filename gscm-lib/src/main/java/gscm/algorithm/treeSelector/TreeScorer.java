@@ -22,9 +22,9 @@ package gscm.algorithm.treeSelector;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeNode;
-import phyloTree.model.tree.TreeUtils;
+import phylo.tree.model.Tree;
+import phylo.tree.model.TreeNode;
+import phylo.tree.model.TreeUtils;
 
 import java.util.Iterator;
 import java.util.Map;

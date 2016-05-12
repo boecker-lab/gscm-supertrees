@@ -20,8 +20,8 @@
  */
 package gscm.algorithm.treeSelector;
 
-import epos.algo.consensus.Consensus;
-import phyloTree.model.tree.Tree;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.model.Tree;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
 import utils.parallel.ParallelUtils;

@@ -20,13 +20,12 @@
  */
 package gscm.algorithm;
 
-import epos.algo.consensus.Consensus;
-import epos.algo.consensus.loose.LooseConsensus;
 import gscm.algorithm.treeSelector.InsufficientOverlapException;
 import gscm.algorithm.treeSelector.TreeScorer;
 import gscm.algorithm.treeSelector.TreeSelector;
 import gscm.algorithm.treeSelector.TreeSelectorFactory;
-import phyloTree.model.tree.Tree;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.model.Tree;
 import utils.parallel.DefaultIterationCallable;
 import utils.parallel.IterationCallableFactory;
 

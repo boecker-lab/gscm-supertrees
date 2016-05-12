@@ -1,7 +1,8 @@
 package gscm.algorithm;
 
-import phyloTree.io.Newick;
-import phyloTree.model.tree.Tree;
+
+import phylo.tree.io.Newick;
+import phylo.tree.model.Tree;
 
 import java.io.File;
 

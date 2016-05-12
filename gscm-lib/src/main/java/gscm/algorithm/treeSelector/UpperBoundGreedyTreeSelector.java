@@ -6,13 +6,10 @@ package gscm.algorithm.treeSelector;
  */
 
 import gnu.trove.map.hash.THashMap;
-import phyloTree.model.tree.Tree;
-import utils.parallel.DefaultIterationCallable;
-import utils.parallel.ParallelUtils;
+import phylo.tree.model.Tree;
 
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)

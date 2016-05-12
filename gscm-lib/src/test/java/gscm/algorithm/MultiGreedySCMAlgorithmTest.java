@@ -5,8 +5,8 @@ import gscm.algorithm.treeSelector.TreeScorers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import phyloTree.io.Newick;
-import phyloTree.model.tree.Tree;
+import phylo.tree.io.Newick;
+import phylo.tree.model.Tree;
 
 import java.util.Arrays;
 import java.util.LinkedList;

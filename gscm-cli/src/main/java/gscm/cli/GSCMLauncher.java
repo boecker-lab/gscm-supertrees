@@ -26,7 +26,7 @@ import gscm.algorithm.treeSelector.TreeSelectorFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.InterfaceCmdLineParser;
-import phyloTree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.io.IOException;
 import java.nio.file.Files;

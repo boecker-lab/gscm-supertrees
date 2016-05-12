@@ -20,9 +20,9 @@
  */
 package gscm.cli;
 
-import cli.EnumArrayOptionHandler;
-import cli.Multithreaded;
-import cli.Progressbar;
+import core.cli.EnumArrayOptionHandler;
+import core.cli.Multithreaded;
+import core.cli.Progressbar;
 import gscm.algorithm.GreedySCMAlgorithm;
 import gscm.algorithm.MultiGreedySCMAlgorithm;
 import gscm.algorithm.RandomizedGreedySCMAlgorithm;
@@ -32,8 +32,8 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.Setter;
-import phyloTree.SupertreeAlgortihmCLI;
-import phyloTree.model.tree.Tree;
+import phylo.tree.cli.SupertreeAlgortihmCLI;
+import phylo.tree.model.Tree;
 
 import java.io.IOException;
 import java.io.PrintStream;

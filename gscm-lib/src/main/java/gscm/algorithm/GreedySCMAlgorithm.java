@@ -22,7 +22,7 @@ package gscm.algorithm;
 
 
 import gscm.algorithm.treeSelector.*;
-import phyloTree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -4,7 +4,6 @@ package gscm.algorithm.treeSelector;/**
  * 27.04.16.
  */
 
-import java.util.Set;
 
 /**
  * @author Markus Fleischauer (markus.fleischauer@gmail.com)

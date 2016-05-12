@@ -1,13 +1,13 @@
 package gscm.algorithm;
 
-import epos.algo.consensus.Consensus;
 import gscm.algorithm.treeSelector.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import phyloTree.io.Newick;
-import phyloTree.model.tree.Tree;
-import phyloTree.model.tree.TreeUtils;
+import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.io.Newick;
+import phylo.tree.model.Tree;
+import phylo.tree.model.TreeUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
