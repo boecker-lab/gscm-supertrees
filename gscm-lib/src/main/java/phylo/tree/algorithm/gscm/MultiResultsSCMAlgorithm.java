@@ -22,7 +22,7 @@ package phylo.tree.algorithm.gscm;
 
 import core.utils.parallel.DefaultIterationCallable;
 import core.utils.parallel.IterationCallableFactory;
-import phylo.tree.algorithm.gscm.treeSelector.InsufficientOverlapException;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
 import phylo.tree.algorithm.gscm.treeSelector.TreeScorer;
 import phylo.tree.algorithm.gscm.treeSelector.TreeSelector;
 import phylo.tree.algorithm.gscm.treeSelector.TreeSelectorFactory;

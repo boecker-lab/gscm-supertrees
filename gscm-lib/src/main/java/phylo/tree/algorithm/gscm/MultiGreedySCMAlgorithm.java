@@ -21,6 +21,7 @@
 package phylo.tree.algorithm.gscm;
 
 import core.utils.parallel.ParallelUtils;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
 import phylo.tree.algorithm.gscm.treeSelector.*;
 import phylo.tree.model.Tree;
 

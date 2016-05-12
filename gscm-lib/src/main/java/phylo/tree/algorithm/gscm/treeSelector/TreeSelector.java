@@ -25,6 +25,7 @@ import core.utils.parallel.IterationCallableFactory;
 import core.utils.parallel.ParallelUtils;
 import core.utils.progressBar.CLIProgressBar;
 import phylo.tree.algorithm.consensus.Consensus;
+import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
 import phylo.tree.algorithm.gscm.SCMAlgorithm;
 import phylo.tree.model.Tree;
 
