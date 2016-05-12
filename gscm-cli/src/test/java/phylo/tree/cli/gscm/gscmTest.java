@@ -23,9 +23,9 @@ import static org.junit.Assert.*;
  */
 @RunWith(Parameterized.class)
 public class gscmTest {
-    public static final Path nexIn = Paths.get(gscmTest.class.getResource("/gscm/cli/sm.11.sourceTrees_OptSCM-Rooting.nex").getFile());
-    public static final Path newIn = Paths.get(gscmTest.class.getResource("/gscm/cli/sm.11.sourceTrees_OptSCM-Rooting.tre").getFile());
-    public static final Path badIn = Paths.get(gscmTest.class.getResource("/gscm/cli/simpleInsufficient.tre").getFile());
+    public static final Path nexIn = Paths.get(gscmTest.class.getResource("/phylo/tree/cli/gscm/sm.11.sourceTrees_OptSCM-Rooting.nex").getFile());
+    public static final Path newIn = Paths.get(gscmTest.class.getResource("/phylo/tree/cli/gscm/sm.11.sourceTrees_OptSCM-Rooting.tre").getFile());
+    public static final Path badIn = Paths.get(gscmTest.class.getResource("/phylo/tree/cli/gscm/simpleInsufficient.tre").getFile());
     public static final Path out = newIn.getParent().resolve("outFile");
     public static final Path time = newIn.getParent().resolve("timeFile");
     String[] args;
@@ -33,8 +33,6 @@ public class gscmTest {
     Path timeFile = null;
     private int numOfTrees;
 
-//    @Rule
-//    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
     public gscmTest(String[] args, Path result, Path time, int numOfTrees) {
         this.args = args;
@@ -134,7 +132,6 @@ public class gscmTest {
     @Test
     public void testLauncher() {
         if (numOfTrees > 0) {
-            exit.expectSystemExitWithStatus(0);
             GSCMLauncher.main(args);
             assertTrue(Files.exists(resultFile));
             try {
