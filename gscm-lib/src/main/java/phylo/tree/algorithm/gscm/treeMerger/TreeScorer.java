@@ -22,9 +22,9 @@ package phylo.tree.algorithm.gscm.treeMerger;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import phylo.tree.model.tree.Tree;
-import phylo.tree.model.tree.TreeNode;
-import phylo.tree.model.tree.TreeUtils;
+import phylo.tree.model.Tree;
+import phylo.tree.model.TreeNode;
+import phylo.tree.model.TreeUtils;
 
 import java.util.Iterator;
 import java.util.Map;

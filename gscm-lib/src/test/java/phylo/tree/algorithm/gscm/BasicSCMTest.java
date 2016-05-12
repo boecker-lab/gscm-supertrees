@@ -3,7 +3,7 @@ package phylo.tree.algorithm.gscm;
 import phylo.tree.algorithm.gscm.treeMerger.TreeScorer;
 import phylo.tree.algorithm.gscm.treeMerger.TreeScorers;
 import phylo.tree.algorithm.consensus.Consensus;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.Arrays;
 

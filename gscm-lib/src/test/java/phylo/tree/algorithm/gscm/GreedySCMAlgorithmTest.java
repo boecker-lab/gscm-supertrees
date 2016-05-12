@@ -9,8 +9,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import phylo.tree.algorithm.consensus.Consensus;
 import phylo.tree.io.Newick;
-import phylo.tree.model.tree.Tree;
-import phylo.tree.model.tree.TreeUtils;
+import phylo.tree.model.Tree;
+import phylo.tree.model.TreeUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;

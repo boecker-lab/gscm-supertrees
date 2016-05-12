@@ -2,7 +2,7 @@ package phylo.tree.algorithm.gscm;
 
 
 import phylo.tree.io.Newick;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.io.File;
 

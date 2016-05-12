@@ -21,7 +21,7 @@
 package phylo.tree.algorithm.gscm.treeMerger;
 
 import gnu.trove.map.hash.THashMap;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.PriorityQueue;
 

@@ -27,7 +27,7 @@ import phylo.tree.algorithm.gscm.treeMerger.TreeMerger;
 import phylo.tree.algorithm.gscm.treeMerger.TreeMergerFactory;
 import phylo.tree.algorithm.consensus.Consensus;
 import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.HashSet;
 import java.util.List;

@@ -26,7 +26,7 @@ import core.utils.parallel.ParallelUtils;
 import core.utils.progressBar.CLIProgressBar;
 import phylo.tree.algorithm.consensus.Consensus;
 import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;

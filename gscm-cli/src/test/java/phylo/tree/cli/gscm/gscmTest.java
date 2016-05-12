@@ -7,7 +7,7 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import phylo.tree.io.TreeFileUtils;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.io.IOException;
 import java.nio.file.Files;

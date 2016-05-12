@@ -27,7 +27,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.InterfaceCmdLineParser;
 import phylo.tree.algorithm.exceptions.InsufficientOverlapException;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.io.IOException;
 import java.nio.file.Files;

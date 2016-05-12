@@ -22,7 +22,7 @@ package phylo.tree.algorithm.gscm.treeMerger;
 
 
 import phylo.tree.algorithm.consensus.Consensus;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.util.Collection;
 import java.util.LinkedList;

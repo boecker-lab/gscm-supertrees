@@ -33,7 +33,7 @@ import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.Setter;
 import phylo.tree.cli.SupertreeAlgortihmCLI;
-import phylo.tree.model.tree.Tree;
+import phylo.tree.model.Tree;
 
 import java.io.IOException;
 import java.io.PrintStream;
