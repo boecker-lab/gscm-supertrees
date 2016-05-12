@@ -4,8 +4,8 @@ dependencies {
     compile group: "de.unijena.bioinf", name: "phyloTree-lib.model", version: "0.9.9-SNAPSHOT", changing: true
     compile group: 'de.unijena.bioinf', name:'phyloTree-lib.algorithm', version:'0.9.9-SNAPSHOT', changing: true
     compile group: 'de.unijena.bioinf', name:'phyloTree-lib.consensus', version:'0.9.9-SNAPSHOT', changing: true
-    compile group: 'de.unijena.bioinf', name:'core-lib.algorithm', version:'0.9-SNAPSHOT', changing: true
-    compile group: 'de.unijena.bioinf', name:'core-lib.utils', version:'0.9-SNAPSHOT', changing: true
+    compile group: 'de.unijena.bioinf', name:'core-lib.algorithm', version:'0.9.1-SNAPSHOT', changing: true
+    compile group: 'de.unijena.bioinf', name:'core-lib.utils', version:'0.9.1-SNAPSHOT', changing: true
 
     testCompile 'org.apache.commons:commons-math3:3.2'
     testCompile group: 'de.unijena.bioinf', name:'phyloTree-lib.utils', version:'0.9.9-SNAPSHOT', changing: true
