@@ -7,6 +7,10 @@ For more detailed information about the algorithm see the Literature.
 ### Literature
 
 1. Markus Fleischauer and Sebastian Böcker,
+**Collecting reliable clades using the Greedy Strict Consensus Merger.**
+_PeerJ (2016) 4:e2172_ https://doi.org/10.7717/peerj.2172
+
+2. Markus Fleischauer and Sebastian Böcker,
 **Collecting reliable clades using Greedy Strict Consensus Merger.**
 _Proc. of German Conference on Bioinformatics (GCB 2015)_, volume 3 of PeerJ PrePrints, pages e1595. PeerJ Inc. San Francisco, USA, 2015.
 
