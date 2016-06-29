@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
@@ -10,12 +9,10 @@ buildscript {
 }
 
 //command line interface stuff
-version = '1.0'
-
 dependencies {
     compile project(':gscm-lib')
 
-    compile group: 'de.unijena.bioinf', name: 'phyloTree-lib.cli', version: '0.9.9', changing: false
+    compile group: 'de.unijena.bioinf.phylo', name: 'phyloTree-lib.cli', version: '0.9.9', changing: false
     compile group: 'de.unijena.bioinf', name: 'core-lib.cli', version: '0.9', changing: false
 
     testCompile 'com.github.stefanbirkner:system-rules:1.5.0'
@@ -50,8 +47,12 @@ fatJarPrepareFiles.dependsOn jar
 
 launch4j {
     outfile = 'gscm.exe'
+    copyright = "Chair of Bioinformatics, Friedrich-Schiller-University Jena, Markus Fleischauer"
+    companyName = "Friedrich-Schiller-University Jena"
     mainClassName = project.mainClassName
     copyConfigurable = project.tasks.fatJar.outputs.files
+    jreRuntimeBits = '64/32'
+    headerType = "console"
     jar = "lib/${project.tasks.fatJar.archiveName}"
 }
 
@@ -93,8 +94,10 @@ distributions {
 
 }
 
-task distribute {}
-distribute.dependsOn 'linuxDistZip', /*'winDistZip',*/ 'jarDistZip'
+task distribute {
+    group = 'distribution'
+}
+distribute.dependsOn 'linuxDistZip', 'winDistZip', 'jarDistZip'
 
 
 linuxDistZip.doLast {
@@ -120,8 +123,6 @@ installLinuxDist.dependsOn 'fatJar'
 winDistZip.dependsOn 'createExe'
 winDistTar.dependsOn 'createExe'
 installWinDist.dependsOn 'createExe'
-
-
 
 
 

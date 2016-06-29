@@ -1,3 +1,8 @@
+import java.nio.file.Paths
+
+plugins {
+    id "com.jfrog.artifactory" version "4.3.0"
+}
 configurations.all {
     // check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -5,16 +10,17 @@ configurations.all {
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: "com.jfrog.artifactory"
 
     sourceCompatibility = 1.8
 
-    group = 'de.unijena.bioinf'
+    group = 'de.unijena.bioinf.phylo'
+    version = '1.0'
 
     repositories {
         mavenCentral()
-        maven {url "http://bio.informatik.uni-jena.de/artifactory/repo"}
-        mavenLocal()
+        maven { url "http://bio.informatik.uni-jena.de/repository/local" }
     }
 
     dependencies {
@@ -22,6 +28,10 @@ allprojects {
         testCompile 'junit:junit:4.11'
     }
 
+
+}
+
+subprojects {
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
@@ -32,17 +42,55 @@ allprojects {
         from javadoc.destinationDir
     }
 
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                if (version.toString().endsWith('-SNAPSHOT'))
+                    setArtifacts([jar, sourcesJar])
+                else
+                    setArtifacts([jar, javadocJar, sourcesJar])
+
+            }
+        }
     }
 }
-
-version = '1.0'
 
 dependencies {
     compile project(':gscm-cli')
     compile project(':gscm-lib')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            setArtifacts([])
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'https://bio.informatik.uni-jena.de/repository/'
+    publish {
+        repository {
+            if (version.toString().endsWith('-SNAPSHOT'))
+                repoKey = 'libs-snapshot-local'
+            else
+                repoKey = 'libs-release-local'
+            Properties properties = new Properties()
+            File propertiesFile = Paths.get(System.properties['user.home'], 'artifactory.properties').toFile()
+            propertiesFile.withInputStream {
+                properties.load(it)
+            }
+
+            username = properties['username']
+            password = properties['password']
+        }
+        defaults {
+            publications('mavenJava')
+        }
+    }
 }
 
 

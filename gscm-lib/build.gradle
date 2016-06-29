@@ -1,13 +1,11 @@
-version = '1.0'
-
 dependencies {
-    compile group: "de.unijena.bioinf", name: "phyloTree-lib.model", version: "0.9.9", changing: false
-    compile group: 'de.unijena.bioinf', name:'phyloTree-lib.algorithm', version:'0.9.9', changing: false
-    compile group: 'de.unijena.bioinf', name:'phyloTree-lib.consensus', version:'0.9.9', changing: false
+    compile group: "de.unijena.bioinf.phylo", name: "phyloTree-lib.model", version: "0.9.9", changing: false
+    compile group: 'de.unijena.bioinf.phylo', name:'phyloTree-lib.algorithm', version:'0.9.9', changing: false
+    compile group: 'de.unijena.bioinf.phylo', name:'phyloTree-lib.consensus', version:'0.9.9', changing: false
 
     compile group: 'de.unijena.bioinf', name:'core-lib.algorithm', version:'0.9', changing: false
     compile group: 'de.unijena.bioinf', name:'core-lib.utils', version:'0.9', changing: false
 
     testCompile 'org.apache.commons:commons-math3:3.2'
-    testCompile group: 'de.unijena.bioinf', name:'phyloTree-lib.utils', version:'0.9.9', changing: false
+    testCompile group: 'de.unijena.bioinf.phylo', name:'phyloTree-lib.utils', version:'0.9.9', changing: false
 }
