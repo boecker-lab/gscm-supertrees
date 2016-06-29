@@ -19,9 +19,9 @@ Download Links
 ============
 GSCM commandline tool v1.0
 
-* for Windows *coming soon*
-* for [Linux/Unix](http://bio.informatik.uni-jena.de/artifactory/dist/de/unijena/bioinf/gscm-cli/gscm-cli-1.0-Linux.zip)
-* as [jar file](http://bio.informatik.uni-jena.de/artifactory/dist/de/unijena/bioinf/gscm-cli/gscm-cli-1.0.zip)
+* for [Windows](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Win.zip)
+* for [Linux/Unix](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Linux.zip)
+* as [jar file](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.zip)
 
 Installation
 ============

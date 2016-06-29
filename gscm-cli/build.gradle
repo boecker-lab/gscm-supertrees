@@ -47,12 +47,16 @@ fatJarPrepareFiles.dependsOn jar
 
 launch4j {
     outfile = 'gscm.exe'
+    icon = file('src/main/resources/dist/icon.ico')
     copyright = "Chair of Bioinformatics, Friedrich-Schiller-University Jena, Markus Fleischauer"
     companyName = "Friedrich-Schiller-University Jena"
     mainClassName = project.mainClassName
-    copyConfigurable = project.tasks.fatJar.outputs.files
+    dontWrapJar = true
     jreRuntimeBits = '64/32'
     headerType = "console"
+
+    copyConfigurable = project.tasks.fatJar.outputs.files
+    println("lib/${project.tasks.fatJar.archiveName}")
     jar = "lib/${project.tasks.fatJar.archiveName}"
 }
 
@@ -78,8 +82,11 @@ distributions {
     win {
         baseName = project.getName() + winSuffix
         contents {
-            from {'src/main/dist/'}
-            from {'build/launch4j/'}
+            from {'src/main/resources/dist/'}
+            from ('build/launch4j/'){
+                include ('lib/')
+                include ('*.exe')
+            }
         }
     }
 

@@ -42,7 +42,8 @@ import java.util.List;
 public class GSCMLauncher {
 
     public static void main(String[] args) {
-        SCMCLI CLI = new SCMCLI(SCMCLI.DEFAULT_PROPERTIES_FILE);
+//        SCMCLI CLI = new SCMCLI(SCMCLI.DEFAULT_PROPERTIES_FILE); //can be use if something is in there ;-)
+        SCMCLI CLI = new SCMCLI(null);
         double startTime = System.currentTimeMillis();
         BasicAlgorithmCLI.LOGGER.info("Start calculation with following parameters: " + Arrays.toString(args));
         final CmdLineParser parser = new InterfaceCmdLineParser(CLI);

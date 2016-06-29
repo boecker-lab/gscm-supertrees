@@ -36,6 +36,7 @@ import phylo.tree.cli.SupertreeAlgortihmCLI;
 import phylo.tree.model.Tree;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class SCMCLI extends SupertreeAlgortihmCLI<SCMAlgorithm> implements Multi
         super(appHomeParent, appHomeFolderName, logDir, maxLogFileSize, logRotation);
     }
 
-    public SCMCLI(Path propertiesFile) {
+    public SCMCLI(InputStream propertiesFile) {
         super(propertiesFile);
     }
 
