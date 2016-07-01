@@ -31,10 +31,6 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 10.02.15.
- */
-
-/**
  * This class stores a Pair of trees and their scores
  * I does the pairwise merging (strict consensus merger) step
  * and caches the consensus tree and other interim result
@@ -44,33 +40,35 @@ import java.util.logging.Logger;
  * @since version 1.0
  */
 class TreePair implements Comparable<TreePair> {
+    final static boolean NO_CACHING = true;
     final static TreePair MIN_VALUE = new TreePair();
 
-    private final Consensus.ConsensusMethod consensusMethod;
+
 
     final Tree t1;
     final Tree t2;
-
-    private Tree t1pruned;
-    private Tree t2pruned;
-
-    int t1prunedVertexCount = Integer.MIN_VALUE;
-    int t2prunedVertexCount = Integer.MIN_VALUE;
-
 
     double score;
     double tieBreakingScore = 0d;
 
 
+    //caching stuff (Caching is memory intensive and optional)
+    private Tree t1pruned;
+    private Tree t2pruned;
+
+    int t1prunedVertexCount;
+    int t2prunedVertexCount;
+
     Tree consensus = null;
-    int backboneClades = -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
-    int consensusNumOfTaxa = -1;
+    int backboneClades;
+    int consensusNumOfTaxa;
 
     Set<String> commonLeafes;
-    Map<Set<String>, Set<SingleTaxon>> commonInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
 
-    private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
+    Map<Set<String>, Set<SingleTaxon>> commonInsertionPointTaxa;
 
+    private List<SingleTaxon> singleTaxa;
+    private final Consensus.ConsensusMethod consensusMethod;
 
     //just to create min value
     private TreePair() {
@@ -85,14 +83,34 @@ class TreePair implements Comparable<TreePair> {
         calculateScore(scorer);
     }
 
+
     TreePair(final Tree t1, final Tree t2, final Consensus.ConsensusMethod method) {
+        clearCache();
         this.t1 = t1;
         this.t2 = t2;
         consensusMethod = method;
     }
 
+    void clearCache(){
+        t1pruned = null;
+        t2pruned = null;
+
+        t1prunedVertexCount = Integer.MIN_VALUE;
+        t2prunedVertexCount = Integer.MIN_VALUE;
+
+        consensus = null;
+        backboneClades = -1; // number of the clades in the strict consensus of t1pruned and t2pruned before reinserting singe taxa.
+        consensusNumOfTaxa = -1;
+
+        commonInsertionPointTaxa = null; //this null value is indicator if first or second pruning step was done null=first notnull=second
+
+        singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs
+    }
+
     TreePair calculateScore(TreeScorer scorer) {
         scorer.scoreTreePair(this);
+        if(NO_CACHING)
+            clearCache();
         return this;
     }
 
@@ -293,7 +311,7 @@ class TreePair implements Comparable<TreePair> {
         return labelToNode.size();
     }
 
-    Tree getConsensus() {
+    Tree getConsensus(TreeScorer scorer) {
         if (consensus == null)
             calculateConsensus();
         return consensus;

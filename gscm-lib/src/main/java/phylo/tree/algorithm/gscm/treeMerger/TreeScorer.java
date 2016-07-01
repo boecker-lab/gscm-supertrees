@@ -47,6 +47,8 @@ public abstract class TreeScorer {
     public final boolean synced;
     public final static boolean TIE_BREAKER = true;
 
+
+
     public TreeScorer() {
         this(true);
     }
