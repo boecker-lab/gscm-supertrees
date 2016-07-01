@@ -22,6 +22,7 @@ package phylo.tree.algorithm.gscm.treeMerger;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import phylo.tree.algorithm.consensus.Consensus;
 import phylo.tree.model.Tree;
 import phylo.tree.model.TreeNode;
 import phylo.tree.model.TreeUtils;
@@ -44,9 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class TreeScorer {
     final Map<Tree, THashSet<String>> treeToTaxa;
+
     public final boolean synced;
     public final static boolean TIE_BREAKER = true;
-
 
 
     public TreeScorer() {
@@ -60,6 +61,7 @@ public abstract class TreeScorer {
         } else {
             treeToTaxa = new THashMap<>();
         }
+
 
     }
 
@@ -104,27 +106,27 @@ public abstract class TreeScorer {
      * The running time of the scoring highlly depends of the scoring function
      * implemetation. Some scoring may already calculate the consesus merger tree.
      * If that is the case the consensus tree is chached and not calculated a second tim
-     *
+     * <p>
      * Note: The given {@link TreePair} gets modified.
      *
      * @param pair pair to score
      */
-    public void scoreTreePair(TreePair pair) {
+    public void scoreTreePair(TreePair pair,Consensus.ConsensusMethod method) {
         Set<String> common = calculateCommonLeafes(pair);
-        pair.setCommonLeafes(common);
         if (common.size() < 3)
             pair.score = Double.NEGATIVE_INFINITY;
         else {
-            pair.score = calculateScore(pair);
+            TreePairMerger merger =  new TreePairMerger(pair,common);
+            pair.score = calculateScore(merger, method);
             if (TIE_BREAKER)
-                pair.tieBreakingScore = calculateTieBreakScore(pair);
+                pair.tieBreakingScore = calculateTieBreakScore(merger, method);
         }
     }
 
-    protected abstract double calculateScore(TreePair pair);
+    protected abstract double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method);
 
-    protected double calculateTieBreakScore(TreePair pair) {
-        return treeToTaxa.get(pair.t1).size() + treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size();
+    protected double calculateTieBreakScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+        return treeToTaxa.get(merger.t1).size() + treeToTaxa.get(merger.t2).size() - merger.commonLeafes.size();
     }
 
     public void clearCache() {
@@ -149,21 +151,21 @@ public abstract class TreeScorer {
 
     //#################### Scoring helper Methods ##################
     //unchecked
-    int getNumOfConsensusTaxa(TreePair pair) {
+    int getNumOfConsensusTaxa(TreePairMerger pair) {
         return pair.consensusNumOfTaxa;
     }
 
-    int getNumOfConsensusVertices(TreePair pair) {
+    int getNumOfConsensusVertices(TreePairMerger pair) {
         return pair.consensus.vertexCount();
     }
 
     //unchecked
-    int getNumOfBackboneTaxa(TreePair pair) {
+    /*int getNumOfBackboneTaxa(TreePair pair) {
         return pair.commonLeafes.size();
-    }
+    }*/
 
     //unchecked
-    int getNumUniqueClades(TreePair pair) {
+    int getNumUniqueClades(TreePairMerger pair) {
         int t1Clades = pair.t1.vertexCount() - treeToTaxa.get(pair.t1).size();
         int t2Clades = pair.t2.vertexCount() - treeToTaxa.get(pair.t2).size();
         int t1BackboneClades = pair.t1prunedVertexCount - pair.commonLeafes.size();
@@ -172,22 +174,22 @@ public abstract class TreeScorer {
         return (t1Clades - t1BackboneClades) + (t2Clades - t2BackboneClades);
     }
 
-    int getNumRemainingUniqueClades(TreePair pair) {
+    int getNumRemainingUniqueClades(TreePairMerger pair) {
         return pair.consensus.vertexCount() - pair.backboneClades - pair.consensusNumOfTaxa;
     }
 
     //unchecked
-    int getNumOfConsensusBackboneVertices(TreePair pair) {
+    int getNumOfConsensusBackboneVertices(TreePairMerger pair) {
         return pair.consensus.vertexCount();
     }
 
     //unchecked
-    int getNumOfCollisionPoints(TreePair pair) {
+    int getNumOfCollisionPoints(TreePairMerger pair) {
         return pair.commonInsertionPointTaxa.size();
     }
 
     //unchecked
-    int getNumOfCollisions(TreePair pair) {
+    int getNumOfCollisions(TreePairMerger pair) {
         int collsions = 0;
         for (Set singleTaxonSet : pair.commonInsertionPointTaxa.values()) {
             collsions += singleTaxonSet.size();
@@ -196,7 +198,7 @@ public abstract class TreeScorer {
     }
 
     //unchecked
-    int getNumOfMultiCollisionPoints(TreePair pair) {
+    int getNumOfMultiCollisionPoints(TreePairMerger pair) {
         int multiCollionsPoints = 0;
         for (Set singleTaxonSet : pair.commonInsertionPointTaxa.values()) {
             if (singleTaxonSet.size() > 2)
@@ -206,7 +208,7 @@ public abstract class TreeScorer {
     }
 
     //unchecked
-    int getNumOfCollisionPointsMultiTieBreak(TreePair pair) {
+    int getNumOfCollisionPointsMultiTieBreak(TreePairMerger pair) {
         int multiCollionsPoints = 0;
         for (Set singleTaxonSet : pair.commonInsertionPointTaxa.values()) {
             multiCollionsPoints += 100000 + (singleTaxonSet.size());
@@ -231,10 +233,9 @@ public abstract class TreeScorer {
         // for this score i use the resolution as a ty breaker. because i can!
         //OK
         @Override
-        protected double calculateScore(TreePair pair) {
-
-            pair.pruneToCommonLeafes();
-            return (pair.t1prunedVertexCount - getNumOfBackboneTaxa(pair)) + (pair.t2prunedVertexCount - getNumOfBackboneTaxa(pair));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.pruneToCommonLeafes();
+            return (merger.t1prunedVertexCount - merger.commonLeafes.size()) + (merger.t2prunedVertexCount - merger.commonLeafes.size());
         }
     }
 
@@ -253,10 +254,9 @@ public abstract class TreeScorer {
         // for this score i use the resolution as a ty breaker. because i can!
         //OK
         @Override
-        protected double calculateScore(TreePair pair) {
-
-            pair.pruneToCommonLeafes();
-            return pair.t1prunedVertexCount + pair.t2prunedVertexCount - getNumOfBackboneTaxa(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.pruneToCommonLeafes();
+            return merger.t1prunedVertexCount + merger.t2prunedVertexCount - merger.commonLeafes.size();
         }
 
     }
@@ -275,11 +275,11 @@ public abstract class TreeScorer {
 
         //BAD
         @Override
-        protected double calculateScore(TreePair pair) {
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
 
 
-            pair.pruneToCommonLeafes();
-            return (-getNumOfMultiCollisionPoints(pair));
+            merger.pruneToCommonLeafes();
+            return (-getNumOfMultiCollisionPoints(merger));
         }
     }
 
@@ -297,9 +297,10 @@ public abstract class TreeScorer {
 
         // GOOOD
         @Override
-        protected double calculateScore(TreePair pair) {
-            pair.pruneToCommonLeafes();
-            return (-getNumOfCollisions(pair));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+
+            merger.pruneToCommonLeafes();
+            return (-getNumOfCollisions(merger));
         }
     }
 
@@ -317,11 +318,9 @@ public abstract class TreeScorer {
 
         //OK
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.pruneToCommonLeafes();
-            return (-getNumOfCollisionPoints(pair));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.pruneToCommonLeafes();
+            return (-getNumOfCollisionPoints(merger));
         }
     }
 
@@ -339,12 +338,10 @@ public abstract class TreeScorer {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.calculateConsensus();
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
             //        return ((pair.getNumOfConsensusBackboneVertices() - pair.getNumOfBackboneTaxa()) * 100) + TreeUtils.calculateTreeResolution(pair.getNumOfBackboneTaxa(), pair.getNumOfBackboneTaxa()) ;
-            return getNumOfConsensusBackboneVertices(pair) - getNumOfBackboneTaxa(pair);
+            return getNumOfConsensusBackboneVertices(merger) - merger.commonLeafes.size();
         }
     }
 
@@ -361,11 +358,9 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.calculateConsensus();
-            return TreeUtils.calculateTreeResolution(getNumOfBackboneTaxa(pair), getNumOfConsensusBackboneVertices(pair));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            return TreeUtils.calculateTreeResolution(merger.commonLeafes.size(), getNumOfConsensusBackboneVertices(merger));
         }
     }
 
@@ -382,11 +377,9 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.calculateConsensus();
-            return getNumOfConsensusBackboneVertices(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            return getNumOfConsensusBackboneVertices(merger);
         }
     }
 
@@ -404,12 +397,10 @@ public abstract class TreeScorer {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.calculateConsensus();
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
             //        return ((pair.getNumOfConsensusVertices() - pair.getNumOfConsensusTaxa()) * 100) + TreeUtils.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices()) ;
-            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
+            return getNumOfConsensusVertices(merger) - getNumOfConsensusTaxa(merger);
         }
     }
 
@@ -424,10 +415,8 @@ public abstract class TreeScorer {
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            return getLeafLabels(pair.t1).size() + getLeafLabels(pair.t2).size() - pair.commonLeafes.size();
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            return getLeafLabels(merger.t1).size() + getLeafLabels(merger.t2).size() - merger.commonLeafes.size();
         }
     }
 
@@ -444,11 +433,9 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-
-
-            pair.calculateConsensus();
-            return TreeUtils.calculateTreeResolution(getNumOfConsensusTaxa(pair), getNumOfConsensusVertices(pair));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            return TreeUtils.calculateTreeResolution(getNumOfConsensusTaxa(merger), getNumOfConsensusVertices(merger));
         }
     }
 
@@ -465,9 +452,8 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-
-            return getNumOfBackboneTaxa(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            return merger.commonLeafes.size();
         }
     }
 
@@ -481,7 +467,7 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateTieBreakScore(TreePair pair) {
+        protected double calculateTieBreakScore(TreePairMerger merge, Consensus.ConsensusMethod method) {
             return 0d;
         }
     }
@@ -500,9 +486,9 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            pair.pruneToCommonLeafes();
-            return getNumUniqueClades(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.pruneToCommonLeafes();
+            return getNumUniqueClades(merger);
         }
 
     }
@@ -520,16 +506,16 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            pair.calculateConsensus();
-            double uniqueCladesBefore = getNumUniqueClades(pair);
-            double uniqueCladesAfter = getNumRemainingUniqueClades(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            double uniqueCladesBefore = getNumUniqueClades(merger);
+            double uniqueCladesAfter = getNumRemainingUniqueClades(merger);
             return uniqueCladesAfter / uniqueCladesBefore;
         }
 
         @Override
-        protected double calculateTieBreakScore(TreePair pair) {
-            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
+        protected double calculateTieBreakScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            return getNumOfConsensusVertices(merger) - getNumOfConsensusTaxa(merger);
         }
     }
 
@@ -543,14 +529,14 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            pair.calculateConsensus();
-            return getNumRemainingUniqueClades(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            return getNumRemainingUniqueClades(merger);
         }
 
         @Override
-        protected double calculateTieBreakScore(TreePair pair) {
-            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
+        protected double calculateTieBreakScore(TreePairMerger merge, Consensus.ConsensusMethod method) {
+            return getNumOfConsensusVertices(merge) - getNumOfConsensusTaxa(merge);
         }
     }
 
@@ -564,17 +550,17 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            pair.calculateConsensus();
-            int uniqueCladesBefore = getNumUniqueClades(pair);
-            int uniqueCladesAfter = getNumRemainingUniqueClades(pair);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            merger.calculateConsensus(method);
+            int uniqueCladesBefore = getNumUniqueClades(merger);
+            int uniqueCladesAfter = getNumRemainingUniqueClades(merger);
 
             return (uniqueCladesAfter - uniqueCladesBefore); //should be negative... best score is 0
         }
 
         @Override
-        protected double calculateTieBreakScore(TreePair pair) {
-            return getNumOfConsensusVertices(pair) - getNumOfConsensusTaxa(pair);
+        protected double calculateTieBreakScore(TreePairMerger merge, Consensus.ConsensusMethod method) {
+            return getNumOfConsensusVertices(merge) - getNumOfConsensusTaxa(merge);
         }
     }
 
@@ -591,8 +577,8 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            return -((treeToTaxa.get(pair.t1).size() - pair.commonLeafes.size()) + (treeToTaxa.get(pair.t2).size() - pair.commonLeafes.size()));
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            return -((treeToTaxa.get(merger.t1).size() - merger.commonLeafes.size()) + (treeToTaxa.get(merger.t2).size() - merger.commonLeafes.size()));
         }
     }
 
@@ -606,7 +592,7 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateTieBreakScore(TreePair pair) {
+        protected double calculateTieBreakScore(TreePairMerger merge, Consensus.ConsensusMethod method) {
             return 0d;
         }
     }
@@ -625,10 +611,10 @@ public abstract class TreeScorer {
         }
 
         @Override
-        protected double calculateScore(TreePair pair) {
-            int tax1 = treeToTaxa.get(pair.t1).size();
-            int tax2 = treeToTaxa.get(pair.t2).size();
-            return -((tax1 - pair.commonLeafes.size()) / tax1 + (tax2 - pair.commonLeafes.size()) / tax2);
+        protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
+            int tax1 = treeToTaxa.get(merger.t1).size();
+            int tax2 = treeToTaxa.get(merger.t2).size();
+            return -((tax1 - merger.commonLeafes.size()) / tax1 + (tax2 - merger.commonLeafes.size()) / tax2);
         }
     }
 

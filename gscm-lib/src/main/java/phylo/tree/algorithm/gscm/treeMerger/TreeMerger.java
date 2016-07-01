@@ -90,7 +90,7 @@ public abstract class TreeMerger {
             Tree t1 = inputTrees[i];
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
-                final TreePair pair = new TreePair(t1, t2, scorer, method);
+                final TreePair pair = new TreePair(t1, t2, scorer,method);
                 if (!pair.isInsufficient()) {
                     addTreePair(pair);
                 }
@@ -108,7 +108,7 @@ public abstract class TreeMerger {
             for (int j = i + 1; j < inputTrees.length; j++) {
                 Tree t2 = inputTrees[j];
                 pairsToAdd.add(
-                        new TreePair(t1, t2, method));
+                        new TreePair(t1, t2));
             }
         }
         // parallel scoring --> we have to score the pairs before adding them into the SORTED data structure
@@ -137,7 +137,7 @@ public abstract class TreeMerger {
         List<TreePair> pairsToAdd = new ArrayList<>(remainingTrees.size());
         for (Tree old : remainingTrees) {
             pairsToAdd.add(
-                    new TreePair(tree, old, method));
+                    new TreePair(tree, old));
         }
 
         //parralel scoring O(n))
@@ -171,7 +171,7 @@ public abstract class TreeMerger {
             return false;
         //iterate over trees (O(n)) to add to new list and refresh old entries
         for (Tree old : remainingTrees) {
-            TreePair pair = new TreePair(tree, old, scorer, method);
+            TreePair pair = new TreePair(tree, old, scorer,method);
             if (!pair.isInsufficient()) {
                 addTreePair(pair);
             }
@@ -188,7 +188,7 @@ public abstract class TreeMerger {
             return null;
         } else {
             removeTreePair(tp);
-            return tp.getConsensus();
+            return new TreePairMerger(tp,scorer.calculateCommonLeafes(tp)).getConsensus(method);
         }
     }
 
@@ -373,7 +373,7 @@ public abstract class TreeMerger {
 
         @Override
         public TreePair doJob(TreePair pair) {
-            return pair.calculateScore(scorer);
+            return pair.calculateScore(scorer,method);
         }
 
     }
