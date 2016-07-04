@@ -11,4 +11,4 @@ me=`which $0`
 
 me=`ls -l $me | awk '{print $NF}'`
 dir=`dirname $me`
-java -Xmx4048m -jar $dir/gscm-cli-1.0-fat.jar $@
+java -Xmx4048m -jar $dir/gscm-cli-1.0.1-fat.jar $@
