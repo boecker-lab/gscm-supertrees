@@ -208,6 +208,7 @@ public abstract class MultiResultsSCMAlgorithm extends SCMAlgorithm {
         @Override
         public GSCMCallable newIterationCallable(List<TreeScorer> list) {
             TreeMerger s = selectorFactory.getNewSelectorInstance();
+            s.setCloneTrees(true);
             selectors.add(s);
             if (scorer != null)
                 s.setScorer(scorer);

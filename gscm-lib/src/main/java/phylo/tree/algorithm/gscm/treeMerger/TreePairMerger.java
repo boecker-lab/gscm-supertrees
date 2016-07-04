@@ -22,7 +22,7 @@ public class TreePairMerger {
     final Tree t1;
     final Tree t2;
 
-    //caching stuff (Caching is memory intensive and optional)
+
     private Tree t1pruned;
     private Tree t2pruned;
     final Set<String> commonLeafes;
@@ -41,18 +41,24 @@ public class TreePairMerger {
     private List<SingleTaxon> singleTaxa = null; //this null value is indicator if trees are already pruned to common leafs;
 
 
-    TreePairMerger(final TreePair pair, final Set<String> commonLeafes) {
+    TreePairMerger(final TreePair pair, final Set<String> commonLeafes, final boolean cloneTrees) {
         this.t1 = pair.t1;
         this.t2 = pair.t2;
+
+        if (cloneTrees) {
+            t1pruned = t1.cloneTree();
+            t2pruned = t2.cloneTree();
+
+        } else {
+            t1pruned = t1;
+            t2pruned = t2;
+        }
 
         this.commonLeafes = commonLeafes;
     }
 
     //uncheked and uncached
     void pruneToCommonLeafes() {
-        t1pruned = t1.cloneTree();
-        t2pruned = t2.cloneTree();
-
         singleTaxa = new ArrayList<>(t1pruned.vertexCount() + t2pruned.vertexCount()); // is an upper bound for the list --> no resizing
 
 
@@ -250,8 +256,6 @@ public class TreePairMerger {
             Logger.getGlobal().warning("Trees have nothing in common!");
         }
     }
-
-
 
 
     private class SingleTaxon {

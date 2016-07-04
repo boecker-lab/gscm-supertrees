@@ -53,9 +53,11 @@ public abstract class TreeMerger {
     private Consensus.ConsensusMethod method;
 
     protected boolean clearScorer = true;
+    private boolean cloneTrees = false;
 
     TreeScorer scorer;
     Tree[] inputTrees;
+
 
 
     protected TreeMerger(Consensus.ConsensusMethod method) {
@@ -188,7 +190,7 @@ public abstract class TreeMerger {
             return null;
         } else {
             removeTreePair(tp);
-            return new TreePairMerger(tp,scorer.calculateCommonLeafes(tp)).getConsensus(method);
+            return new TreePairMerger(tp,scorer.calculateCommonLeafes(tp),cloneTrees).getConsensus(method);
         }
     }
 
@@ -336,6 +338,14 @@ public abstract class TreeMerger {
      */
     public void setClearScorer(boolean clearScorer) {
         this.clearScorer = clearScorer;
+    }
+
+    /**
+     * Specifies if {@link phylo.tree.algorithm.gscm.treeMerger.TreePairMerger} has to clone source tree before computation
+     * @param cloneTrees set true if input trees have to be cloned
+     */
+    public void setCloneTrees(boolean cloneTrees) {
+        this.cloneTrees = cloneTrees;
     }
 
     /**

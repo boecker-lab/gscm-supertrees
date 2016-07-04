@@ -82,6 +82,7 @@ public class MultiGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
     @Override
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final TreeMerger selector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
+        selector.setCloneTrees(true);
         selector.setInputTrees(inputTrees);
         List<Tree> superTrees = new ArrayList<>(scorerArray.length);
         for (TreeScorer scorer : scorerArray) {

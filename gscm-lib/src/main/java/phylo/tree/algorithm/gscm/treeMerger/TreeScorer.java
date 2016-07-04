@@ -48,14 +48,16 @@ public abstract class TreeScorer {
 
     public final boolean synced;
     public final static boolean TIE_BREAKER = true;
+    public final boolean cloneTrees; //scoring that can be calculated form unmodified input trees are lite scorings
 
 
-    public TreeScorer() {
-        this(true);
+    protected TreeScorer(boolean cloneTrees) {
+        this(cloneTrees, true);
     }
 
-    public TreeScorer(boolean syncedCache) {
+    protected TreeScorer(boolean cloneTrees, boolean syncedCache) {
         synced = syncedCache;
+        this.cloneTrees = cloneTrees;
         if (synced) {
             treeToTaxa = new ConcurrentHashMap<>();
         } else {
@@ -111,12 +113,12 @@ public abstract class TreeScorer {
      *
      * @param pair pair to score
      */
-    public void scoreTreePair(TreePair pair,Consensus.ConsensusMethod method) {
+    public void scoreTreePair(TreePair pair, Consensus.ConsensusMethod method) {
         Set<String> common = calculateCommonLeafes(pair);
         if (common.size() < 3)
             pair.score = Double.NEGATIVE_INFINITY;
         else {
-            TreePairMerger merger =  new TreePairMerger(pair,common);
+            TreePairMerger merger = new TreePairMerger(pair, common, cloneTrees);
             pair.score = calculateScore(merger, method);
             if (TIE_BREAKER)
                 pair.tieBreakingScore = calculateTieBreakScore(merger, method);
@@ -218,11 +220,11 @@ public abstract class TreeScorer {
      */
     public static class BackboneCladeNumberScorer extends TreeScorer {
         BackboneCladeNumberScorer() {
-            super();
+            super(true);
         }
 
         BackboneCladeNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         // for this score i use the resolution as a ty breaker. because i can!
@@ -239,11 +241,11 @@ public abstract class TreeScorer {
      */
     public static class BackboneSizeScorer extends TreeScorer {
         BackboneSizeScorer() {
-            super();
+            super(true);
         }
 
         BackboneSizeScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         // for this score i use the resolution as a ty breaker. because i can!
@@ -261,18 +263,16 @@ public abstract class TreeScorer {
      */
     public static class CollisionMultiCollisionPointScorer extends TreeScorer {
         CollisionMultiCollisionPointScorer() {
-            super();
+            super(true);
         }
 
         CollisionMultiCollisionPointScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         //BAD
         @Override
         protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
-
-
             merger.pruneToCommonLeafes();
             return (-getNumOfMultiCollisionPoints(merger));
         }
@@ -283,17 +283,16 @@ public abstract class TreeScorer {
      */
     public static class CollisionNumberScorer extends TreeScorer {
         CollisionNumberScorer() {
-            super();
+            super(true);
         }
 
         CollisionNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         // GOOOD
         @Override
         protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
-
             merger.pruneToCommonLeafes();
             return (-getNumOfCollisions(merger));
         }
@@ -304,11 +303,11 @@ public abstract class TreeScorer {
      */
     public static class CollisionPointNumberScorer extends TreeScorer {
         CollisionPointNumberScorer() {
-            super();
+            super(true);
         }
 
         CollisionPointNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         //OK
@@ -324,11 +323,11 @@ public abstract class TreeScorer {
      */
     public static class ConsensusBackboneCladeNumberScorer extends TreeScorer {
         ConsensusBackboneCladeNumberScorer() {
-            super();
+            super(true);
         }
 
         ConsensusBackboneCladeNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         // for this score i use the resolution as a ty breaker. because i can!
@@ -345,11 +344,11 @@ public abstract class TreeScorer {
      */
     public static class ConsensusBackboneResolutionScorer extends TreeScorer {
         ConsensusBackboneResolutionScorer() {
-            super();
+            super(true);
         }
 
         ConsensusBackboneResolutionScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -364,11 +363,11 @@ public abstract class TreeScorer {
      */
     public static class ConsensusBackboneSizeScorer extends TreeScorer {
         ConsensusBackboneSizeScorer() {
-            super();
+            super(true);
         }
 
         ConsensusBackboneSizeScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -383,29 +382,28 @@ public abstract class TreeScorer {
      */
     public static class ConsensusCladeNumberScorer extends TreeScorer {
         ConsensusCladeNumberScorer() {
-            super();
+            super(true);
         }
 
         ConsensusCladeNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         // for this score i use the resolution as a ty breaker. because i can!
         @Override
         protected double calculateScore(TreePairMerger merger, Consensus.ConsensusMethod method) {
             merger.calculateConsensus(method);
-            //        return ((pair.getNumOfConsensusVertices() - pair.getNumOfConsensusTaxa()) * 100) + TreeUtils.calculateTreeResolution(pair.getNumOfConsensusTaxa(), pair.getNumOfConsensusVertices()) ;
             return getNumOfConsensusVertices(merger) - getNumOfConsensusTaxa(merger);
         }
     }
 
     public static class ConsensusTaxonNumberScorer extends TreeScorer {
         ConsensusTaxonNumberScorer() {
-            super();
+            super(false);
         }
 
         ConsensusTaxonNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(false, syncedCache);
         }
 
         // for this score i use the resolution as a ty breaker. because i can!
@@ -420,11 +418,11 @@ public abstract class TreeScorer {
      */
     public static class ConsensusResolutionScorer extends TreeScorer {
         ConsensusResolutionScorer() {
-            super();
+            super(true);
         }
 
         ConsensusResolutionScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -439,11 +437,11 @@ public abstract class TreeScorer {
      */
     public static class OverlapScorer extends TreeScorer {
         OverlapScorer() {
-            super();
+            super(false);
         }
 
         OverlapScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(false, syncedCache);
         }
 
         @Override
@@ -473,11 +471,11 @@ public abstract class TreeScorer {
      */
     public static class UniqueCladesNumberScorer extends TreeScorer {
         UniqueCladesNumberScorer() {
-            super();
+            super(true);
         }
 
         UniqueCladesNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -493,11 +491,11 @@ public abstract class TreeScorer {
      */
     public static class UniqueCladesRateScorer extends TreeScorer {
         UniqueCladesRateScorer() {
-            super();
+            super(true);
         }
 
         UniqueCladesRateScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -516,11 +514,11 @@ public abstract class TreeScorer {
 
     public static class UniqueCladesRemainingNumberScorer extends TreeScorer {
         UniqueCladesRemainingNumberScorer() {
-            super();
+            super(true);
         }
 
         UniqueCladesRemainingNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -537,11 +535,11 @@ public abstract class TreeScorer {
 
     public static class UniqueCladesLostNumberScorer extends TreeScorer {
         UniqueCladesLostNumberScorer() {
-            super();
+            super(true);
         }
 
         UniqueCladesLostNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(true, syncedCache);
         }
 
         @Override
@@ -564,11 +562,11 @@ public abstract class TreeScorer {
      */
     public static class UniqueTaxaNumberScorer extends TreeScorer {
         UniqueTaxaNumberScorer() {
-            super();
+            super(false);
         }
 
         UniqueTaxaNumberScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(false, syncedCache);
         }
 
         @Override
@@ -598,11 +596,11 @@ public abstract class TreeScorer {
      */
     public static class UniqueTaxaRateScorer extends TreeScorer {
         UniqueTaxaRateScorer() {
-            super();
+            super(false);
         }
 
         UniqueTaxaRateScorer(boolean syncedCache) {
-            super(syncedCache);
+            super(false, syncedCache);
         }
 
         @Override

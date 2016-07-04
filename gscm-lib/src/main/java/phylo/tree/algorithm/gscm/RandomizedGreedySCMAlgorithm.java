@@ -90,8 +90,10 @@ public class RandomizedGreedySCMAlgorithm extends MultiResultsSCMAlgorithm {
     protected List<Tree> calculateSequencial() throws InsufficientOverlapException {
         final int iterations = getIterations();
         final GreedyTreeMerger nonRandomResultSelector = GreedyTreeMerger.FACTORY.getNewSelectorInstance();
+        nonRandomResultSelector.setCloneTrees(true);
         nonRandomResultSelector.setInputTrees(inputTrees);
         final RandomizedGreedyTreeMerger randomResultSelector = RandomizedGreedyTreeMerger.FACTORY.getNewSelectorInstance();
+        randomResultSelector.setCloneTrees(true);
         randomResultSelector.setInputTrees(inputTrees);
 
         List<Tree> superTrees = new ArrayList<>();

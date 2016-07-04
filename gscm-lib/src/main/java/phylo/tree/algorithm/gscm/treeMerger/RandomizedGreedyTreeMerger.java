@@ -47,7 +47,6 @@ public class RandomizedGreedyTreeMerger extends MapBasedGreedyTreeMerger<THashMa
 
     private double sumOfScores = 0d;
     private THashSet<TreePair> pairs;
-    private THashSet<TreePair> securePairs;
 
     private double[] indices;
     private TreePair[] pairToIndex;
