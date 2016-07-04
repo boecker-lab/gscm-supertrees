@@ -160,11 +160,6 @@ public abstract class TreeScorer {
     }
 
     //unchecked
-    /*int getNumOfBackboneTaxa(TreePair pair) {
-        return pair.commonLeafes.size();
-    }*/
-
-    //unchecked
     int getNumUniqueClades(TreePairMerger pair) {
         int t1Clades = pair.t1.vertexCount() - treeToTaxa.get(pair.t1).size();
         int t2Clades = pair.t2.vertexCount() - treeToTaxa.get(pair.t2).size();

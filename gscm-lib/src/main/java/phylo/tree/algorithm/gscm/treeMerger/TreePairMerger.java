@@ -23,8 +23,8 @@ public class TreePairMerger {
     final Tree t2;
 
     //caching stuff (Caching is memory intensive and optional)
-    private final Tree t1pruned;
-    private final Tree t2pruned;
+    private Tree t1pruned;
+    private Tree t2pruned;
     final Set<String> commonLeafes;
 
     int t1prunedVertexCount;
@@ -44,14 +44,17 @@ public class TreePairMerger {
     TreePairMerger(final TreePair pair, final Set<String> commonLeafes) {
         this.t1 = pair.t1;
         this.t2 = pair.t2;
-        t1pruned = t1.cloneTree();
-        t2pruned = t2.cloneTree();
+
         this.commonLeafes = commonLeafes;
     }
 
     //uncheked and uncached
     void pruneToCommonLeafes() {
+        t1pruned = t1.cloneTree();
+        t2pruned = t2.cloneTree();
+
         singleTaxa = new ArrayList<>(t1pruned.vertexCount() + t2pruned.vertexCount()); // is an upper bound for the list --> no resizing
+
 
         pruneLeafes(t1pruned);
         pruneLeafes(t2pruned);
