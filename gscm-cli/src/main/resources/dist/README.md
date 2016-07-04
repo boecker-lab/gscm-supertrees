@@ -17,6 +17,13 @@ _Proc. of German Conference on Bioinformatics (GCB 2015)_, volume 3 of PeerJ Pre
 
 Download Links
 ============
+
+GSCM commandline tool v1.0.1
+
+* for [Windows](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1-Win.zip)
+* for [Linux/Unix](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1-Linux.zip)
+* as [jar file](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1.zip)
+
 GSCM commandline tool v1.0
 
 * for [Windows](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Win.zip)
@@ -248,6 +255,10 @@ The in Fleischauer et al. presented scorings are:
 
 Changelog
 =========
+
+1.0.1
+   * less memory consumption
+   * bug fix for simple/fast scorings such as Overlap -> large speed up
 
 1.0
    * release version
