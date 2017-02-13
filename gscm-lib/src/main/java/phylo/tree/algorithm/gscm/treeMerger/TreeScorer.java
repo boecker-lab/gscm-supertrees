@@ -115,7 +115,7 @@ public abstract class TreeScorer {
      */
     public void scoreTreePair(TreePair pair, Consensus.ConsensusMethod method) {
         Set<String> common = calculateCommonLeafes(pair);
-        if (common.size() < 3)
+        if (common.size() < 2)
             pair.score = Double.NEGATIVE_INFINITY;
         else {
             TreePairMerger merger = new TreePairMerger(pair, common, cloneTrees);
