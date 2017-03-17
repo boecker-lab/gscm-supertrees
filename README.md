@@ -1,4 +1,4 @@
-The GSCM Project is a *java* library and command line tool providing the
+The *GSCM Project* is a *java* library and command line tool providing the
 greedy strict consensus merger supertree algorithm for rooted input trees.
 It provides several scoring functions to determine in which oder the input trees get merged. 
 Combining different scorings is also implemented as well as a randomized version of the algorithm. 
@@ -18,13 +18,11 @@ _Proc. of German Conference on Bioinformatics (GCB 2015)_, volume 3 of PeerJ Pre
 Download Links
 ============
 GSCM commandline tool v1.0.1
-
 * for [Windows](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1-Win.zip)
 * for [Linux/Unix](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1-Linux.zip)
 * as [jar file](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.1.zip)
 
 GSCM commandline tool v1.0
-
 * for [Windows](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Win.zip)
 * for [Linux/Unix](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Linux.zip)
 * as [jar file](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.zip)
@@ -34,7 +32,6 @@ Installation
 
 Windows
 -------
-
 The gscm.exe should hopefully work out of
 the box. To execute GSCM from every location you have to add the
 location of the `gscm.exe` to your **PATH** environment variable.
@@ -42,7 +39,6 @@ location of the `gscm.exe` to your **PATH** environment variable.
 
 Linux and MacOSX
 ----------------
-
 To execute GSCM from every location you have to add the location of
 the gscm executable to your **PATH** variable. Open the file `~/.bashrc`
 in an editor and add the following line (replacing the placeholder path):
@@ -51,22 +47,22 @@ in an editor and add the following line (replacing the placeholder path):
 
 Jar (any OS)
 ----------------
-
 Alternatively, you can run the gscm.jar jar file using java with the
 command:
 
 	java -jar /path/to/gscm.jar
 
-You can always use the `--help` option to get a documentation about
-the available commands and options.
-
 
 Using GSCM command line tool
 ============================
+You can always use the `--help` option to get a documentation about
+the available commands and options.
+
+Generally you only need to specify the input trees as input.
+Other options are listet below or be see via `--help` option
 
 Supported Filtypes
 ------------------
-
 The GSCM command line tool handles trees in **NEWICK** and **NEXUS** format.
 For an automatic file format detection use the common file extension
 for **NEWICK** `(tree|TREE|tre|TRE|phy|PHY|nwk|NWK)` and **NEXUS** `(nex|NEX|ne|NE|nexus|NEXUS)`.
@@ -179,18 +175,17 @@ just have to specify scorer(s) and input trees.
 
 There are currently 3 implemetations of `de.unijena.bioinf.gscm.algorithm.GSCMAlgorithm`:
 
-### Algorithm Implemetations:
+### Algorithm Implemetation(s):
 
 `public class GreedySCMAlgorithm`	
 
 This class provides the basic greedy strict consensus merger algorithm.
-
 Parameters:
-   * **input** -- List of rooted input trees.
-   * **scorer** -- scoring function that should be used
+* **input** -- List of rooted input trees.
+* **scorer** -- scoring function that should be used
 
 Returns:
-    The greedy strict consensus merger supertree
+   The greedy strict consensus merger supertree
 
 
 `public class MultiGreedySCMAlgorithm`
@@ -261,4 +256,4 @@ Changelog
    * bug fix for simple/fast scorings such as Overlap -> large speed up
 
 1.0
-   * release version
+* release version
