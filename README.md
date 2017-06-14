@@ -254,9 +254,9 @@ The in Fleischauer et al. presented scorings are:
 Changelog
 =========
 
-1.0.1
-   * less memory consumption
-   * bug fix for simple/fast scorings such as Overlap -> large speed up
+#### 1.0.1
+* less memory consumption
+* bug fix for simple/fast scorings such as Overlap -> large speed up
 
-1.0
+#### 1.0
 * release version
