@@ -27,6 +27,8 @@ GSCM commandline tool v1.0
 * for [Linux/Unix](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0-Linux.zip)
 * as [jar file](https://bio.informatik.uni-jena.de/repository/dist/de/unijena/bioinf/phylo/gscm-cli/gscm-cli-1.0.zip)
 
+#### Source Code
+can be found on [GitHub](https://github.com/boecker-lab/gscm-supertrees)
 
 Installation
 ============
