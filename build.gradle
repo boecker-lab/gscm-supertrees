@@ -19,6 +19,7 @@ allprojects {
     version = '1.0.1'
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url "http://bio.informatik.uni-jena.de/repository/local" }
     }
