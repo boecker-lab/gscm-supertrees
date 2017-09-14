@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Created by Markus Fleischauer (markus.fleischauer@gmail.com) on 06.02.15.
@@ -115,9 +116,11 @@ public abstract class TreeScorer {
      */
     public void scoreTreePair(TreePair pair, Consensus.ConsensusMethod method) {
         Set<String> common = calculateCommonLeafes(pair);
-        if (common.size() < 2)
+        final int overlap = common.size();
+        if (overlap < 2)
             pair.score = Double.NEGATIVE_INFINITY;
         else {
+            if (overlap == 2) Logger.getLogger(this.getClass().getName()).warning("Low overlap between the trees. Results of the GSCM algorithm may be unreliable");
             TreePairMerger merger = new TreePairMerger(pair, common, cloneTrees);
             pair.score = calculateScore(merger, method);
             if (TIE_BREAKER)

@@ -246,12 +246,11 @@ public class TreePairMerger {
     }
 
     public void calculateConsensus(Consensus.ConsensusMethod consensusMethod) {
-        if (commonLeafes.size() > 2) {
+        if (commonLeafes.size() >= 2) {
             pruneToCommonLeafes();
             consensus = Consensus.getConsensus(Arrays.asList(t1pruned, t2pruned), consensusMethod);
             backboneClades = consensus.vertexCount() - commonLeafes.size();
             consensusNumOfTaxa = reinsertSingleTaxa(consensus);
-
         } else {
             Logger.getGlobal().warning("Trees have nothing in common!");
         }
